@@ -18,12 +18,38 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from datastore import *
 from google.appengine.ext import db
-import pprint
+from google.appengine.ext.webapp import template
+import appengine_utilities
+import pprint, os
 import TicTacToeMatch
 
-class MainHandler(webapp.RequestHandler):
+class Lobby(webapp.RequestHandler):
     def get(self):
-        self.response.out.write('Hello world!')
+        template_values = {  
+                           }  # map of variables to be handed to html template
+        path = os.path.join(os.path.dirname(__file__),'lobby.html')
+        self.response.out.write(template.render(path,template_values))
+
+class SignUp(webapp.RequestHandler):
+    def get(self):
+        ''' this signup module will receive ajax call from lobby.html  '''
+        # read given user id and password 
+        # create User object defined in datastore.py
+        # assign usr id and password and save it
+        # send back success message
+
+class LogIn(webapp.RequestHandler):
+    def get(self):
+        ''' this login module will receive ajax call from lobby.html '''
+        # read given user id and password
+        # user GqlQuery to retrieve matching User object from datastore
+        # if matching User found, 
+        #        1) create session object using user id
+        session = appengine_utilities.sessions.Session()
+        session["id"] =  'tak' # user id here
+        
+        #        2) [LATER!] read Match that the user has played and hand JSON data to lobby.html
+        
 
 class UpdateRule(webapp.RequestHandler):
     def get(self):
@@ -56,11 +82,12 @@ class ReviewMatch(webapp.RequestHandler):
 
 
 def main():
-    application = webapp.WSGIApplication([('/', MainHandler),
+    application = webapp.WSGIApplication([('/', Lobby),
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
                                           ('/reviewMatch',ReviewMatch)
+                                          
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
