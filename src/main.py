@@ -18,7 +18,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from datastore import *
 from google.appengine.ext import db
-
+import pprint
+import TicTacToeMatch
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
@@ -41,7 +42,9 @@ class UpdateRule(webapp.RequestHandler):
   
 class PlayMatch(webapp.RequestHandler):
     def get(self):
-        self.response.out.write('Hello world!')
+        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),turn=self.request.get('p1'))
+        history = match.run()
+        self.response.out.write(pprint.pprint(history))
 
 class Trainer(webapp.RequestHandler):
     def get(self):
