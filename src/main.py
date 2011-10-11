@@ -83,6 +83,8 @@ class ReviewMatch(webapp.RequestHandler):
 
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
+                                          ('/signUp',SignUp),
+                                          ('/LogIn',LogIn),
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
