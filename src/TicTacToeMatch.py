@@ -10,7 +10,7 @@ from random import choice
 from django.utils import simplejson
 
 class TicTacToeMatch:
-    def __init__(self,p1=None,p2=None,strategy=None,turn=None):
+    def __init__(self,p1=None,p2=None,turn=None,strategy=None):
         self.p1 = p1
         self.p2 = p2
         self.game = 'tictactoe'
@@ -20,8 +20,7 @@ class TicTacToeMatch:
             self.strategy[p2] = self.loadStrategy(self.p2,self.game)
         else:
             self.strategy = strategy
-        if turn==None:
-            self.turn=self.p1
+        self.turn = turn if turn!=None else self.p1
         self.history = []
         # tictactoe parameters
         self.width=3

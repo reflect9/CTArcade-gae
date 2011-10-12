@@ -42,10 +42,18 @@ class SignUp(webapp.RequestHandler):
         # create User object defined in datastore.py
         # assign usr id and password and save it
         # send back success message
+        existingUser = db.GqlQuery("SELECT * FROM User WHERE uid=:1",self.request.get('name')).get()
+        if existingUser:
+            self.response.out.write("The name is already being used. Try different name please.")
+            return
         user = User(uid = self.request.get('name'),
                     email = self.request.get('email'),
-                    password = self.request.get('email'))
-        user.put()
+                    password = self.request.get('password'))
+        result = user.put()
+        if result:
+            self.response.out.write("A new account "+ user['name'] + " has been created")
+        
+        #http://ctarcade.appspot.com/signUp?name=ben&email=ben@umd.edu&password=ben
 
 class LogIn(webapp.RequestHandler):
     def get(self):
@@ -65,8 +73,10 @@ class UpdateRule(webapp.RequestHandler):
         user = db.GqlQuery("SELECT * FROM User WHERE uid=:1",self.request.get("player")).get()
         game = db.GqlQuery("SELECT * FROM Game WHERE title=:1",self.request.get("game")).get()
         if user==None:
-            newUser = User(uid=self.request.get("player"),password=self.request.get("player"))
-            userKey = newUser.put()
+            self.response.out.write(self.request.get("player") + " doesn't exist.")
+            return
+#            newUser = User(uid=self.request.get("player"),password=self.request.get("player"))
+#            userKey = newUser.put()
         else:
             userKey = user.key()
         if game==None:
@@ -86,8 +96,8 @@ class UpdateRule(webapp.RequestHandler):
          
 class PlayMatch(webapp.RequestHandler):
     def get(self):
-        match = TicTacToeMatch(p1='tak',p2='ben')
-#        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),turn=self.request.get('p1'))
+#        match = TicTacToeMatch(p1='tak',p2='ben')
+        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),turn=self.request.get('p1'))
         result = match.run()
         
         self.response.out.write(pprint.pprint(result['history']))
