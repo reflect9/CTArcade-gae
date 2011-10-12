@@ -1,11 +1,12 @@
 from google.appengine.ext import db
 
+
 class Game(db.Model):
-    gid = db.StringProperty()
-    title = db.StringListProperty()
+    title = db.StringProperty()
     
 class User(db.Model):
     uid = db.StringProperty()
+    email= db.StringProperty()
     password = db.StringProperty()
 
 class Match(db.Model):

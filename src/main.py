@@ -21,14 +21,19 @@ from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 import appengine_utilities
 import pprint, os
-import TicTacToeMatch
+from TicTacToeMatch import TicTacToeMatch
 
 class Lobby(webapp.RequestHandler):
     def get(self):
-        template_values = {  
-                           }  # map of variables to be handed to html template
-        path = os.path.join(os.path.dirname(__file__),'lobby.html')
-        self.response.out.write(template.render(path,template_values))
+        query = User.all()
+        users = query.fetch(10)
+        
+        template_values = {
+            'users': users,
+        }  # map of variables to be handed to html template
+
+        path = os.path.join(os.path.dirname(__file__), 'lobby.html')
+        self.response.out.write(template.render(path, template_values))
 
 class SignUp(webapp.RequestHandler):
     def get(self):
@@ -37,6 +42,10 @@ class SignUp(webapp.RequestHandler):
         # create User object defined in datastore.py
         # assign usr id and password and save it
         # send back success message
+        user = User(uid = self.request.get('name'),
+                    email = self.request.get('email'),
+                    password = self.request.get('email'))
+        user.put()
 
 class LogIn(webapp.RequestHandler):
     def get(self):
@@ -53,25 +62,38 @@ class LogIn(webapp.RequestHandler):
 
 class UpdateRule(webapp.RequestHandler):
     def get(self):
-        try:
-            player = db.GqlQuery("SELECT * FROM User WHERE uid=:1",self.request.get("player")).get()
-            game = db.GqlQuery("SELECT * FROM Game WHERE gid=:1",self.request.get("game")).get()
-        except Exception:
-            self.response.out.write(Exception.message)
-            return
+        user = db.GqlQuery("SELECT * FROM User WHERE uid=:1",self.request.get("player")).get()
+        game = db.GqlQuery("SELECT * FROM Game WHERE title=:1",self.request.get("game")).get()
+        if user==None:
+            newUser = User(uid=self.request.get("player"),password=self.request.get("player"))
+            userKey = newUser.put()
+        else:
+            userKey = user.key()
+        if game==None:
+            newGame = Game(title=self.request.get("game"))
+            gameKey = newGame.put()
+        else:
+            gameKey = game.key()
         rule = Rule(
-                    player = player,
-                    game = game,
+                    player = userKey,
+                    game = gameKey,
                     data = self.request.get("strategy")   
                     )
         self.response.out.write(rule.put())
-  
+        ''' dummy URL for testing '''
+        ''' http://localhost:8080/updateRule?player=ben&game=tictactoe&strategy=[{%22name%22:%22Win%22,%22code%22:%22takeWin%22,%22tooltip%22:%22Take%20a%20cell%20completing%20three%20of%20my%20stones%20in%20a%20row/column/diagonal%22,%22enabled%22:true},{%22name%22:%22Block%20Win%22,%22code%22:%22takeBlockWin%22,%22tooltip%22:%22Take%20a%20cell%20of%20the%20opponent%27s%20winning%20position%22,%22enabled%22:true},{%22name%22:%22Take%20Center%22,%22code%22:%22takeCenter%22,%22tooltip%22:%22Take%20the%20center%20cell%22,%22enabled%22:true},{%22name%22:%22Take%20Any%20Corner%22,%22code%22:%22takeAnyCorner%22,%22tooltip%22:%22Take%20any%20corner%22,%22enabled%22:true},{%22name%22:%22Take%20Any%20Side%22,%22code%22:%22takeAnySide%22,%22tooltip%22:%22Take%20any%20non-corner%20cells%20on%20the%20side.%22,%22enabled%22:true},{%22name%22:%22Random%20Move%22,%22code%22:%22takeRandom%22,%22tooltip%22:%22Take%20any%20empty%20cell.%22,%22enabled%22:true}]'''
+        ''' http://localhost:8080/updateRule?player=tak&game=tictactoe&strategy=[{%22name%22:%22Win%22,%22code%22:%22takeWin%22,%22tooltip%22:%22Take%20a%20cell%20completing%20three%20of%20my%20stones%20in%20a%20row/column/diagonal%22,%22enabled%22:true},{%22name%22:%22Take%20Center%22,%22code%22:%22takeCenter%22,%22tooltip%22:%22Take%20the%20center%20cell%22,%22enabled%22:true},{%22name%22:%22Take%20Any%20Corner%22,%22code%22:%22takeAnyCorner%22,%22tooltip%22:%22Take%20any%20corner%22,%22enabled%22:true},{%22name%22:%22Random%20Move%22,%22code%22:%22takeRandom%22,%22tooltip%22:%22Take%20any%20empty%20cell.%22,%22enabled%22:true}]'''
+         
 class PlayMatch(webapp.RequestHandler):
     def get(self):
-        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),turn=self.request.get('p1'))
-        history = match.run()
-        self.response.out.write(pprint.pprint(history))
-
+        match = TicTacToeMatch(p1='tak',p2='ben')
+#        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),turn=self.request.get('p1'))
+        result = match.run()
+        
+        self.response.out.write(pprint.pprint(result['history']))
+        self.response.out.write( result['winner'])
+        ''' http://localhost:8080/playMatch?p1=tak&p2=ben '''
+        
 class Trainer(webapp.RequestHandler):
     def get(self):
         self.response.out.write('Hello world!')
