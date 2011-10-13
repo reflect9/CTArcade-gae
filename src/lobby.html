@@ -1,21 +1,20 @@
-<html>
-<head>
-	<meta name = "viewport" content = "width=device-width">
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
-    <style type="text/css">
-		@import url(css/login.css);
-	</style>
-</head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><META http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>
 
-<body>
-<!-- here's lobby, showing list of all the users. a small sign-up/login UI will be here as well. -->
-<div id="main_container" align="center">
-    <div id="banner">
+	
+	
+	
+	
+
+
+<div>
+
+<div align="center">
+    <div>
     	<h1>CTarcade Lobby</h1>
     </div>
-    <div id="col_container" style="width: 900px;border:1px solid black;">
-        <div id="left_col" style="width:80%;float:left;border:1px solid black;">
+    <div style="width:900px;border:1px solid black">
+        <div style="width:80%;float:left;border:1px solid black">
+
         	<p align="left">User List:</p>
             <p> {% for user in users %}
                   {% if user.uid %}
@@ -25,75 +24,69 @@
                   {% endif %}
                 {% endfor %}</p>
         </div>
-        <div id="right_col" style="width:19%;float:left;border:1px solid black;">
-        	<p align"left">Navigation:</p>
 
-                      <form name="contact" action="">  
-                      <fieldset>  
-                        <label for="name" id="name_label">Name</label>  
-                        <input type="text" name="name" id="name" size="30" value="" class="text-input" />  
-                        <label class="error" for="name" id="name_error">This field is required.</label>  
-                      	<br />
-                        <label for="email" id="email_label">Return Email</label>  
-                        <input type="text" name="email" id="email" size="30" value="" class="text-input" />  
-                        <label class="error" for="email" id="email_error">This field is required.</label>  
-                      	<br />
-                        <label for="phone" id="phone_label">Return Phone</label>  
-                        <input type="text" name="phone" id="phone" size="30" value="" class="text-input" />  
-                        <label class="error" for="phone" id="phone_error">This field is required.</label>  
-                      
-                        <br />  
-                        <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
+        <div style="width:19%;float:left;border:1px solid black">
+        	<div style="overflow:hidden">
+            <div>
+                <div style="height:0px">
+                  <div> </div>
+                  <br>
+                  <div><p>
+					<form name="0.1_contact" target="_blank" onsubmit="return window.confirm(&quot;You are submitting information to an external page.\nAre you sure?&quot;);">  
+                      	<fieldset>  
+                        <label>Name</label>  
+                        <input type="text" name="name" size="20" value="">  
+                        <label>This field is required.</label>  
+                      	<br>
+
+                        <label>Email</label>
+                        <input type="text" name="email" size="20" value="">  
+                        <label>This field is required.</label>  
+                        <br>  
+                        <input type="submit" name="submit" value="Send">  
                       </fieldset>  
-                    </form>  
+                    </form>  </p>
+                  </div>
+                </div>
+	<div style="display:visible"><img src="http://static/expand.png"> <a href="#0.1_">Register</a> </div>
+
+	<div><img src="http://static/collapse.png"> <a href="#0.1_">Hide</a> </div>
+              </div>
+              </div>
+              <hr>
+              <div style="overflow:hidden">
+              <div>
+                <div style="height:0px">
+
+                  <div> </div>
+                  <br>
+                  <div><p>
+					<form name="0.1_contact" target="_blank" onsubmit="return window.confirm(&quot;You are submitting information to an external page.\nAre you sure?&quot;);">  
+                      	<fieldset>  
+                        <label>Name</label>  
+                        <input type="text" name="name" size="20" value="">  
+                        <label>This field is required.</label>  
+                      	<br>
+                        <label>Email</label>
+
+                        <input type="text" name="email" size="20" value="">  
+                        <label>This field is required.</label>  
+                        <br>  
+                        <input type="submit" name="submit" value="Send">  
+                      </fieldset>  
+                    </form>  </p>
+                  </div>
+                </div>
+	<div style="display:visible"><img src="http://static/expand.png"> <a href="#0.1_">Login</a> </div>
+
+	<div><img src="http://static/collapse.png"> <a href="#0.1_">Hide</a> </div>
+              </div>
+        </div>
         </div>
     </div>
 </div>
-<script language="javascript" type="text/javascript">
-    $(function() {  
-      $('.error').hide();  
-      $(".button").click(function() {  
-        // validate and process form here  
-      
-        $('.error').hide();  
-          var name = $("input#name").val();  
-            if (name == "") {  
-          $("label#name_error").show();  
-          $("input#name").focus();  
-          return false;  
-        }  
-            var email = $("input#email").val();  
-            if (email == "") {  
-          $("label#email_error").show();  
-          $("input#email").focus();  
-          return false;  
-        }  
-            var phone = $("input#phone").val();  
-            if (phone == "") {  
-          $("label#phone_error").show();  
-          $("input#phone").focus();  
-          return false;  
-        }  
-        var dataString = 'name='+ name + '&email=' + email + '&phone=' + phone;  
-    //alert (dataString);return false;  
-    $.ajax({  
-      type: "GET",  
-      url: "/signUp",  
-      data: dataString,  
-      success: function() {  
-        $('#contact_form').html("<div id='message'></div>");  
-        $('#message').html("<h2>Contact Form Submitted!</h2>")  
-        .append("<p>We will be in touch soon.</p>")  
-        .hide()  
-        .fadeIn(1500, function() {  
-          $('#message').append("<img id='checkmark' src='images/check.png' />");  
-        });  
-      }  
-    });  
-    return false;    
-      });  
-    });   
-</script>
-</body>
 
-</html>
+
+
+</div>
+</body></html>
