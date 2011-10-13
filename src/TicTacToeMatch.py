@@ -43,8 +43,8 @@ class TicTacToeMatch:
                 selectedLoc = choice(nextMove['locList'])  # randomly select one location from list
                 self.makeMove(selectedLoc[0], selectedLoc[1], self.turn); # update board
                 self.history.append({'board':copy.deepcopy(self.board),'loc':selectedLoc,'turn':self.turn,'message':nextMove['message']})
-                print selectedLoc
-                print self.board
+#                print selectedLoc
+#                print self.board
                 winner = self.checkWinner();
                 if winner:
 #                    self.response.write.out(winner + " win!")
@@ -60,7 +60,7 @@ class TicTacToeMatch:
         playerKey = db.GqlQuery("SELECT * FROM User WHERE uid=:1",player).get().key()
         gameKey = db.GqlQuery("SELECT * FROM Game WHERE title=:1",game).get().key()
         strategy = db.GqlQuery("SELECT * FROM Rule WHERE player=:1 AND game=:2",playerKey,gameKey).get()
-        print player+",   "+ strategy.data
+#        print player+",   "+ strategy.data
         return simplejson.loads(strategy.data)
     def flip(self,player):
         return self.p2 if player==self.p1 else self.p1
@@ -111,7 +111,7 @@ class TicTacToeMatch:
             # locals() provide a dictionary of all elements in local scope
             # locals()[functionName] gives a handler to the function
             # thus, below we execute local function whose name is st['code']
-            print st['code']
+#            print st['code']
             strategyMethodToCall =  getattr(self, st['code'])
             result = strategyMethodToCall(self.board,player) 
             if result['success']:

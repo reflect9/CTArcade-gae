@@ -120,7 +120,8 @@ def main():
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
-                                          ('/reviewMatch',ReviewMatch)
+                                          ('/reviewMatch',ReviewMatch),
+                                          ('/tournament',Tournament)
                                           
                                           ],
                                          debug=True)
