@@ -120,9 +120,7 @@ def main():
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
-                                          ('/reviewMatch',ReviewMatch),
-                                          ('/tournament',Tournament)
-                                          
+                                          ('/reviewMatch',ReviewMatch),                                    
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
