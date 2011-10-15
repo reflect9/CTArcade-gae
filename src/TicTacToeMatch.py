@@ -8,18 +8,16 @@ from google.appengine.ext import db
 import sys, copy
 from random import choice
 from django.utils import simplejson
+import datastore
 
 class TicTacToeMatch:
-    def __init__(self,p1=None,p2=None,turn=None,strategy=None):
+    def __init__(self,p1=None,p2=None,game='tictactoe',turn=None):
         self.p1 = p1
         self.p2 = p2
-        self.game = 'tictactoe'
-        if strategy==None:
-            self.strategy = {}
-            self.strategy[p1] = self.loadStrategy(self.p1,self.game)
-            self.strategy[p2] = self.loadStrategy(self.p2,self.game)
-        else:
-            self.strategy = strategy
+        self.game = game
+        self.strategy = {}
+        self.strategy[p1] = datastore.getUserStrategy(self.p1,self.game)  # list of strategy codes
+        self.strategy[p2] = datastore.getUserStrategy(self.p2,self.game)  # list of strategy codes
         self.turn = turn if turn!=None else self.p1
         self.history = []
         # tictactoe parameters
@@ -56,12 +54,6 @@ class TicTacToeMatch:
         return {'history':self.history, 'winner': result}       
     
     ''' BASIC FUNCTIONS '''
-    def loadStrategy(self,player,game):
-        playerKey = db.GqlQuery("SELECT * FROM User WHERE uid=:1",player).get().key()
-        gameKey = db.GqlQuery("SELECT * FROM Game WHERE title=:1",game).get().key()
-        strategy = db.GqlQuery("SELECT * FROM Rule WHERE player=:1 AND game=:2",playerKey,gameKey).get()
-#        print player+",   "+ strategy.data
-        return simplejson.loads(strategy.data)
     def flip(self,player):
         return self.p2 if player==self.p1 else self.p1
     def isFull(self):

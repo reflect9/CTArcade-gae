@@ -19,9 +19,11 @@ from google.appengine.ext.webapp import util
 from datastore import *
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
+from django.utils import simplejson as json
 import appengine_utilities
-import pprint, os
+import pprint, os, sys
 from TicTacToeMatch import TicTacToeMatch
+from TicTacToeTrainer import TicTacToeTrainer
 
 class Lobby(webapp.RequestHandler):
     def get(self):
@@ -35,6 +37,11 @@ class Lobby(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')
         self.response.out.write(template.render(path, template_values))
 
+class Init(webapp.RequestHandler):
+    def get(self):
+        initSampleData()
+        self.redirect('/')
+
 class SignUp(webapp.RequestHandler):
     def get(self):
         ''' this signup module will receive ajax call from lobby.html  '''
@@ -42,11 +49,12 @@ class SignUp(webapp.RequestHandler):
         # create User object defined in datastore.py
         # assign usr id and password and save it
         # send back success message
-        existingUser = db.GqlQuery("SELECT * FROM User WHERE uid=:1",self.request.get('name')).get()
+        existingUser = db.Query(User.get_by_key_name(self.request.get('name')))
         if existingUser:
             self.response.out.write("The name is already being used. Try different name please.")
             return
-        user = User(uid = self.request.get('name'),
+        user = User(key_name=self.request.get('name'),
+                    id = self.request.get('name'),
                     email = self.request.get('email'),
                     password = self.request.get('password'))
         result = user.put()
@@ -70,7 +78,7 @@ class LogIn(webapp.RequestHandler):
 
 class UpdateRule(webapp.RequestHandler):
     def get(self):
-        user = db.GqlQuery("SELECT * FROM User WHERE uid=:1",self.request.get("player")).get()
+        user = db.GqlQuery("SELECT * FROM User WHERE id=:1",self.request.get("player")).get()
         game = db.GqlQuery("SELECT * FROM Game WHERE title=:1",self.request.get("game")).get()
         if user==None:
             self.response.out.write(self.request.get("player") + " doesn't exist.")
@@ -84,7 +92,7 @@ class UpdateRule(webapp.RequestHandler):
             gameKey = newGame.put()
         else:
             gameKey = game.key()
-        rule = Rule(
+        rule = AI(
                     player = userKey,
                     game = gameKey,
                     data = self.request.get("strategy")   
@@ -96,17 +104,71 @@ class UpdateRule(webapp.RequestHandler):
          
 class PlayMatch(webapp.RequestHandler):
     def get(self):
-#        match = TicTacToeMatch(p1='tak',p2='ben')
-        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),turn=self.request.get('p1'))
+        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=self.request.get('p1'))
         result = match.run()
-        
         self.response.out.write(pprint.pprint(result['history']))
         self.response.out.write( result['winner'])
         ''' http://localhost:8080/playMatch?p1=tak&p2=ben '''
         
 class Trainer(webapp.RequestHandler):
     def get(self):
-        self.response.out.write('Hello world!')
+        try:
+            session = appengine_utilities.sessions.Session()
+            current_user_id = session["id"] if session["id"] else ''   
+        except AttributeError:
+            current_user_id='tak'
+        template_values = {
+            'user_id': current_user_id,
+        }  
+        path = os.path.join(os.path.dirname(__file__), 'trainer.html')
+        self.response.out.write(template.render(path, template_values))
+
+class AjaxTrainer(webapp.RequestHandler):
+    def get(self):
+        action  = self.request.get('action')
+        if action == 'getStrategy':
+#            ai = db.Query(AI.get_by_key_name(self.request.get('player')+"_"+self.request.get('game'))).get()
+            self.response.out.write(getUserStrategy(self.request.get('player'),self.request.get('game')))
+        elif action == 'getPublicStrategyDict':
+            dict = getPublicStrategyDict(self.request.get('game'))
+#            print >>sys.stderr, dict
+            self.response.out.write(json.dumps(dict))
+        elif action == 'findBestStrategy':
+            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
+            result = trainer.findBestStrategy()
+            self.response.out.write(json.dumps(result))
+            # result is an array. each element has 'st':strategy, 'result':['success']true/false and 'loc':[[x,y],.] 
+        elif action == 'findMatchingStrategy':
+#            print >>sys.stderr, self.request.get('board')
+            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
+            result = trainer.findMatchingStrategy(json.loads(self.request.get('loc')))
+            self.response.out.write(json.dumps(result))
+        elif action == 'enableStrategy':
+            # append an existing strategy to the user's AI data 
+            codeList = getUserStrategy(self.request.get('player'),self.request.get('game'))
+            if self.request.get('strategyToEnable') not in codeList:
+                codeList.append(self.request.get('strategyToEnable'))
+                setUserStrategy(self.request.get('player'),self.request.get('game'),codeList)
+                self.response.out.write('True')
+            else:
+                self.response.out.write('False')
+        elif action == 'createStrategy':
+            # TBD : creating a new strategy. add it to Strategy model
+            pass
+        elif action == 'changeOrder':
+            # change the user's AI's data which is JSON string of an array that contains 
+            # codes of strategies
+            user_id = self.request.get('player')
+            game_title = self.request.get('game')
+            data = json.loads(self.request.get('newStrategy'))
+            setUserStrategy(user_id,game_title,data)
+#            self.response.out.write('updated Rule is '+getUserStrategy(user_id,game_title))
+        elif action == '':
+            pass
+        else:
+            # ignore this
+            pass                               
+                                          
 
 class ReviewMatch(webapp.RequestHandler):
     def get(self):
@@ -115,11 +177,13 @@ class ReviewMatch(webapp.RequestHandler):
 
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
+                                          ('/init', Init),
                                           ('/signUp',SignUp),
                                           ('/LogIn',LogIn),
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
+                                          ('/ajaxTrainer',AjaxTrainer),
                                           ('/reviewMatch',ReviewMatch),                                    
                                           ],
                                          debug=True)

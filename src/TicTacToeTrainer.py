@@ -8,28 +8,37 @@ from google.appengine.ext import db
 import sys, copy
 from random import choice
 from django.utils import simplejson
+from datastore import *
 
 class TicTacToeTrainer:
-    def __init__(self,player=None,game='tictactoe'):
-        self.player = player
-        self.game=game
-        
-        self.strategy = self.loadStrategy(self.player,self.game)
-        
-        
-
-
-
+    def __init__(self,user=None,player1=None,player2=None,game='tictactoe',board=None,turn=None):
+        self.user = user;
+        self.p1 = player1
+        self.p2 = player2
+        self.game = game
+        self.board = board
+        self.turn = turn
+        self.strategy = self.loadStrategy(self.user,self.game)
+#        print >>sys.stderr, "trainer board created : " 
+#        print >>sys.stderr, self.board
 
     ''' BASIC FUNCTIONS '''
     def loadStrategy(self,player,game):
-        playerKey = db.GqlQuery("SELECT * FROM User WHERE uid=:1",player).get().key()
-        gameKey = db.GqlQuery("SELECT * FROM Game WHERE title=:1",game).get().key()
-        strategy = db.GqlQuery("SELECT * FROM Rule WHERE player=:1 AND game=:2",playerKey,gameKey).get()
-#        print player+",   "+ strategy.data
-        return simplejson.loads(strategy.data)
+#        playerKey = db.GqlQuery("SELECT * FROM User WHERE uid=:1",player).get().key()
+#        gameKey = db.GqlQuery("SELECT * FROM Game WHERE title=:1",game).get().key()
+        codeList = getUserStrategy(player,game)
+        print >>sys.stderr,"codeList in loadStrategy : "+ json.dumps(codeList)
+#        st = simplejson.loads(strategy.data)
+        return codeList
     def flip(self,player):
-        return self.p2 if player==self.p1 else self.p1
+        if player=='p1':
+            return 'p2'
+        elif player=='p2':
+            return 'p1'
+        elif player==self.p1:
+            return self.p2
+        else:
+            return self.p1
     def isFull(self):
         for row in self.board:  
             for cell in row:
@@ -62,27 +71,52 @@ class TicTacToeTrainer:
         if self.checkDiag2()!=False:
             return self.checkDiag2() 
         return False
-    def makeMove(self,x,y,turn):
-        if turn!=self.turn:
-            print >>sys.stderr,"turn doesn't match!"
-            return
-        if self.board[x][y] != 0:
-            print >>sys.stderr,"cannot move on occipied cell ["+str(x)+","+str(y)+"]"
-            return
-        self.board[x][y]=self.turn
-        return self.board
-    def findBestStrategy(self,player):
+#    def makeMove(self,x,y,turn):
+#        if turn!=self.turn:
+#            print >>sys.stderr,"turn doesn't match!"
+#            return
+#        if self.board[x][y] != 0:
+#            print >>sys.stderr,"cannot move on occupied cell ["+str(x)+","+str(y)+"]"
+#            return
+#        self.board[x][y]=self.turn
+#        return self.board
+    def findBestStrategy(self):
         if self.isFull():       return {'message':"Tie Game",'locList':None}
-        for st in self.strategy[player]:
+        resultList = []
+#        print >>sys.stderr, "self.strategy : "+ json.dumps(self.strategy)
+        for st in self.strategy:
             # locals() provide a dictionary of all elements in local scope
             # locals()[functionName] gives a handler to the function
             # thus, below we execute local function whose name is st['code']
-            print st['code']
-            strategyMethodToCall =  getattr(self, st['code'])
-            result = strategyMethodToCall(self.board,player) 
-            if result['success']:
-                return {'message':st['name'], 'locList':result['loc']}
-        return {'message':"no matching strategy found",'locList':None}
+#            print st
+            strategyMethodToCall =  getattr(self, st)
+            p1p2 = 'p1' if self.turn==self.p1 else 'p2'
+            result = strategyMethodToCall(self.board,p1p2) 
+            resultList.append({'st':st, 'result':result })
+        return resultList
+#        return {'message':"no matching strategy found",'locList':None}
+    def findMatchingStrategy(self,userLoc):
+        matchingStrategy = [];
+        allPublicStrategy = getPublicStrategy(self.game)
+        print >>sys.stderr, allPublicStrategy
+        print >>sys.stderr, userLoc
+        for st in allPublicStrategy:
+            print >>sys.stderr, st
+            strategyMethodToCall = getattr(self, st['code'])
+            if st['code'] in self.strategy: st['enabled']=True 
+            else:  st['enabled']=False
+#            print >>sys.stderr, self.board
+            p1p2 = 'p1' if self.turn==self.p1 else 'p2'
+            print >>sys.stderr, "board : " + json.dumps(self.board) + p1p2
+            result = strategyMethodToCall(self.board,p1p2)
+            if result['success'] and result['loc']!=None:
+                for loc in result['loc']:
+                    if int(userLoc[0])==loc[0] and int(userLoc[1])==loc[1]:
+                        matchingStrategy.append(st)
+                    else:
+                        print >>sys.stderr, str(userLoc) + "__" + str(loc)
+        return matchingStrategy
+    
     
     ''' STRATEGIES'''
     def takeWin(self,board,player):
@@ -98,10 +132,12 @@ class TicTacToeTrainer:
                   [[0,1],[1,1],[2,1]],
                   [[0,2],[1,2],[2,2]]                  
                   ]
+#        print >>sys.stderr, board[1]
         for case in combos:
             countEmptyCell = 0
             countPlayerCell = 0
             for pos in case:
+#                print >>sys.stderr, pos
                 if board[pos[0]][pos[1]]==player:
                     countPlayerCell = countPlayerCell+1
                 if board[pos[0]][pos[1]]==0:
@@ -120,6 +156,7 @@ class TicTacToeTrainer:
     def takeAnyCorner(self,board,player):
         combos = [[0,0],[2,2],[2,0],[0,2]]
         possibleMoves = []
+        print >>sys.stderr, board
         for case in combos:
             if board[case[0]][case[1]]==0:
                 possibleMoves.append(case)

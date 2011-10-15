@@ -13,22 +13,12 @@
 		 	
 oct13 2011, by Tak
 */
-function TicTacToe(user) {		
-	this.firstTurn = user;
-	this.game = 'tictactoe';
-	this.p1 = user;
-	this.p2 = user + "'s AI";
-	this.width=3; 
-	this.height=3;  
-	var started; 	// true when playing game is on
-	this.history = [];	// pop in/out current board state for undo/redo moves
 
-	this.turn = this.p1;
-	this.started = false;    
-	this.board = createEmptyBoard(this.width, this.height);	
-	this.history.push({'board':this.cloneBoard(this.board), 'loc':undefined, 'turn':undefined});
-	this.strategy = getStrategy(user);	// query the server to get list of strategies the user's AI has
+
+function TicTacToeTrainer() {		
 	
+
+
 //  NOW ALL THE RULES ARE STORED ON THE SERVER
 //	this.strategySet = [
 //						{'name':"Win",'code':"takeWin",'tooltip':'Take a cell completing three of my stones in a row/column/diagonal','enabled':true},
@@ -42,19 +32,25 @@ function TicTacToe(user) {
 
 
 	/* BASIC FUNCTIONS */
-    function createEmptyBoard(col, row) {
+    this.createEmptyBoard = function (col, row) {
         var b = new Array();
         for (var i = 0; i < row; i++) {
-            b.push(new Array(col));
+            var r = new Array();
+            for (var j=0;j<col;j++) {
+            	r.push(0);
+            }
+            b.push(r);
         }
         return b;
     }
+    
 	this.flip = function(player) {
 		if (player==this.p1) return this.p2
 		else return this.p1
 	}
+	
 	this.cloneBoard = function(b) {
-		var nb = createEmptyBoard(this.width,this.height);
+		var nb = this.createEmptyBoard(this.width,this.height);
 		for(var i=0;i<this.width;i++) {
 			for (var j=0;j<this.height;j++) {
 				nb[i][j] = b[i][j];
@@ -62,13 +58,16 @@ function TicTacToe(user) {
 		}
 		return nb;
 	}
+	
     this.restart = function() {
-        this.firstTurn = this.flip(firstTurn);
+        this.firstTurn = this.flip(this.firstTurn);
     	this.turn = this.firstTurn;
-        this.board = createEmptyBoard(this.width, this.height);
+        this.board = this.createEmptyBoard(this.width, this.height);
         this.history = [];
         this.history.push({'board':this.cloneBoard(this.board), 'loc':undefined, 'turn':undefined});
-        this.strategy = getStrategy(user);
+        this.getStrategy(this.user,function(response){
+        	this.strategy = response.data;
+        });
         this.started=false;
     }
 
@@ -107,12 +106,16 @@ function TicTacToe(user) {
         	console.log("player turn doesn't match!" + t + "!=" + this.turn);	
         	return;
         } 
-        if (this.board[i][j] != null) {
+        if (this.board[i][j] != 0) {
         	console.log("cannot move on occupied cell [" + i+","+j+"]");	
         	return;    	
         }
-       	if (!started)   started = true;
-        this.board[i][j] = this.turn;    
+       	if (this.started==false)   this.started = true;
+        if (this.p1==this.turn) {
+        	this.board[i][j]='p1';
+        } else {
+        	this.board[i][j]='p2';
+        }
         this.history.push({'board':this.cloneBoard(this.board), 'loc':[i,j], 'turn':t});
         this.turn = this.flip(this.turn);
         return this.board[i][j];
@@ -123,31 +126,31 @@ function TicTacToe(user) {
     this.isFull = function() {
         for (var i = 0; i < 3; i++)
 			for (var j =0; j<3;j++)
-			    if (this.board[i][j] == null)
+			    if (this.board[i][j] == 0)
 			        return false;
         return true;
     }
 	this.checkCol =function(x) {
-        if (this.board[x][0] == this.board[x][1] && (this.board[x][0] == this.board[x][2]) && (this.board[x][0] != null)) 
+        if (this.board[x][0] == this.board[x][1] && (this.board[x][0] == this.board[x][2]) && (this.board[x][0] != 0)) 
         	return this.board[x][0];
         else return false;
     }
     
     this.checkRow = function(y) {
-        if (this.board[0][y] == this.board[1][y] && (this.board[0][y] == this.board[2][y]) && (this.board[0][y] != null))
+        if (this.board[0][y] == this.board[1][y] && (this.board[0][y] == this.board[2][y]) && (this.board[0][y] != 0))
         	return this.board[0][y];
         else return false;
     }
     
     this.checkDiag1 = function()  {
-        if (this.board[0][0] != null && this.board[0][0] == this.board[1][1] && this.board[0][0] == this.board[2][2]) 
+        if (this.board[0][0] != 0 && this.board[0][0] == this.board[1][1] && this.board[0][0] == this.board[2][2]) 
         	return this.board[0][0];
         else return false;
         
     }
     
     this.checkDiag2 = function() {
-        if (this.board[2][0] != null && this.board[1][1] == this.board[2][0] && this.board[0][2] == this.board[2][0]) 
+        if (this.board[2][0] != 0 && this.board[1][1] == this.board[2][0] && this.board[0][2] == this.board[2][0]) 
         	return this.board[2][0];
         else return false;
     }
@@ -205,57 +208,73 @@ function TicTacToe(user) {
     // FUNCTIONS THAT COMMUNICATE WITH SERVER //
     ////////////////////////////////////////////
     
-    this.getStrategy = function(userName) {
+    this.getStrategy = function(userName,callBack) {
     	$.ajax({
     		type : "GET",
     		url: "/ajaxTrainer",
     		async: false,	// browser will hold until it gets the response from server
     		data: 	{	action: 'getStrategy',
     					player: userName,
-    					game: this.game
+    					game: this.gameTitle
     				},
     		success: function(response) {
-    			alert(response);
-    			return JSON.parse(response);
-    		}				
+    			callBack(response);
+    		}
     	});
     }
-    
+    this.getPublicStrategyDict = function(callBack) {
+    	$.ajax({
+    		type : "GET",
+    		url: '/ajaxTrainer',
+    		async: true,
+    		data: {  	action: 'getPublicStrategyDict',
+    					game: this.gameTitle 
+    				},
+    		success: function(response) {
+    			callBack(response);
+    		}
+    	});
+    }
     // ask server to run all the strategies the AI knows one-by-one and retrieve the result
-    this.findBestStrategy = function(userName,board,turn) {
+    this.findBestStrategy = function(board,turn,callBack) {
     	$.ajax({
     		type : "GET",
     		url: "/ajaxTrainer",
-    		async: false,
+    		async: true,
     		data: { action: 'findBestStrategy',
-    				player: userName,
-    				game : this.game,
-    				board: board,
+    				user:this.user,
+    				player1: this.p1,
+    				player2: this.p2,
+    				game : this.gameTitle,
+    				board: JSON.stringify(board),
     				turn: turn
     				},
     		success: function(response) {
-    			alert(response);
-    			return JSON.parse(response);
+    			callBack(response);
     		}
     	})
     }
     
     // ask server to infer which strategy (among all the public rules) might be the one user has used.
-	this.showMatchingStrategy = function(brd,userName,userMoveLoc)  {  
+	this.findMatchingStrategy = function(brd,turn,userMoveLoc,callBack)  {  
 		// matchingRules : {name:text, code:text, locList:array of [x,y]}
 		$.ajax({
 			type : "GET",
 			url: "/ajaxTrainer",
 			async: false,
-			data: 	{ 	action: 'showMatchingStrategy',
-						player: userName, 
- 	 					game: this.game,
- 	 					board: brd,
- 	 					loc: userMoveLoc
+			data: 	{ 	action: 'findMatchingStrategy',
+						user: this.user,
+						player1: this.p1,
+						player2: this.p2,
+						turn: turn, 
+ 	 					game: this.gameTitle,
+ 	 					board: JSON.stringify(brd),
+ 	 					loc: JSON.stringify(userMoveLoc)
  	 				},
  	 		success: function(response) {
- 	 				alert(response);
- 	 				return JSON.parse(response);
+// 	 				alert(response);
+ 	 				callBack(response);	
+ 	 		
 //					cons.clear();
 //					cons.appendMessage("Is your last move based on one of these rules?")
 //					$(matchingRules).each( function(i,rule) {
@@ -277,264 +296,76 @@ function TicTacToe(user) {
     	$.ajax({
     		type : "GET",
     		url: "/ajaxTrainer",
-    		async: false,
+    		async: true,
     		data: 	{ 	action: 'enableStrategy',
     					player: userName,
-    					game: this.game,
-    					strategyToEnale : code
-    				}
+    					game: this.gameTitle,
+    					strategyToEnable : code
+    				},
     		success: function(response) {
-    					alert(response);
-    					return JSON.parse(response);
+//    					alert(response);
+    					if (response=='True') {
+//    						alert(code);
+//    						alert($(cons.target).find("#mR_"+code).html());
+    						$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#955;'> I learned this new rule!</span>");
+    					} else if(response=='False') {
+    						$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#595;'> Thanks! But I knew it already.</span>");
+    					}
     				}
+    	
     	});
     }
     
-    this.checkStrategyEnabled = function(code) {
-    	for (i in this.strategySet) {
-    		if(st['code']==code) {
-    			return st['enabled'];
-    		}
-    	}
-    }
     
     this.changeOrder = function(nameList) {
-    	newStrategySet = [];  
-    	// console.log(nameList);
-    	for (ni in nameList) {
-    		name = nameList[ni];
-    		for(i in this.strategySet) {
-    			st=this.strategySet[i];
-    			if(st['name']==name) {
-    				newStrategySet.push(st);
-    			}
-    		}
-    	}
-    	console.log(newStrategySet);
-    	// add strategies not in the codeList (new strategy order)
-    	for(si in this.strategySet) {
-    		st = this.strategySet[si];
-    		alreadyAdded = false;
-    		for (ni in nameList) {
-    			name = nameList[ni];
-    			if (name==st['name']) alreadyAdded = true;
-    		}
-    		if (alreadyAdded==false) newStrategySet.push(st);
-    	}
-    	this.strategySet = newStrategySet;
+    	$.ajax({
+    		type : "GET",
+    		url: "/ajaxTrainer",
+    		async: true,
+    		data: 	{ 	action: 'changeOrder',
+    					player: this.user,
+    					game: this.gameTitle,
+    					newStrategy : JSON.stringify(nameList)
+    				},
+//    		success: function(response) {
+//    					alert(response);
+//    					return JSON.parse(response);
+//    				}
+    	});
     }
-    
-    this.findBestStrategy = function(brd,player,strategy) {
-    	if (this.isFull()) {
-    		return {'message':"Tie Game",'locList':undefined};
-    	}
-    	for (key in strategy) {
-    		st = strategy[key];  // select one strategy one-by-one
-    		if(st['enabled']==false) continue;  // if the strategy is not enabled, pass
-    		result = this[st.code](brd,player); // try the strategy on current board
-    		if (result['success']==true)  {
-    			bestStrategy = {'message':st.name,'locList':result.loc};
-    			return bestStrategy;	// return the first strategy matched. d'nt try the rest
-    		}
-    	}
-		bestStrategy = {'message':'no strategy found','locList':undefined};
-		return bestStrategy;
+	
+    this.assignStrategy = function(data) {
+//    	alert(data);
+    	this.strategy = (JSON.parse(data)).data;
+    }
+    this.assignStrategyDict = function(data) {
+//    	alert(data);
+    	this.publicStrategyDict = JSON.parse(data);
     }
     
     
+	this.init = function(user) {
+		this.user = user;
+		this.firstTurn = user;
+		this.gameTitle = 'tictactoe';
+		this.p1 = user;
+		this.p2 = user + "'s AI";
+		this.width=3; 
+		this.height=3;  
+		var started; 	// true when playing game is on
+		
+		this.publicStrategyDict = {};  // list of code -> other information of all the public codes for the game
+		this.strategy = [];  // list of strategy codes that this user's AI knows
+		this.history = [];	// pop in/out current board state for undo/redo moves
+	
+		this.turn = this.p1;
+		this.started = true;    
+		this.board = this.createEmptyBoard(this.width, this.height);	
+//		alert(this);
+//		alert(this.flip(this.turn));
+		this.history.push({'board':this.cloneBoard(this.board), 'loc':undefined, 'turn':undefined});
+        this.getStrategy(this.user, $.proxy(this.assignStrategy,this)); // $.proxy(function,scope) : will force the function to run within the scope 
+        this.getPublicStrategyDict($.proxy(this.assignStrategyDict,this));
+	}
     
-    
-    
-	/* STRATEGIES */
-    this.takeWin = function(brd,player) {
-		var result = new Object();		
-		result['success']=false;
-		result['loc'] = [];		// one strategy can generate multiple locations
-        // Check diagonals for win
-        var combos = [
-            [[0,0],[1,1],[2,2]],
-            [[0,2],[1,1], [2,0]], 
-            
-            [[0,0], [0,1], [0,2]], 
-            [[1,0], [1,1], [1,2]], 
-            [[2,0], [2,1], [2,2]], 
-            
-            [[0,0], [1,0], [2,0]], 
-            [[0,1], [1,1], [2,1]],
-            [[0,2], [1,2], [2,2]],         
-        ];
-        
-        for (var  i in combos) {
-            var positions = combos[i];
-            var open = null;
-            var count = 0;
-            for (var pos in positions) {
-                var move = positions[pos];
-                var x = move[0];
-                var y = move[1];
-                //console.log(brd, player);
-                if (brd[x][y] == player)
-                    count++;
-                else if (!brd[x][y]) 
-                    open = move;
-            }
-            
-            if (count == 2 && open) {
-				result['success']=true;
-				result['loc'].push(open);	
-				// alert(result['loc']);
-				//return result;
-            }
-        }
-        
-		return result;
-        
-    }
-    this.takeBlockWin = function(brd,player) {
-		var result = new Object();
-		result['success']=false;
-		result['loc'] = [];		
-        var origTurn = player
-        // Flip turn
-        player =  this.flip(player);;
-        var willWin = this.takeWin(brd,player);
-        // Restore original turn
-        player = origTurn;
-		if (willWin['success']) {
-			return willWin;		
-		} else {
-			// no winning condition for opponent
-			result['success']=false;
-			return result;
-		}		
-    }
-    this.takeCenter = function(brd,player) {
-    	// alert("take Center");
-		var result = new Object();
-		result['success']=false;  
-		result['loc'] = [];	
-		// console.log('check takecenter' + brd[1][1]);
-        if (!brd[1][1]) {
-			result['success']=true;
-			result['loc'].push([1,1]);	
-			// alert(result['loc']);
-			return result;
-        } else {
-        	// alert('center occupied');
-			result['success']=false;	
-			return result;
-		}
-    }
-	this.takeAnyCorner = function(brd,player) {
-		var result = new Object();	
-		result['success']=false;
-		result['loc'] = [];	
-		var moves = [[0,0], [2,2], [2,0], [0, 2]];
-		for (var i=0;i<moves.length; i++) {
-           var move=moves[i];
-           var x = move[0];
-           var y = move[1];
-           
-           if (!brd[x][y]) {
-               // this.move(x,y);
-				result['success']=true;
-				result['loc'].push([x, y]);	
-				//return result;
-           }
-		}
-		// result['success']=false;
-		return result;
-    }
-    this.takeAnySide = function(brd,player) {
-        var result = new Object();
-        result['success']=false;
-		result['loc'] = [];	
-        var moves = [[0,1], [1,0], [1,2], [2,1]];
-        for (var i=0; i<moves.length;i++) {
-            var pt = moves[i];
-            if (!brd[pt[0]][pt[1]]) {
-                result['success']=true;
-				result['loc'].push([pt[0],pt[1]]);	
-            }
-        }
-        return result;
-    }
-    this.takeRandom = function(brd,player) {	
-		var result = new Object();	
-		result['success']=false;
-		result['loc'] = [];
-		for(var i=0;i<this.width;i++) {
-			for (var j=0;j<this.height;j++) {
-				if(!brd[i][j]) {
-					result['success']=true;
-					result['loc'].push([i,j]);
-				}
-			}
-		}	
-		return result;
-    }
-	this.stopL = function (brd,player) {
-	    // block corner trap strategy : two adj. sides are occupied by opponent, 
-	    //								and in-between corner is empty.
-	    // 								if I don't take the corner, opp. will take it. 
-    	var result = new Object();	
- 		result['success']=false;
-		result['loc'] = [];	
-        var oppTurn =  this.flip(player);
-        if (!brd[0][0] && brd[0][1] == oppTurn && brd[1][0] == oppTurn)
-			result['success']=true;
-			result['loc'].push([0,0]);	
-			// return result;		
-        if (!brd[0][2] && brd[0][1] == oppTurn && brd[1][2] == oppTurn)
-			result['success']=true;
-			result['loc'].push([0,2]);	
-			// return result;	
-        if (!brd[2][0] && brd[1][0] == oppTurn && brd[2][1] == oppTurn)
-			result['success']=true;
-			result['loc'].push([2,0]);	
-			// return result;
-        if (!brd[2][2] && (brd[1][2] == oppTurn) && (brd[2][1] == oppTurn))
-			result['success']=true;
-			result['loc'].push([2,2]);	
-			// return result;
-        return result;
-    }
-    this.takeOppositeCorner = function(brd,player) {
-		var result = new Object();	
-   		result['success']=false;
-		result['loc'] = [];	
-        var pairs = [ [[0,0], [2,2]], [[0,2], [2,0]] ];  // for each pair of opposing corners
-        for (var i=0;i<pairs.length; i++) {		
-              var pair=pairs[i];	
-              var pt1 = pair[0];	// x
-              var pt2 = pair[1];	// y
-              var ptOccupied1 = brd[pt1[0]][pt1[1]]; 
-              var ptOccupied2 = brd[pt2[0]][pt2[1]];
-              
-              // if one corner is occupied, take another one. 
-              if (ptOccupied1 && !ptOccupied2) { 
-				result['success']=true;
-				result['loc'].push(pt2);	
-				// return result;
-              }
-              else if (ptOccupied2 && !ptOccupied1) {
-				result['success']=true;
-				result['loc'].push(pt1);	
-				// return result;
-              }
-                
-		}
-		// result['success']=false;
-		return result;
-    }
 }
-
-// //
-// var TTT_WIN = "Win";
-// var TTT_CENTER = "Take Center";
-// var TTT_CORNER = "Take any corner";
-// var TTT_OPP_CORNER = "Take opposite corner";
-// var TTT_BLOCK_WIN = "Block Win";
-// var TTT_TAKE_SIDE = "Take any side";
-// var TTT_RANDOM = "Random Move";
-// var TTT_BLOCK_CORNER_TRAP = "Block Corner Trap";
