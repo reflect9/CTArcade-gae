@@ -25,6 +25,8 @@ import pprint, os, sys
 from TicTacToeMatch import TicTacToeMatch
 from TicTacToeTrainer import TicTacToeTrainer
 
+loggedInAs = "You are not logged in.";
+
 class Lobby(webapp.RequestHandler):
     def get(self):
         query = User.all()
@@ -32,6 +34,7 @@ class Lobby(webapp.RequestHandler):
         
         template_values = {
             'users': users,
+			'loggedInAs': loggedInAs,
         }  # map of variables to be handed to html template
 
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')

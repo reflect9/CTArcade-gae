@@ -23,7 +23,7 @@ Updates:
         	<p align="left">User List:</p>
             <p> {% for user in users %}
                   {% if user.id %}
-                    <b>{{ user.id }}</b><br>
+                    <strong>{{ user.id }}</strong><br />
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
@@ -84,7 +84,22 @@ Updates:
 	<div class="panel_button2" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Login</a></div></div>
 	<div class="panel_button2" id="hide_button2" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
               </div>
-        </div>
+        	  </div>
+                            <hr />
+              <div id="menu_item_3" style="overflow:hidden;">
+              <div id="toppanel3">
+                <div id="panel3" style="height: 0px;">
+                  <div id="panel_contents3"> </div>
+                  <br />
+                  <div class="border" id="login3"><p>
+                    <strong>{{ loggedInAs }}</strong>
+                    </p>
+                  </div>
+                </div>
+	<div class="panel_button3" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">User Info</a></div></div>
+	<div class="panel_button3" id="hide_button3" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
+              </div>
+              </div>
         </div>
     </div>
 </div>
@@ -126,6 +141,25 @@ $(document).ready(function() {
    });	
 });
 </script>
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+	$("div.panel_button3").click(function(){
+		$("div#panel3").animate({
+			height: "350px"
+		})
+		.animate({
+			height: "300px"
+		}, "fast");
+		$("div.panel_button3").toggle();
+	});		
+   $("div#hide_button3").click(function(){
+		$("div#panel3").animate({
+			height: "0px"
+		}, "fast");
+   });	
+});
+</script>
+
 <script language="javascript" type="text/javascript">
     $(function() {  
       $('.error').hide();  
