@@ -49,18 +49,18 @@ class SignUp(webapp.RequestHandler):
         # create User object defined in datastore.py
         # assign usr id and password and save it
         # send back success message
-        existingUser = db.Query(User.get_by_key_name(self.request.get('name')))
+        existingUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",self.request.get('name')).get()
         if existingUser:
-            self.response.out.write("The name is already being used. Try different name please.")
+            self.response.out.write("However, the name is already being used. Try a different name please.")
             return
         user = User(key_name=self.request.get('name'),
-                    id = self.request.get('name'),
+					id = self.request.get('name'),
                     email = self.request.get('email'),
                     password = self.request.get('password'))
         result = user.put()
         if result:
-            self.response.out.write("A new account "+ user['name'] + " has been created")
-        
+            self.response.out.write("You may now login.")
+			
         #http://ctarcade.appspot.com/signUp?name=ben&email=ben@umd.edu&password=ben
 
 class LogIn(webapp.RequestHandler):

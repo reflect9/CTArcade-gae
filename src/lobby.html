@@ -1,92 +1,190 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><META http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>
+<html>
+<head>
+	<title>Lobby - CTArcade</title>
+	<meta name = "viewport" content = "width=device-width">
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+</head>
 
-	
-	
-	
-	
-
-
-<div>
-
-<div align="center">
-    <div>
+<body>
+<!-- here's lobby, showing list of all the users. a small sign-up/login UI will be here as well. -->
+<div id="main_container" align="center">
+    <div id="banner">
     	<h1>CTarcade Lobby</h1>
     </div>
-    <div style="width:900px;border:1px solid black">
-        <div style="width:80%;float:left;border:1px solid black">
-
+    <div id="col_container" style="width: 900px;border:1px solid black;">
+        <div id="left_col" style="width:80%;float:left;border:1px solid black;">
         	<p align="left">User List:</p>
             <p> {% for user in users %}
-                  {% if user.uid %}
-                    <b>{{ user.uid }}</b><br>
+                  {% if user.id %}
+                    <b>{{ user.id }}</b><br>
                   {% else %}
-            		<b>None</b>
+            		<!--- Do Nothing --->
                   {% endif %}
                 {% endfor %}</p>
         </div>
-
-        <div style="width:19%;float:left;border:1px solid black">
-        	<div style="overflow:hidden">
-            <div>
-                <div style="height:0px">
-                  <div> </div>
-                  <br>
-                  <div><p>
-					<form name="0.1_contact" target="_blank" onsubmit="return window.confirm(&quot;You are submitting information to an external page.\nAre you sure?&quot;);">  
+        <div id="right_col" style="width:19%;float:left;border:1px solid black;">
+        	<div id="menu_item_1" style="overflow:hidden;">
+            <div id="toppanel">
+                <div id="panel" style="height: 0px;">
+                  <div id="panel_contents"> </div>
+                  <br />
+                  <div class="border" id="login"><p><br />
+					<form name="contact_form" action="">  
                       	<fieldset>  
-                        <label>Name</label>  
-                        <input type="text" name="name" size="20" value="">  
-                        <label>This field is required.</label>  
-                      	<br>
-
-                        <label>Email</label>
-                        <input type="text" name="email" size="20" value="">  
-                        <label>This field is required.</label>  
-                        <br>  
-                        <input type="submit" name="submit" value="Send">  
+                        <label for="name" id="name_label">Username</label>  
+                        <input type="text" name="name" id="name" size="20" value="" class="text-input" />  
+                        <label class="error" for="name" id="name_error">This field is required.</label>  
+                      	<br /> 
+                        <label for="name" id="password_label">Password</label>  
+                        <input type="text" name="password" id="password" size="20" value="" class="text-input" />  
+                        <label class="error" for="password" id="password_error">This field is required.</label>  
+                      	<br />
+                        <label for="email" id="email_label">Email</label>
+                        <input type="text" name="email" id="email" size="20" value="" class="text-input" />  
+                        <label class="error" for="email" id="email_error">This field is required.</label>  
+                        <br />  
+                        <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
                       </fieldset>  
                     </form>  </p>
                   </div>
                 </div>
-	<div style="display:visible"><img src="http://static/expand.png"> <a href="#0.1_">Register</a> </div>
-
-	<div><img src="http://static/collapse.png"> <a href="#0.1_">Hide</a> </div>
+	<div class="panel_button" style="display: visible;padding-top:8px;"><div style="width:50%;float:left;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Register</a></div></div>
+	<div class="panel_button" id="hide_button" style="display:none;"><div style="width:50%;float:left;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
               </div>
               </div>
-              <hr>
-              <div style="overflow:hidden">
-              <div>
-                <div style="height:0px">
-
-                  <div> </div>
-                  <br>
-                  <div><p>
-					<form name="0.1_contact" target="_blank" onsubmit="return window.confirm(&quot;You are submitting information to an external page.\nAre you sure?&quot;);">  
+              <hr />
+              <div id="menu_item_2" style="overflow:hidden;">
+              <div id="toppanel2">
+                <div id="panel2" style="height: 0px;">
+                  <div id="panel_contents2"> </div>
+                  <br />
+                  <div class="border" id="login2"><p><br />
+					<form name="contact" action="">  
                       	<fieldset>  
-                        <label>Name</label>  
-                        <input type="text" name="name" size="20" value="">  
-                        <label>This field is required.</label>  
-                      	<br>
-                        <label>Email</label>
-
-                        <input type="text" name="email" size="20" value="">  
-                        <label>This field is required.</label>  
-                        <br>  
-                        <input type="submit" name="submit" value="Send">  
+                        <label for="name" id="name_label">Name</label>  
+                        <input type="text" name="name" id="name" size="20" value="" class="text-input" />  
+                        <label class="error" for="name" id="name_error">This field is required.</label>  
+                      	<br />
+                        <label for="email" id="email_label">Email</label>
+                        <input type="text" name="email" id="email" size="20" value="" class="text-input" />  
+                        <label class="error" for="email" id="email_error">This field is required.</label>  
+                        <br />  
+                        <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
                       </fieldset>  
                     </form>  </p>
                   </div>
                 </div>
-	<div style="display:visible"><img src="http://static/expand.png"> <a href="#0.1_">Login</a> </div>
-
-	<div><img src="http://static/collapse.png"> <a href="#0.1_">Hide</a> </div>
+	<div class="panel_button2" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Login</a></div></div>
+	<div class="panel_button2" id="hide_button2" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
               </div>
         </div>
         </div>
     </div>
 </div>
-
-
-
-</div>
-</body></html>
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+	$("div.panel_button").click(function(){
+		$('#login').show()
+		$("div#panel").animate({
+			height: "350px"
+		})
+		.animate({
+			height: "300px"
+		}, "fast");
+		$("div.panel_button").toggle();
+	});	
+   $("div#hide_button").click(function(){
+	   	$('#panel_contents').html(""); 
+		$("div#panel").animate({
+			height: "0px"
+		}, "fast");
+   });	
+});
+</script>
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+	$("div.panel_button2").click(function(){
+		$("div#panel2").animate({
+			height: "350px"
+		})
+		.animate({
+			height: "300px"
+		}, "fast");
+		$("div.panel_button2").toggle();
+	});		
+   $("div#hide_button2").click(function(){
+		$("div#panel2").animate({
+			height: "0px"
+		}, "fast");
+   });	
+});
+</script>
+<script language="javascript" type="text/javascript">
+    $(function() {  
+      $('.error').hide();  
+      $(".button").click(function() {  
+        // validate and process form here  
+        $('.error').hide();  
+		var name = $("input#name").val();  
+		if (name == "") {  
+          $("label#name_error").show();  
+          $("input#name").focus();  
+          return false;  
+        }
+		var password = $("input#password").val();  
+		if (password == "") {  
+          $("label#password_error").show();  
+          $("input#password").focus();  
+          return false;  
+        }  
+		var email = $("input#email").val();  
+		if (email == "") {  
+          $("label#email_error").show();  
+          $("input#email").focus();  
+          return false;  
+        }  
+        var dataString = 'name=' + name + '&password=' + password + '&email=' + email;  
+		$.ajax({  
+		  type: "GET",  
+		  url: "/signUp",  
+		  data: dataString,  
+		  success: function(response) { 
+		  	if(response == "You may now login."){ 
+				$('#login').hide();
+				$("div#panel").animate({
+					height: "200px"
+				})
+				.animate({
+					height: "150px"
+				}, "fast");
+		  	} else {
+				$("div#panel").animate({
+					height: "450px"
+				})
+				.animate({
+					height: "400px"
+				}, "fast");
+			}
+			$('#panel_contents').html("<div id='message'></div>");  
+			$('#message').html("<strong>Registration Submitted</strong>")  
+			.append("<p>"+response+"</p>")  
+			.hide()  
+			.fadeIn(1500, function() {  
+				if(response == "You may now login."){
+					$("input#name").val("");  
+					$("input#email").val("");  
+					$("input#password").val("");  
+			  		$('#message').append("<img id='checkmark' src='css/image/icon_y.png' />");  
+				} else {
+					$('#message').append("<img id='checkmark' src='css/image/icon_x.png' />");  
+				}
+			}); 
+		  }  
+		});  
+		return false;    
+		  });  
+		});   
+</script>
+</body>
+</html>
