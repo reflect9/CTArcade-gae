@@ -17,7 +17,7 @@ class Match(db.Model):
     result = db.TextProperty()
     
 class AI(db.Model):  
-    ''' set of strategies in JSON format for each (player,game) combination   '''
+    id = db.StringProperty()
     user = db.StringProperty()
     game = db.StringProperty()
     data = db.TextProperty()

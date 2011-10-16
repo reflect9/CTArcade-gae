@@ -59,11 +59,16 @@ class SignUp(webapp.RequestHandler):
         user = User(key_name=self.request.get('name'),
 					id = self.request.get('name'),
                     email = self.request.get('email'),
-                    password = self.request.get('password'))
-        result = user.put()
+                    password = self.request.get('password'))			
+        result = user.put()		        
         if result:
-            self.response.out.write("You may now login.")
-			
+			ai_rec = AI(id="name="+self.request.get('name')+"_tictactoe",
+						user = self.request.get('name'),
+						game = "tictactoe",
+						data = 	"{\"data\":[]}")
+			result_2 = ai_rec.put()
+			self.response.out.write("You may now login.")
+						
         #http://ctarcade.appspot.com/signUp?name=ben&email=ben@umd.edu&password=ben
 
 class LogIn(webapp.RequestHandler):
