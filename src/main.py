@@ -112,11 +112,36 @@ class UpdateRule(webapp.RequestHandler):
          
 class PlayMatch(webapp.RequestHandler):
     def get(self):
-        match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=self.request.get('p1'))
-        result = match.run()
+        matches = []
+        p1 = self.request.get('p1')
+        p2 = self.request.get('p2')
+        firstTurn = p1
+        for i in range(0,30):
+            match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=firstTurn)
+            matches.append(match.run())
+            firstTurn = p2 if firstTurn==p1 else p1
 #        self.response.out.write(pprint.pprint(result['history']))
-        self.response.out.write(result['history'])
-        self.response.out.write( result['winner'])
+#        self.response.out.write(result['history'])
+#        self.response.out.write( result['winner'])
+        winners = {}
+        for m in matches:
+            if m['winner'] in winners:
+                winners[m['winner']] = winners[m['winner']] + 1
+            else:
+                winners[m['winner']] = 1
+        
+        template_values = {
+            'p1' : self.request.get('p1'),
+            'p2' : self.request.get('p2'),
+            'winners' : winners,
+            'p1_AI' : json.dumps(getUserStrategy(self.request.get('p1'),'tictactoe')),
+            'p2_AI' : json.dumps(getUserStrategy(self.request.get('p2'),'tictactoe')),      
+            'matches': json.dumps(matches)
+        }  # map of variables to be handed to html template
+
+        path = os.path.join(os.path.dirname(__file__), 'playMatch.html')
+        self.response.out.write(template.render(path, template_values))        
+
         ''' http://localhost:8080/playMatch?p1=tak&p2=ben '''
         
 class Trainer(webapp.RequestHandler):

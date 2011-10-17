@@ -1,0 +1,78 @@
+<html>
+<head>
+	<meta name = "viewport" content = "width=device-width">
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+	<script type="text/javascript">
+		var matches =  {{ matches }};
+		var {{p1}}_AI = {{p1_AI}};
+		var {{p2}}_AI = {{p2_AI}};
+		
+		function createMiniBoard(board,st,loc) {
+			var miniBoard = $("<div style='width:130px; float:left; margin:2px; '></div>"); 
+			$(miniBoard).append("<div>"+st+"</div>");
+				$(board).each( function(ir,r) {
+					//alert(r);
+					var row = $("<div style='height:40px; font-size:15px;'></div>");
+					$(r).each( function(ic,c) {
+						var col = $("<div style='float:left; width:40px; height:39px; border:1px solid #eee;'>"+c+"</div>");
+						if (loc!=undefined && loc[0]==ir && loc[1]==ic) {
+							//$(col).css('background-color:#ddd');
+							if (c=='{{p1}}') $(col).css("background-color","blue");
+							else  $(col).css("background-color","red");
+						}
+						$(row).append(col);
+					});
+					$(row).append("<div style='clear:both'></div>");
+					$(miniBoard).append(row);
+				});
+			$(miniBoard).append("<div style='clear:both;'></div>");
+			return miniBoard;
+		}
+		
+		
+		$(document).ready( function() {
+			$("#desc").append("<div> {{p1}} : " + {{p1}}_AI +"</div>");
+			$("#desc").append("<div> {{p2}} : " + {{p2}}_AI +"</div>");
+			
+			$("#desc").append("<div> RESULT : {{winners}} </div>");
+			
+			$(matches).each( function(i,m) {
+				//alert(e.message);
+				var match = $("<div style='clear:both; margin:10px 0 10px 0; border-top:2px dotted'></div>");
+				$(match).append("<div> Winner : "+ m.winner + "</div>");
+				$(m.history).each(function(bi,turn) {
+					var matchBoard = createMiniBoard(turn.board,turn.message,turn.loc);
+					$(match).append(matchBoard);
+				});
+				$(match).append("<div style='clear:both'/>");
+				$("#container").append(match);
+				
+			});
+			
+		
+		
+		});
+	
+	</script>
+	<style>
+		.miniBoard {
+			height:30px;
+			width:30px;
+			border: 1px solid #ddd;
+		}
+	
+	</style>
+</head>
+<body>
+	Match result between {{p1}} and {{p2}}
+	<div id='desc'></div>
+	<div id='container'>
+	</div>
+
+
+
+</body>
+
+</html>
+	

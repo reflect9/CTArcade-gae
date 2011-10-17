@@ -36,7 +36,7 @@ class TicTacToeMatch:
             if nextMove['message']=="Tie Game":
                 self.history.append({'board':copy.deepcopy(self.board),'loc':None,'turn':self.turn,'message':nextMove['message']})
                 result = "Tie Game"
-                break
+                return {'history':self.history, 'winner': result}       
             else: # now it selects one from all the moves of the best strategy
                 selectedLoc = choice(nextMove['locList'])  # randomly select one location from list
                 self.makeMove(selectedLoc[0], selectedLoc[1], self.turn); # update board
@@ -46,9 +46,9 @@ class TicTacToeMatch:
 #                print self.board
                 winner = self.checkWinner();
                 if winner:
-#                    self.response.write.out(winner + " win!")
+                    print >>sys.stderr, winner + " win!"
                     result = winner
-                    break
+                    return {'history':self.history, 'winner': result}       
                 self.turn = self.flip(self.turn)
             counter = counter+1
             if counter>9: break
