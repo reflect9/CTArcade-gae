@@ -20,23 +20,53 @@ Updates:
     	<h1>CTarcade Lobby</h1>
     </div>
     <div id="col_container" style="width: 900px;border:1px solid black;">
-        <div id="left_col" style="width:80%;float:left;border:1px solid black;">
-        	<p align="left">User List:</p>
-            <p> {% for user in users %}
+        <div id="left_col" style="width:70%;float:left;border:1px solid black;">
+        <div style="width:100%;">
+            <div style="width:33%;float:left;">
+            <p>User List<br />
+            	{% for user in users %}
                   {% if user.id %}
                     <strong>{{ user.id }}</strong><br />
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
                 {% endfor %}</p>
+                </div>
+            <div style="width:33%;float:left;">
+            <p>Score<br />
+             {% for user in users %}
+                  {% if user.id %}
+                    <strong>0</strong><br />
+                  {% else %}
+            		<!--- Do Nothing --->
+                  {% endif %}
+                {% endfor %}</p>
+                </div>
+            <div style="width:33%;float:left;">
+            <p>Actions<br />
+             {% for user in users %}
+                  {% if user.id %}
+                    <strong><a href="">Challenge</a></strong><br />
+                  {% else %}
+            		<!--- Do Nothing --->
+                  {% endif %}
+                {% endfor %}</p>
+                </div>
+                </div>
+         	<div style="width:100%;clear:both;">
+                <hr />
+                <p align="left" style="padding-left:60px;width:40%;float:left"><a href=""><img src="css/image/expand.png"/> Start Server Competition</a></p>
+                <p align="left" style="padding-top:8px;"><a href=""><img src="css/image/expand.png"/> Access Trainer</a></p>
+            </div>
         </div>
-        <div id="right_col" style="width:19%;float:left;border:1px solid black;">
+        <div id="right_col" style="width:29%;float:left;border:1px solid black;">
         	<div id="menu_item_1" style="overflow:hidden;">
             <div id="toppanel">
                 <div id="panel" style="height: 0px;">
                   <div id="panel_contents"> </div>
                   <br />
-                  <div class="border" id="login"><p><br />
+                  <div class="border" id="login"><p>
+                  <strong>CTAracade Registration:</strong><br /><br />
 					<form name="contact_form" action="">  
                       	<fieldset>  
                         <label for="name" id="name_label">Username</label>  
@@ -53,7 +83,7 @@ Updates:
                         <br />  
                         <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
                       </fieldset>  
-                    </form>  </p>
+                    </form></p>
                   </div>
                 </div>
 	<div class="panel_button" style="display: visible;padding-top:8px;"><div style="width:50%;float:left;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Register</a></div></div>
@@ -66,7 +96,8 @@ Updates:
                 <div id="panel2" style="height: 0px;">
                   <div id="panel_contents2"> </div>
                   <br />
-                  <div class="border" id="login2"><p><br />
+                  <div class="border" id="login2"><p>
+                  <strong>CTAracade Login:</strong><br /><br />
 					<form name="contact" action="">  
                       	<fieldset>  
                         <label for="name" id="name_label">Name</label>  
@@ -79,7 +110,8 @@ Updates:
                         <br />  
                         <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
                       </fieldset>  
-                    </form>  </p>
+                    </form><br />
+                    <a href="">Forgotten Login Information</a></p>
                   </div>
                 </div>
 	<div class="panel_button2" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Login</a></div></div>
@@ -93,12 +125,33 @@ Updates:
                   <div id="panel_contents3"> </div>
                   <br />
                   <div class="border" id="login3"><p>
+                  <strong>User Info:</strong><br /><br />
                     <strong>{{ loggedInAs }}</strong>
                     </p>
                   </div>
                 </div>
 	<div class="panel_button3" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">User Info</a></div></div>
 	<div class="panel_button3" id="hide_button3" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
+              </div>
+              </div>
+		<hr />
+		<div id="menu_item_4" style="overflow:hidden;">
+              <div id="toppanel4">
+                <div id="panel4" style="height: 0px;">
+                  <div id="panel_contents4"> </div>
+                  <br />
+                  <div class="border" id="login4" align="center"><p align="left" style="padding-left:20px;">
+                    <strong>Recent CTAracade Activity:</strong><br /><br />
+                    <strong>mattm401 has logged in.</strong><br />
+                    <strong>mattm402 has logged in.</strong><br />
+                    <strong>mattm403 has logged in.</strong><br />
+                    <strong>mattm401 is training.</strong><br />
+                    <strong>mattm402 challenged mattm403</strong><br />
+                    </p>
+                  </div>
+                </div>
+	<div class="panel_button4" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">History</a></div></div>
+	<div class="panel_button4" id="hide_button4" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
               </div>
               </div>
         </div>
@@ -160,7 +213,24 @@ $(document).ready(function() {
    });	
 });
 </script>
-
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+	$("div.panel_button4").click(function(){
+		$("div#panel4").animate({
+			height: "350px"
+		})
+		.animate({
+			height: "300px"
+		}, "fast");
+		$("div.panel_button4").toggle();
+	});		
+   $("div#hide_button4").click(function(){
+		$("div#panel4").animate({
+			height: "0px"
+		}, "fast");
+   });	
+});
+</script>
 <script language="javascript" type="text/javascript">
     $(function() {  
       $('.error').hide();  
