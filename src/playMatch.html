@@ -9,23 +9,31 @@
 		var {{p2}}_AI = {{p2_AI}};
 		
 		function createMiniBoard(board,st,loc) {
-			var miniBoard = $("<div style='width:130px; float:left; margin:2px; '></div>"); 
+			var miniBoard = $("<div style='width:100px; float:left; margin:2px; '></div>"); 
 			$(miniBoard).append("<div>"+st+"</div>");
+			var boardDiv = $("<div style='border:1px solid #aaa;'></div>");
 				$(board).each( function(ir,r) {
 					//alert(r);
-					var row = $("<div style='height:40px; font-size:15px;'></div>");
+					var row = $("<div style='height:30px; font-size:15px;'></div>");
 					$(r).each( function(ic,c) {
-						var col = $("<div style='float:left; width:40px; height:39px; border:1px solid #eee;'>"+c+"</div>");
+						var col = $("<div style='float:left; width:30px; height:30px; border:1px solid #eee;'>"+c+"</div>");
 						if (loc!=undefined && loc[0]==ir && loc[1]==ic) {
 							//$(col).css('background-color:#ddd');
 							if (c=='{{p1}}') $(col).css("background-color","blue");
 							else  $(col).css("background-color","red");
+							if (st=='takeWin') {
+								if (c=='{{p1}}') $(boardDiv).css('border','2px solid blue');
+								else $(boardDiv).css('border','2px solid red');
+							}
 						}
+						
 						$(row).append(col);
 					});
 					$(row).append("<div style='clear:both'></div>");
-					$(miniBoard).append(row);
+					$(boardDiv).append(row);
 				});
+			$(boardDiv).append("<div style='clear:both'></div>");
+			$(miniBoard).append(boardDiv);
 			$(miniBoard).append("<div style='clear:both;'></div>");
 			return miniBoard;
 		}
