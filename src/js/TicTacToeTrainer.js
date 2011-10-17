@@ -213,6 +213,7 @@ function TicTacToeTrainer() {
     		type : "GET",
     		url: "/ajaxTrainer",
     		async: false,	// browser will hold until it gets the response from server
+    		cache: false,
     		data: 	{	action: 'getStrategy',
     					player: userName,
     					game: this.gameTitle
@@ -227,6 +228,7 @@ function TicTacToeTrainer() {
     		type : "GET",
     		url: '/ajaxTrainer',
     		async: true,
+    		cache: false,
     		data: {  	action: 'getPublicStrategyDict',
     					game: this.gameTitle 
     				},
@@ -241,6 +243,7 @@ function TicTacToeTrainer() {
     		type : "GET",
     		url: "/ajaxTrainer",
     		async: true,
+    		cache: false,
     		data: { action: 'findBestStrategy',
     				user:this.user,
     				player1: this.p1,
@@ -297,6 +300,7 @@ function TicTacToeTrainer() {
     		type : "GET",
     		url: "/ajaxTrainer",
     		async: true,
+    		cache: false,
     		data: 	{ 	action: 'enableStrategy',
     					player: userName,
     					game: this.gameTitle,
@@ -336,7 +340,7 @@ function TicTacToeTrainer() {
 	
     this.assignStrategy = function(data) {
 //    	alert(data);
-    	this.strategy = (JSON.parse(data)).data;
+    	this.strategy = JSON.parse(data);
     }
     this.assignStrategyDict = function(data) {
 //    	alert(data);

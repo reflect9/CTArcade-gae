@@ -71,16 +71,18 @@ def getPublicStrategyDict(game_title):
         dict[st['code']]=st
     return dict
 def getUserStrategy(user_id,game_title):
-    userAI = db.Query(AI.get_by_key_name(user_id+"_"+game_title)).get()
+    userAI = db.GqlQuery("SELECT * FROM AI WHERE user=:1 AND game=:2",user_id,game_title).get()
+#    print >>sys.stderr, user_id+"_"+game_title
+#    print >>sys.stderr, len(userAI)
     if userAI==None:
         return "no rule found for "+user_id + "'s game "+ game_title
-#    print >>sys.stderr, userAI.data
+#    print >>sys.stderr, userAI.user + userAI.data
     strr = json.loads(userAI.data)
-    print >>sys.stderr, strr
+#    print >>sys.stderr, strr
     return strr['data']
 
 def setUserStrategy(user_id,game_title,codeList):
-    userAI = db.Query(AI.get_by_key_name(user_id+"_"+game_title)).get()
+    userAI = db.GqlQuery("SELECT * FROM AI WHERE user=:1 AND game=:2",user_id,game_title).get()
     result = {"data": codeList};
     userAI.data = json.dumps(result)
     userAI.put()

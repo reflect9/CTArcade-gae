@@ -114,17 +114,19 @@ class PlayMatch(webapp.RequestHandler):
     def get(self):
         match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=self.request.get('p1'))
         result = match.run()
-        self.response.out.write(pprint.pprint(result['history']))
+#        self.response.out.write(pprint.pprint(result['history']))
+        self.response.out.write(result['history'])
         self.response.out.write( result['winner'])
         ''' http://localhost:8080/playMatch?p1=tak&p2=ben '''
         
 class Trainer(webapp.RequestHandler):
     def get(self):
-        try:
-            session = appengine_utilities.sessions.Session()
-            current_user_id = session["id"] if session["id"] else ''   
-        except AttributeError:
-            current_user_id='tak'
+#        try:
+#            session = appengine_utilities.sessions.Session()
+#            current_user_id = session["id"] if session["id"] else ''   
+        current_user_id = self.request.get('id')
+#        except AttributeError:
+#            current_user_id='ben'
         template_values = {
             'user_id': current_user_id,
         }  

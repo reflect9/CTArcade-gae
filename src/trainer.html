@@ -312,8 +312,9 @@
 	
 	
 	$(document).ready(function () {
+		$.ajaxSetup({ cache: false });
 		game = new TicTacToeTrainer();
-		game.init('tak');
+		game.init('{{user_id}}');
 		cons = new Console();
 		cons.init("#console > .message"); // initialize console object
 		currentTurn = game.turn;
@@ -350,9 +351,10 @@
 		<div id="pane_control">
 			<div>
 				<div style="float:left; margin-right:10px;"><input type="button" value="New Game" onclick="clearBoard();"></div>
+				<div style="float:left">{{user_id}}</div>
 				<div id="historyControl" style="float:right;">
 					<span id="prev" onclick="history('prev');" style="cursor:pointer">
-						<
+						
 					</span> 
 					[<span id='currentStep'>0</span>]
 					<span id="next" onclick="history('next');" style="cursor:pointer">

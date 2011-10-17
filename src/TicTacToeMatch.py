@@ -34,12 +34,13 @@ class TicTacToeMatch:
         while True:
             nextMove = self.findBestStrategy(self.turn)
             if nextMove['message']=="Tie Game":
-                self.history.append({'board':copy.deepcopy(self.board),'loc':None,'turn':self.turn,'message':nextMove.message})
+                self.history.append({'board':copy.deepcopy(self.board),'loc':None,'turn':self.turn,'message':nextMove['message']})
                 result = "Tie Game"
                 break
             else: # now it selects one from all the moves of the best strategy
                 selectedLoc = choice(nextMove['locList'])  # randomly select one location from list
                 self.makeMove(selectedLoc[0], selectedLoc[1], self.turn); # update board
+                
                 self.history.append({'board':copy.deepcopy(self.board),'loc':selectedLoc,'turn':self.turn,'message':nextMove['message']})
 #                print selectedLoc
 #                print self.board
@@ -57,6 +58,7 @@ class TicTacToeMatch:
     def flip(self,player):
         return self.p2 if player==self.p1 else self.p1
     def isFull(self):
+#        print self.board
         for row in self.board:  
             for cell in row:
                 if cell==0: return False
@@ -103,11 +105,11 @@ class TicTacToeMatch:
             # locals() provide a dictionary of all elements in local scope
             # locals()[functionName] gives a handler to the function
             # thus, below we execute local function whose name is st['code']
-#            print st['code']
-            strategyMethodToCall =  getattr(self, st['code'])
+#            print st
+            strategyMethodToCall =  getattr(self, st)
             result = strategyMethodToCall(self.board,player) 
             if result['success']:
-                return {'message':st['name'], 'locList':result['loc']}
+                return {'message':st, 'locList':result['loc']}
         return {'message':"no matching strategy found",'locList':None}
    
     ''' STRATEGIES'''
