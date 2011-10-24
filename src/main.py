@@ -24,21 +24,26 @@ import appengine_utilities
 import pprint, os, sys
 from TicTacToeMatch import TicTacToeMatch
 from TicTacToeTrainer import TicTacToeTrainer
-
-loggedInAs = "You are not logged in.";
+from appengine_utilities import sessions
 
 class Lobby(webapp.RequestHandler):
     def get(self):
-        query = User.all()
-        users = query.fetch(10)
+		self.sess = sessions.Session()
+		try:
+			self.sess['loggedInAs']
+		except KeyError:
+			self.sess['loggedInAs'] = "You are not logged in."
+				
+		query = User.all()
+		users = query.fetch(10)
         
-        template_values = {
+		template_values = {
             'users': users,
-			'loggedInAs': loggedInAs,
+			'loggedInAs': self.sess['loggedInAs'],
         }  # map of variables to be handed to html template
 
-        path = os.path.join(os.path.dirname(__file__), 'lobby.html')
-        self.response.out.write(template.render(path, template_values))
+		path = os.path.join(os.path.dirname(__file__), 'lobby.html')
+		self.response.out.write(template.render(path, template_values))
 
 class Init(webapp.RequestHandler):
     def get(self):
@@ -73,8 +78,17 @@ class SignUp(webapp.RequestHandler):
 
 class LogIn(webapp.RequestHandler):
     def get(self):
+	self.sess = sessions.Session()
         ''' this login module will receive ajax call from lobby.html '''
         # read given user id and password
+	findUser = db.GqlQuery("SELECT * FROM User WHERE id=:1 and password=:2",self.request.get('name'),self.request.get('password')).get()
+	if findUser:
+		self.sess['loggedInAs'] = findUser.id
+		self.response.out.write("You are now logged in.")
+		return
+	else:
+		self.response.out.write("We could not find your user information,<br />please try again.")	
+		return	
         # user GqlQuery to retrieve matching User object from datastore
         # if matching User found, 
         #        1) create session object using user id

@@ -20,7 +20,7 @@ Updates:
     	<h1>CTarcade Lobby</h1>
     </div>
     <div id="col_container" style="width: 900px;border:1px solid black;">
-        <div id="left_col" style="width:70%;float:left;border:1px solid black;">
+        <div id="left_col" style="width:60%;float:left;border:1px solid black;">
         <div style="width:100%;">
             <div style="width:33%;float:left;">
             <p>User List<br />
@@ -59,7 +59,7 @@ Updates:
                 <p align="left" style="padding-top:8px;"><a href=""><img src="css/image/expand.png"/> Access Trainer</a></p>
             </div>
         </div>
-        <div id="right_col" style="width:29%;float:left;border:1px solid black;">
+        <div id="right_col" style="width:39%;float:left;border:1px solid black;">
         	<div id="menu_item_1" style="overflow:hidden;">
             <div id="toppanel">
                 <div id="panel" style="height: 0px;">
@@ -69,17 +69,17 @@ Updates:
                   <strong>CTAracade Registration:</strong><br /><br />
 					<form name="contact_form" action="">  
                       	<fieldset>  
-                        <label for="name" id="name_label">Username</label>  
+                        <label for="name" id="name_label">Username:</label>  
                         <input type="text" name="name" id="name" size="20" value="" class="text-input" />  
-                        <label class="error" for="name" id="name_error">This field is required.</label>  
+                        <label class="error" for="name" id="name_error"> *Required</label>  
                       	<br /> 
-                        <label for="name" id="password_label">Password</label>  
+                        <label for="name" id="password_label">Password:</label>  
                         <input type="text" name="password" id="password" size="20" value="" class="text-input" />  
-                        <label class="error" for="password" id="password_error">This field is required.</label>  
+                        <label class="error" for="password" id="password_error"> *Required</label>  
                       	<br />
-                        <label for="email" id="email_label">Email</label>
+                        <label for="email" id="email_label">Email:</label>
                         <input type="text" name="email" id="email" size="20" value="" class="text-input" />  
-                        <label class="error" for="email" id="email_error">This field is required.</label>  
+                        <label class="error" for="email" id="email_error"> *Required</label>  
                         <br />  
                         <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
                       </fieldset>  
@@ -98,17 +98,17 @@ Updates:
                   <br />
                   <div class="border" id="login2"><p>
                   <strong>CTAracade Login:</strong><br /><br />
-					<form name="contact" action="">  
+					<form name="login" action="#">  
                       	<fieldset>  
-                        <label for="name" id="name_label">Name</label>  
-                        <input type="text" name="name" id="name" size="20" value="" class="text-input" />  
-                        <label class="error" for="name" id="name_error">This field is required.</label>  
+                        <label for="name2" id="name_label2">Name:</label>  
+                        <input type="text" name="name2" id="name2" size="20" value="" class="text-input" />  
+                        <label class="error2" for="name2" id="name_error2"> *Required</label>  
                       	<br />
-                        <label for="password" id="password_label">password</label>
-                        <input type="password" name="password" id="password" size="20" value="" class="text-input" />  
-                        <label class="password" for="password" id="password_error">This field is required.</label>  
+                        <label for="password2" id="password_label2">Password:</label>
+                        <input type="password" name="password2" id="password2" size="20" value="" class="text-input" />  
+                        <label class="error2" for="password2" id="password_error2"> *Required</label>  
                         <br />  
-                        <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
+                        <input type="submit" name="submit2" class="button2" id="submit_btn2" value="Send" />  
                       </fieldset>  
                     </form><br />
                     <a href="">Forgotten Login Information</a></p>
@@ -180,6 +180,7 @@ $(document).ready(function() {
 <script language="javascript" type="text/javascript">
 $(document).ready(function() {
 	$("div.panel_button2").click(function(){
+		$('#login2').show()
 		$("div#panel2").animate({
 			height: "350px"
 		})
@@ -189,6 +190,7 @@ $(document).ready(function() {
 		$("div.panel_button2").toggle();
 	});		
    $("div#hide_button2").click(function(){
+	    $('#panel_contents2').html(""); 
 		$("div#panel2").animate({
 			height: "0px"
 		}, "fast");
@@ -297,5 +299,66 @@ $(document).ready(function() {
 		  });  
 		});   
 </script>
+<script language="javascript" type="text/javascript">
+    $(function() {  
+      $('.error2').hide(); 
+	  $(".button2").click(function() {  
+        // validate and process form here  
+        $('.error').hide();  
+		var name = $("input#name2").val();  
+		if (name == "") {  
+          $("label#name_error2").show();  
+          $("input#name2").focus();  
+          return false;  
+        }
+		var password = $("input#password2").val();  
+		if (password == "") {  
+          $("label#password_error2").show();  
+          $("input#password2").focus();  
+          return false;  
+        }
+		var dataString = 'name=' + name + '&password=' + password;  
+		$.ajax({  
+		  type: "GET",  
+		  url: "/LogIn",  
+		  data: dataString,  
+		  success: function(response) { 
+		  	if(response == "You are now logged in."){ 
+				$('#login2').hide();
+				$("div#panel2").animate({
+					height: "200px"
+				})
+				.animate({
+					height: "150px"
+				}, "fast");
+		  	} else {
+				$("div#panel2").animate({
+					height: "450px"
+				})
+				.animate({
+					height: "400px"
+				}, "fast");
+			}
+			$('#panel_contents2').html("<div id='message2'></div>");  
+			$('#message2').html("<strong>Login Submitted</strong>")  
+			.append("<p>"+response+"</p>")  
+			.hide()  
+			.fadeIn(1500, function() {  
+				if(response == "You are now logged in."){
+					$("input#name2").val("");  
+					$("input#email2").val("");  
+					$("input#password2").val("");  
+			  		$('#message2').append("<img id='checkmark' src='css/image/icon_y.png' />");  
+				} else {
+					$('#message2').append("<img id='checkmark' src='css/image/icon_x.png' />");  
+				}
+			}); 
+		  }  
+		});  
+		return false;  
+	  });
+	});
+</script>
+
 </body>
 </html>
