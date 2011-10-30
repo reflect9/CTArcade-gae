@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from google.appengine.dist import use_library
+use_library('django', '1.2')
+
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from datastore import *
@@ -28,22 +31,27 @@ from appengine_utilities import sessions
 
 class Lobby(webapp.RequestHandler):
     def get(self):
-		self.sess = sessions.Session()
-		try:
-			self.sess['loggedInAs']
-		except KeyError:
-			self.sess['loggedInAs'] = "You are not logged in."
-				
-		query = User.all()
-		users = query.fetch(10)
+        self.sess = sessions.Session()
+        logged=True
+        loggedID = ""
+        try:
+            loggedID = self.sess['loggedInAs']
+        except KeyError:
+            logged =False
+            loggedID = "Guest"
+#            self.sess['loggedInAs'] = "You are not logged in."   # next time KeyError exception wont be thrown.
+                
+        query = User.all()
+        users = query.fetch(10)
         
-		template_values = {
+        template_values = {
             'users': users,
-			'loggedInAs': self.sess['loggedInAs'],
+            'logged' : logged,
+            'loggedInAs': loggedID
         }  # map of variables to be handed to html template
 
-		path = os.path.join(os.path.dirname(__file__), 'lobby.html')
-		self.response.out.write(template.render(path, template_values))
+        path = os.path.join(os.path.dirname(__file__), 'lobby.html')
+        self.response.out.write(template.render(path, template_values))
 
 class Init(webapp.RequestHandler):
     def get(self):
@@ -62,44 +70,45 @@ class SignUp(webapp.RequestHandler):
             self.response.out.write("However, the name is already being used. Try a different name please.")
             return
         user = User(key_name=self.request.get('name'),
-					id = self.request.get('name'),
+                    id = self.request.get('name'),
                     email = self.request.get('email'),
-                    password = self.request.get('password'))			
-        result = user.put()		        
+                    password = self.request.get('password'))            
+        result = user.put()                
         if result:
-			ai_rec = AI(id="name="+self.request.get('name')+"_tictactoe",
-						user = self.request.get('name'),
-						game = "tictactoe",
-						data = 	"{\"data\":[]}")
-			result_2 = ai_rec.put()
-			self.response.out.write("You may now login.")
-						
+            ai_rec = AI(key_name="name="+self.request.get('name')+"_tictactoe",
+                        user = self.request.get('name'),
+                        game = "tictactoe",
+                        data =     "{\"data\":[\"takeRandom\",]}")
+            result_2 = ai_rec.put()
+            self.response.out.write("You may now login.")
+                        
         #http://ctarcade.appspot.com/signUp?name=ben&email=ben@umd.edu&password=ben
 
 class LogIn(webapp.RequestHandler):
     def get(self):
-	self.sess = sessions.Session()
+        self.sess = sessions.Session()
         ''' this login module will receive ajax call from lobby.html '''
         # read given user id and password
-	findUser = db.GqlQuery("SELECT * FROM User WHERE id=:1 and password=:2",self.request.get('name'),self.request.get('password')).get()
-	if findUser:
-		self.sess['loggedInAs'] = findUser.id
-		self.response.out.write("You are now logged in.")
-		return
-	else:
-		self.response.out.write("We could not find your user information,<br />please try again.")	
-		return	
-        # user GqlQuery to retrieve matching User object from datastore
-        # if matching User found, 
-        #        1) create session object using user id
-        session = appengine_utilities.sessions.Session()
-        session["id"] =  'tak' # user id here
+        findUser = db.GqlQuery("SELECT * FROM User WHERE id=:1 and password=:2",self.request.get('name'),self.request.get('password')).get()
+        if findUser:
+            self.sess['loggedInAs'] = findUser.id
+            self.response.out.write("You are now logged in as " + self.sess['loggedInAs'])
+            return
+        else:
+            self.response.out.write("We could not find your user information,<br />please try again.")    
+            return    
+            # user GqlQuery to retrieve matching User object from datastore
+            # if matching User found, 
+            #        1) create session object using user id
+#            session = appengine_utilities.sessions.Session()
+#            session["id"] =  'tak' # user id here
         
         #        2) [LATER!] read Match that the user has played and hand JSON data to lobby.html
         
 
 class UpdateRule(webapp.RequestHandler):
     def get(self):
+        ''' This module is only called directly from URL - it's manual updating of rule. '''
         user = db.GqlQuery("SELECT * FROM User WHERE id=:1",self.request.get("player")).get()
         game = db.GqlQuery("SELECT * FROM Game WHERE title=:1",self.request.get("game")).get()
         if user==None:
@@ -143,15 +152,17 @@ class PlayMatch(webapp.RequestHandler):
                 winners[m['winner']] = winners[m['winner']] + 1
             else:
                 winners[m['winner']] = 1
-        
+        p1_AI = json.dumps(getUserStrategy(self.request.get('p1'),'tictactoe'))
+        p2_AI = json.dumps(getUserStrategy(self.request.get('p2'),'tictactoe'))
         template_values = {
             'p1' : self.request.get('p1'),
             'p2' : self.request.get('p2'),
             'winners' : winners,
-            'p1_AI' : json.dumps(getUserStrategy(self.request.get('p1'),'tictactoe')),
-            'p2_AI' : json.dumps(getUserStrategy(self.request.get('p2'),'tictactoe')),      
-            'matches': json.dumps(matches)
+            'p1_AI' : p1_AI,
+            'p2_AI' : p2_AI,      
+            'matches': json.dumps(matches).replace("&quot;","'")
         }  # map of variables to be handed to html template
+#        print json.dumps(getUserStrategy(self.request.get('p2'),'tictactoe'))
 
         path = os.path.join(os.path.dirname(__file__), 'playMatch.html')
         self.response.out.write(template.render(path, template_values))        
@@ -177,7 +188,7 @@ class AjaxTrainer(webapp.RequestHandler):
         action  = self.request.get('action')
         if action == 'getStrategy':
 #            ai = db.Query(AI.get_by_key_name(self.request.get('player')+"_"+self.request.get('game'))).get()
-            self.response.out.write(getUserStrategy(self.request.get('player'),self.request.get('game')))
+            self.response.out.write(json.dumps(getUserStrategy(self.request.get('player'),self.request.get('game'))))
         elif action == 'getPublicStrategyDict':
             dict = getPublicStrategyDict(self.request.get('game'))
 #            print >>sys.stderr, dict

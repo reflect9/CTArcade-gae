@@ -3,7 +3,7 @@
 	<meta name = "viewport" content = "width=device-width">
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="js/TicTacToeTrainer.js"> </script>
+	<script type="text/javascript" src="js/TicTacToe.js"> </script>
 	<script type="text/javascript" src="js/Console.js"> </script>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<script type="text/javascript">
@@ -31,8 +31,8 @@
 		if (winner) {
 			$("#status").text(winner + " wins!");
 			$("#status").css('background-color', 'yellow');
-			if(winner=='p1') cons.appendHTML("<div style='font-size:17px; margin:10px;'>"+game.p1 + " wins!</div>");
-			else cons.appendHTML("<div style='font-size:17px; margin:10px;'>"+game.p2 + " wins!</div>");
+			if(winner=='p1') cons.appendMessage('You win!');
+			else cons.appendMessage('I win!');
 			// $("#bigButton_newGame").show();
 			needReset = true;
 		} else {
@@ -41,63 +41,50 @@
 		}
 	}	
 	
-
-	
 	// it uses AI's current strategy set 
 	// to find the best move
-	function computerMove(response) {
-//		alert("computerMove");
+	function computerMove() {
+
 		if(needReset) {
 			cons.appendMessage('Game already finished. Press new game button to start again.');
 			return;
 		}
+		
 		$("#sortable").each( function() {
 			$(this).attr('id','');	
 		});
 		
-		var html = "<div>For my last move I tried all my strategies,</div><ul id='sortable'>";
-//		var strategy = game.findBestStrategy(game.board,game.turn); // returns {'message':[[title]],'loc':[[x,y],...]};
-		var strategy = JSON.parse(response);
 		
-//		alert(strategy);
+		var html = "<div>For my last move I tried all my strategies,</div><ul id='sortable'>";
+		var nextMove = game.findBestStrategy(game.board,game.turn,game.strategySet); // returns {'message':[[title]],'loc':[[x,y],...]};
 		// console.log(nextMove);
 		// convert used strategies in HTML
-//		enabledStrategy = game.getEnabledStrategy();  // get strategies AI learned so far
-		var nextMove;
-		for(i in strategy) {
-			result = strategy[i].result;
-			if (result.success) {
-				nextMove=strategy[i];
-				break;
-			}
-		}
-		for(i in strategy) {
-			code = strategy[i].st;
-			strt = game.publicStrategyDict[code];  
-			name = strt['name'];
-			html = html+"<li class='ui-state-default'><div style='margin:10px 0 0 10px; ' id='ai_"+code+"' class='ai_"+ code +" rule_inactive'>"+ name +"</div></li>";
+		enabledStrategy = game.getEnabledStrategy();  // get strategies AI learned so far
+		for(i in enabledStrategy) {
+			st = enabledStrategy[i];
+			html = html+"<li class='ui-state-default'><div style='margin:10px 0 0 10px; ' class='ai_"+ st['code'] +" rule_inactive'>"+ st['name'] +"</div></li>";
 		}
 		html = html+"</ul>";
 		// $("#console > .message").append(html);	// create list of strategies that AI knows
 		cons.appendHTML(html);
-		for(i in strategy) {
-			stCode = strategy[i].st;
-			if (nextMove!=undefined && nextMove.st==strategy[i].st) {	// for the best strategy, 
+		for(i in enabledStrategy) {
+			st = enabledStrategy[i];
+			if (nextMove.message==st.name) {	// for the best strategy, 
 				// color it in red
-				console.log("found it!"+stCode);
+				console.log("found it!"+st.name);
 				var currentMove = cons.getLast(); 
-				$(".ai_"+stCode).removeClass('rule_inactive');
-				$(".ai_"+stCode).removeClass('rule_unapplicable');
-				$(".ai_"+stCode).addClass('rule_selected');
-				$(".ai_"+stCode).append("<span style='color:gray; font-size:13px;'> was the first applicable rule.</span>");
+				$(".ai_"+st['code']).removeClass('rule_inactive');
+				$(".ai_"+st['code']).removeClass('rule_unapplicable');
+				$(".ai_"+st['code']).addClass('rule_selected');
+				$(".ai_"+st['code']).append("<span style='color:gray; font-size:13px;'> was the first applicable rule.</span>");
 				break;
 			} else {   // for non-feasible (but top-priority) strategies
 				var currentMove = cons.getLast(); 
-				console.log("cannot find it!"+ stCode);  
-				$(".ai_"+stCode).removeClass('rule_inactive');
-				$(".ai_"+stCode).addClass('rule_unapplicable');
-				$(".ai_"+stCode).removeClass('rule_selected');
-				$(".ai_"+stCode).append("<span style='color:gray; font-size:13px;'> was not applicable.</span>");
+				console.log("cannot find it!"+ st.name);  
+				$(".ai_"+st['code']).removeClass('rule_inactive');
+				$(".ai_"+st['code']).addClass('rule_unapplicable');
+				$(".ai_"+st['code']).removeClass('rule_selected');
+				$(".ai_"+st['code']).append("<span style='color:gray; font-size:13px;'> was not applicable.</span>");
 			}
 		}
 		$("#sortable").sortable({
@@ -109,23 +96,23 @@
 		// $("#console_p2 > .message").append("<div onclick='changeOrder();' style='font-size:14px; margin:10px 0 10px 15px; color:blue; cursor:pointer;'>[CHANGE ORDER]</div>");
 		
 		
-		if (strategy.message=="Tie Game") {
-			$("#status").text(strategy.message);
+		if (nextMove.message=="Tie Game") {
+			$("#status").text(nextMove.message);
 			// $("#bigButton_newGame").show();
 			html = "<div style='line-height:2em;'>Tie game! Click 'new game' button to start over.</div>"
 			cons.appendHTML(html);
-		} else if (strategy.message=="no strategy found") {
-			$("#status").text(strategy.message);
+		} else if (nextMove.message=="no strategy found") {
+			$("#status").text(nextMove.message);
 			html = "<div style='line-height:2em;'>No strategy seems to match the situation.</div>"
 			cons.appendHTML(html);
 		} else {
-			$("#rule").text(strategy.message);
+			$("#rule").text(nextMove.message);
 			//console.log(nextMove.locList.length);
 			html = "<div style='line-height:1.2em;margin-top:10px;'>Your turn now. Click an empty cell to continue.</div>"
 			cons.appendHTML(html);
 
 			// now it selects one from all the moves of the best strategy
-			selectedLoc = nextMove.result.loc[Math.floor(Math.random()*nextMove.result.loc.length)]; // randomly select one location from list
+			selectedLoc = nextMove.locList[Math.floor(Math.random()*nextMove.locList.length)]; // randomly select one location from list
 			game.move(selectedLoc[0], selectedLoc[1], game.turn); // update board ds with current game.turn and return new value of the cell
 			$("#currentStep").text(game.history.length-1);
 			updateBoard(game.board);
@@ -156,10 +143,10 @@
 			$("#currentStep").text(currentStep);
 			// $(".icon_player").css('border','0px');
 			cons.clear();
-			cons.appendHTML("<span style='color:#2222ee; font-size:20px;'>History Mode</div>");
-			if (tempBoard['turn']==game.p2) {
+			cons.appendMessage('We are in history mode. You can trace current game back and forth.<br>');
+			if (tempBoard['turn']=='p2') {
 				// $("#icon_p1").css('border','2px solid #aaa');
-				cons.appendHTML("<div>It was your turn. Do you want to start again from this point?</div><div class='button_round' onclick='resumeGame("+currentStep+");' style='width:200px; text-align:center; background-color:#aaa; font-size:17px; margin:10px auto;'>Resume Game Here</div></div>");
+				cons.appendHTML("<div>It was your turn. Do you want to start again from this point? <div class='button_round' onclick='resumeGame("+currentStep+");' style='float:right;'>Resume Game Here</div></div>");
 				// $("#console_p2 > .message").empty();
 			} else {
 				// $("#icon_p2").css('border','2px solid #aaa');
@@ -177,20 +164,17 @@
 		// this teaching method is being used in history mode only. 
 		var x = loc[1];
 		var y = loc[2];
+		// console.log(board, turn, [x,y]);
 		flippedTurn = (turn == 'p1') ? 'p2' : 'p1';
-		game.findMatchingStrategy(board,flippedTurn,[x,y],showTeachingStrategy);
-		
-//		// console.log(board, turn, [x,y]);
-//		flippedTurn = (turn == 'p1') ? 'p2' : 'p1';
-//		var matchingRules = game.analyzeMove(board,flippedTurn,[x,y]);
-//		// console.log(matchingRules);
-//		cons.appendHTML("<div>Which rule below does match with your choice?</div>");
-//		html = "<div class='teach'>";
-//		$(matchingRules).each( function(i,rule) {
-//			html = "<div style='margin-left:20px;'>"+rule['name']+"</div>"			
-//		});
-//		html = html+"</div>";
-//		cons.appendHTML(html);
+		var matchingRules = game.analyzeMove(board,flippedTurn,[x,y]);
+		// console.log(matchingRules);
+		cons.appendHTML("<div>Which rule below does match with your choice?</div>");
+		html = "<div class='teach'>";
+		$(matchingRules).each( function(i,rule) {
+			html = "<div style='margin-left:20px;'>"+rule['name']+"</div>"			
+		});
+		html = html+"</div>";
+		cons.appendHTML(html);
 	}
 	
 	function resumeGame(currentStep) {
@@ -200,24 +184,6 @@
 			callUserMove($(this).attr('id'));
 		});
 	}
-	
-	function showTeachingStrategy(response) {   
-//		alert (response);
-//		alert("cons");
-		matchingRules = JSON.parse(response);
-//		cons.clear();
-		cons.appendHTML("<div>Which rule below does match with your choice?</div>");
-		$(matchingRules).each( function(i,rule) {
-			$('<div></div>',{
-				id : 'mR_'+rule['code'],
-				style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
-			})	.text(rule['name'])
-				.click(function() { game.enableStrategy(game.user,rule['code']);})
-				.appendTo($(cons.target));
-		});
-//		cons.appendButton("CONTINUE","$(this).hide(); game.findBestStrategy(game.board,game.turn,computerMove);");
-	}
-	
 	
 	function historyMode(flag) {
 		if(flag=='on') {
@@ -246,25 +212,42 @@
 		$('#sortable li').each(function(i,e) {
 			// extract the strategy code and push into new list
 			var c = $(e).clone();
-//			console.log($(c).html());
-//			console.log($(c).find('div').attr('id'));
-			code = $(c).find('div').attr('id').replace('ai_','');
-			nameList.push(code);
+			console.log($(c).html());
+			console.log("aa"+ $(c).find('span').remove().end().text());
+			nameList.push($(c).text());
 		});
 		game.changeOrder(nameList);
 	}
 	
-//	function enableStrategy(code) {
-//		console.log(code + ' is enabled!');
-//	 	isNewStrategyLearned = game.enableStrategy(code);
-//		if(isNewStrategyLearned) {
-//			$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#955;'> I learned this new rule!</span>");
-//		} else {
-//			$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#595;'> Thanks! But I knew it already.</span>");
-//		}
-//		
-//	}
+	function enableStrategy(code) {
+		console.log(code + ' is enabled!');
+	 	isNewStrategyLearned = game.enableStrategy(code);
+		if(isNewStrategyLearned) {
+			$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#955;'> I learned this new rule!</span>");
+		} else {
+			$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#595;'> Thanks! But I knew it already.</span>");
+		}
+		
+	}
+	
+	function showMatchingRules(matchingRules)  {  // matchingRules : {name:text, code:text, locList:array of [x.y]}
+		cons.clear();
+		cons.appendMessage("Is your last move based on one of these rules?")
+		
+		//alert('showMatching');
+		$(matchingRules).each( function(i,rule) {
+			alreadyKnown = game.checkStrategyEnabled(rule['code']);
+			$('<div></div>',{
+				id : 'mR_'+rule['code'],
+				style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
+			})	.text(rule['name'])
+				.click(function() { enableStrategy(rule['code']);})
+				.appendTo($(cons.target));
 
+		});
+		cons.appendButton("CONTINUE","$(this).hide(); computerMove()");
+
+	}
 	function clearBoard() {
 		needReset=false;
 		$("#status").css('color','black');
@@ -285,17 +268,12 @@
 				$("#t"+i+""+j).removeClass('tile_p2');
 			}
 		}
-		if (game.turn==game.p2) {
-			game.findBestStrategy(game.board,game.turn,computerMove);
-		}
-		
 	}	
 	
 	function callUserMove(dd) {
 		if (needReset) {	// when baord is full or game already ended, needReset is true
 			return;
 		}
-		if (game.turn!=game.p1) { return; }
 		// console.log('clciked');
 		var currentTurn = game.turn;
 		var x = dd[1];
@@ -303,29 +281,9 @@
 		userMove(x,y);
 	}
 
-	function showMatchingStrategy(response) {   
-//		alert (response);
-//		alert("cons");
-		matchingRules = JSON.parse(response);
-		cons.clear();
-		cons.appendMessage("Is your last move based on one of these rules?")
-		$(matchingRules).each( function(i,rule) {
-			var r = $('<div></div>',{
-				id : 'mR_'+rule['code'],
-				class : 'mR',
-				style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
-			})	.text(rule['name'])
-				.click(function() { game.enableStrategy(game.user,rule['code']);
-									$(".mR").unbind().css('cursor','default').css('color','#aaa');
-				}).appendTo($(cons.target));
-			if ($.inArray(rule['code'],game.strategy)==-1) {$(r).append("<span style='font-size:13px;' title='your AI does not know this rule.'> <b>[?]</b></span>");} else {$(r).append("<span style='font-size:13px;' title='your AI knows this rule.'> <b>[!]</b></span>");}
-		});
-		cons.appendButton("CONTINUE","$(this).hide(); game.findBestStrategy(game.board,game.turn,computerMove);");
-	}
-	
 	function userMove(x,y) {
 		// currentStep += 1;
-		game.findMatchingStrategy(game.board,game.turn,[x,y],showMatchingStrategy);
+		showMatchingRules(game.analyzeMove(game.board,game.turn,[x,y]));
 		var val = game.move(x, y, currentTurn);  // update game.board, game.turn and game.history
 		// $(this).text(val);   // change clicked cell's text
 		$("#currentStep").text(game.history.length-1);
@@ -336,13 +294,11 @@
 	
 	
 	$(document).ready(function () {
-		$.ajaxSetup({ cache: false });
-		game = new TicTacToeTrainer();
-		game.init('{{user_id}}');
+		game = new TicTacToe();
 		cons = new Console();
 		cons.init("#console > .message"); // initialize console object
 		currentTurn = game.turn;
-//		$("#status").text(game.getStatus());		
+		$("#status").text(game.getStatus());		
 		$(".tile").click( function() {
 			callUserMove($(this).attr('id'));
 		});
@@ -375,7 +331,8 @@
 		<div id="pane_control">
 			<div>
 				<div style="float:left; margin-right:10px;"><input type="button" value="New Game" onclick="clearBoard();"></div>
-				<div style="float:left">{{user_id}}</div>
+				<div style="float:left;">id: <input type="text" id="user_id" name="user_id" value="tak" size="10"></div>
+				<div style="float:left;"><input type="button" value="Update Trained Rules" onclick="game.updateRule();"></div>
 				<div id="historyControl" style="float:right;">
 					<span id="prev" onclick="history('prev');" style="cursor:pointer">
 						<

@@ -341,6 +341,7 @@ function TicTacToeTrainer() {
     this.assignStrategy = function(data) {
 //    	alert(data);
     	this.strategy = JSON.parse(data);
+//    	alert(this.strategy);
     }
     this.assignStrategyDict = function(data) {
 //    	alert(data);

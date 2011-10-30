@@ -11,6 +11,20 @@ Updates:
 	<meta name = "viewport" content = "width=device-width">
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+	<script type="text/javascript">
+	   var currentUser = "{{loggedInAs}}";
+	   function playMatch(p1, p2) {
+	       window.open("/playMatch?p1="+p1+"&p2="+p2);
+	   }
+	   function challenge(opponent) {
+	       if (currentUser=="Guest") {
+	           alert("To challenge other users you need to be logged in.");
+	           return;
+	       }
+	       playMatch(currentUser,opponent);
+	   }
+	</script>
+	
 </head>
 
 <body>
@@ -21,6 +35,7 @@ Updates:
     </div>
     <div id="col_container" style="width: 900px;border:1px solid black;">
         <div id="left_col" style="width:60%;float:left;border:1px solid black;">
+        <div style="text-align:left; margin:15px 15px 5px 15px;">Welcome, {{loggedInAs}}</div>
         <div style="width:100%;">
             <div style="width:33%;float:left;">
             <p>User List<br />
@@ -46,7 +61,7 @@ Updates:
             <p>Actions<br />
              {% for user in users %}
                   {% if user.id %}
-                    <strong><a href="">Challenge</a></strong><br />
+                    <strong><a href="javascript:challenge('{{user.id}}')">Challenge</a></strong><br />
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
@@ -56,7 +71,7 @@ Updates:
          	<div style="width:100%;clear:both;">
                 <hr />
                 <p align="left" style="padding-left:60px;width:40%;float:left"><a href=""><img src="css/image/expand.png"/> Start Server Competition</a></p>
-                <p align="left" style="padding-top:8px;"><a href=""><img src="css/image/expand.png"/> Access Trainer</a></p>
+                <p align="left" id="accessTrainer" style="padding-top:8px; cursor:pointer;"><img src="css/image/expand.png"/>Access Trainer</p>
             </div>
         </div>
         <div id="right_col" style="width:39%;float:left;border:1px solid black;">
@@ -322,8 +337,8 @@ $(document).ready(function() {
 		  type: "GET",  
 		  url: "/LogIn",  
 		  data: dataString,  
-		  success: function(response) { 
-		  	if(response == "You are now logged in."){ 
+		  success: function(response) {   // response string format is "You are now logged in as [id]"
+		  	if(response.indexOf("You are now logged in ")!=-1){   // if the string contains 'You are now logged in" as substring
 				$('#login2').hide();
 				$("div#panel2").animate({
 					height: "200px"
@@ -331,6 +346,10 @@ $(document).ready(function() {
 				.animate({
 					height: "150px"
 				}, "fast");
+		  		// update clickEvent on accessTrainer button
+		  		$("#accessTrainer").click( function() {
+		  			window.open('/trainer?id='+$.trim(response.replace("You are now logged in as ","")),"_self"); 
+		  		});
 		  	} else {
 				$("div#panel2").animate({
 					height: "450px"
@@ -344,15 +363,18 @@ $(document).ready(function() {
 			.append("<p>"+response+"</p>")  
 			.hide()  
 			.fadeIn(1500, function() {  
-				if(response == "You are now logged in."){
+				if(response.indexOf("You are now logged in") != -1){
 					$("input#name2").val("");  
 					$("input#email2").val("");  
 					$("input#password2").val("");  
 			  		$('#message2').append("<img id='checkmark' src='css/image/icon_y.png' />");  
+			  		window.location.reload();
 				} else {
 					$('#message2').append("<img id='checkmark' src='css/image/icon_x.png' />");  
 				}
 			}); 
+
+			
 		  }  
 		});  
 		return false;  
