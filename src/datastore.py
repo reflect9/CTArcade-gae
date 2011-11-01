@@ -2,13 +2,17 @@ from google.appengine.ext import db
 from django.utils import simplejson as json
 import sys, datetime, time
 
+class Counter(db.Model):
+    c = db.IntegerProperty(indexed=False)
+
 class Game(db.Model):
     title = db.StringProperty()
   
 class User(db.Model):
     id = db.StringProperty()
     password = db.StringProperty()
-    email= db.StringProperty()
+    email = db.StringProperty()
+    score = db.IntegerProperty(indexed=False)
     
 class Match(db.Model):
     user_a = db.StringProperty()

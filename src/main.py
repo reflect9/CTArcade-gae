@@ -28,6 +28,7 @@ import pprint, os, sys
 from TicTacToeMatch import TicTacToeMatch
 from TicTacToeTrainer import TicTacToeTrainer
 from appengine_utilities import sessions
+from google.appengine.api import taskqueue
 
 class Lobby(webapp.RequestHandler):
     def get(self):
@@ -39,19 +40,35 @@ class Lobby(webapp.RequestHandler):
         except KeyError:
             logged =False
             loggedID = "Guest"
-#            self.sess['loggedInAs'] = "You are not logged in."   # next time KeyError exception wont be thrown.
                 
         query = User.all()
         users = query.fetch(10)
-        
+		
+	#key = self.request.get('key')
+	#q = taskqueue.Queue('tournament-queue')
+	#tasks = []
+	#payload_str = 'hello world'
+	#tasks.append(taskqueue.Task(payload=payload_str, countdown=5))
+	#q.add(tasks)
+
+		
         template_values = {
             'users': users,
             'logged' : logged,
-            'loggedInAs': loggedID
+            'loggedInAs': loggedID,
+			'counters': Counter.all()
         }  # map of variables to be handed to html template
 
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')
         self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        key = self.request.get('key')
+
+        # Add the task to the default queue.
+        taskqueue.add(url='/worker', params={'key': key}, countdown=0)
+
+        self.redirect('/')	
 
 class Init(webapp.RequestHandler):
     def get(self):
@@ -72,13 +89,14 @@ class SignUp(webapp.RequestHandler):
         user = User(key_name=self.request.get('name'),
                     id = self.request.get('name'),
                     email = self.request.get('email'),
-                    password = self.request.get('password'))            
+                    password = self.request.get('password'),
+					score = 0)            
         result = user.put()                
         if result:
             ai_rec = AI(key_name="name="+self.request.get('name')+"_tictactoe",
                         user = self.request.get('name'),
                         game = "tictactoe",
-                        data =     "{\"data\":[\"takeRandom\",]}")
+                        data =     "{\"data\":[\"takeRandom\"]}")
             result_2 = ai_rec.put()
             self.response.out.write("You may now login.")
                         
@@ -234,7 +252,13 @@ class ReviewMatch(webapp.RequestHandler):
     def get(self):
         self.response.out.write('Hello world!')
 
-
+class CounterWorker(webapp.RequestHandler):
+    def post(self): # should run at most 1/s
+        users = User.all()
+        for id in users:
+			id.score = id.score + 1;
+			id.put()
+		
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
                                           ('/init', Init),
@@ -244,7 +268,8 @@ def main():
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
                                           ('/ajaxTrainer',AjaxTrainer),
-                                          ('/reviewMatch',ReviewMatch),                                    
+                                          ('/reviewMatch',ReviewMatch), 
+										  ('/worker', CounterWorker),                                   
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

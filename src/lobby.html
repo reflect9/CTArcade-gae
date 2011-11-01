@@ -4,11 +4,12 @@ Updates:
 	-Testing GIT Configuration
 	-Testing GitHub posting as "unknown" author
 --->
-
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 	<title>Lobby - CTArcade</title>
-	<meta name = "viewport" content = "width=device-width">
+	<!--<meta name = "viewport" content = "width=device-width">-->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
 	<script type="text/javascript">
@@ -35,7 +36,8 @@ Updates:
     </div>
     <div id="col_container" style="width: 900px;border:1px solid black;">
         <div id="left_col" style="width:60%;float:left;border:1px solid black;">
-        <div style="text-align:left; margin:15px 15px 5px 15px;">Welcome, {{loggedInAs}}</div>
+        <div style="text-align:left; margin:15px 15px 5px 15px;">Welcome, {{loggedInAs}} ({% for count in counters %}{{count.c}}{% endfor %})
+        </div>
         <div style="width:100%;">
             <div style="width:33%;float:left;">
             <p>User List<br />
@@ -51,7 +53,7 @@ Updates:
             <p>Score<br />
              {% for user in users %}
                   {% if user.id %}
-                    <strong>0</strong><br />
+                    <strong>{{ user.score }}</strong><br />
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
@@ -70,8 +72,14 @@ Updates:
                 </div>
          	<div style="width:100%;clear:both;">
                 <hr />
-                <p align="left" style="padding-left:60px;width:40%;float:left"><a href=""><img src="css/image/expand.png"/> Start Server Competition</a></p>
-                <p align="left" id="accessTrainer" style="padding-top:8px; cursor:pointer;"><img src="css/image/expand.png"/>Access Trainer</p>
+                <p align="left" style="padding-left:60px;width:40%;float:left">
+                <form action="/" method="post">
+                <input type="hidden" name="key" id="key" value="Test"/>
+                <img src="css/image/expand.png"/><input type="submit" value="Run Server Tournament" />
+                </form>
+                </p>
+                <p align="left" id="accessTrainer" style="padding-top:8px; cursor:pointer;">
+                	<img src="css/image/expand.png"/>Access Trainer</p>
             </div>
         </div>
         <div id="right_col" style="width:39%;float:left;border:1px solid black;">
