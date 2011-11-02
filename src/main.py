@@ -1,19 +1,5 @@
 #!/usr/bin/env python
-#
-# Copyright 2007 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+
 from google.appengine.dist import use_library
 use_library('django', '1.2')
 
@@ -93,7 +79,7 @@ class SignUp(webapp.RequestHandler):
 					score = 0)            
         result = user.put()                
         if result:
-            ai_rec = AI(key_name="name="+self.request.get('name')+"_tictactoe",
+            ai_rec = AI(key_name=self.request.get('name')+"_tictactoe",
                         user = self.request.get('name'),
                         game = "tictactoe",
                         data =     "{\"data\":[\"takeRandom\"]}")
@@ -114,15 +100,7 @@ class LogIn(webapp.RequestHandler):
             return
         else:
             self.response.out.write("We could not find your user information,<br />please try again.")    
-            return    
-            # user GqlQuery to retrieve matching User object from datastore
-            # if matching User found, 
-            #        1) create session object using user id
-#            session = appengine_utilities.sessions.Session()
-#            session["id"] =  'tak' # user id here
-        
-        #        2) [LATER!] read Match that the user has played and hand JSON data to lobby.html
-        
+            return      
 
 class UpdateRule(webapp.RequestHandler):
     def get(self):
@@ -147,10 +125,7 @@ class UpdateRule(webapp.RequestHandler):
                     data = self.request.get("strategy")   
                     )
         self.response.out.write(rule.put())
-        ''' dummy URL for testing '''
-        ''' http://localhost:8080/updateRule?player=ben&game=tictactoe&strategy=[{%22name%22:%22Win%22,%22code%22:%22takeWin%22,%22tooltip%22:%22Take%20a%20cell%20completing%20three%20of%20my%20stones%20in%20a%20row/column/diagonal%22,%22enabled%22:true},{%22name%22:%22Block%20Win%22,%22code%22:%22takeBlockWin%22,%22tooltip%22:%22Take%20a%20cell%20of%20the%20opponent%27s%20winning%20position%22,%22enabled%22:true},{%22name%22:%22Take%20Center%22,%22code%22:%22takeCenter%22,%22tooltip%22:%22Take%20the%20center%20cell%22,%22enabled%22:true},{%22name%22:%22Take%20Any%20Corner%22,%22code%22:%22takeAnyCorner%22,%22tooltip%22:%22Take%20any%20corner%22,%22enabled%22:true},{%22name%22:%22Take%20Any%20Side%22,%22code%22:%22takeAnySide%22,%22tooltip%22:%22Take%20any%20non-corner%20cells%20on%20the%20side.%22,%22enabled%22:true},{%22name%22:%22Random%20Move%22,%22code%22:%22takeRandom%22,%22tooltip%22:%22Take%20any%20empty%20cell.%22,%22enabled%22:true}]'''
-        ''' http://localhost:8080/updateRule?player=tak&game=tictactoe&strategy=[{%22name%22:%22Win%22,%22code%22:%22takeWin%22,%22tooltip%22:%22Take%20a%20cell%20completing%20three%20of%20my%20stones%20in%20a%20row/column/diagonal%22,%22enabled%22:true},{%22name%22:%22Take%20Center%22,%22code%22:%22takeCenter%22,%22tooltip%22:%22Take%20the%20center%20cell%22,%22enabled%22:true},{%22name%22:%22Take%20Any%20Corner%22,%22code%22:%22takeAnyCorner%22,%22tooltip%22:%22Take%20any%20corner%22,%22enabled%22:true},{%22name%22:%22Random%20Move%22,%22code%22:%22takeRandom%22,%22tooltip%22:%22Take%20any%20empty%20cell.%22,%22enabled%22:true}]'''
-         
+  
 class PlayMatch(webapp.RequestHandler):
     def get(self):
         matches = []
