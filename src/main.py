@@ -165,9 +165,12 @@ class PlayMatch(webapp.RequestHandler):
 class Trainer(webapp.RequestHandler):
     def get(self):
 #        try:
-#            session = appengine_utilities.sessions.Session()
-#            current_user_id = session["id"] if session["id"] else ''   
-        current_user_id = self.request.get('id')
+        session = appengine_utilities.sessions.Session()
+        if session["loggedInAs"]:
+            current_user_id = session["loggedInAs"]
+        else:
+            self.redirect('/')
+#        current_user_id = self.request.get('id')
 #        except AttributeError:
 #            current_user_id='ben'
         template_values = {
