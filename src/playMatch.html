@@ -9,10 +9,10 @@
 		var matches = JSON.parse("{{ matches }}".replace(/&quot;/g,'"'));
 
         var currentRound = 0;    
-        // alert("blah");
-		
+       
 		function createMiniBoard(board,st,loc) {
 			var miniBoard = $("<div style='width:100px; float:left; margin:2px 5px 15px 2px;  '></div>"); 
+			if (st=="0") st = "";
 			$(miniBoard).append("<div style='font-size:14px; font-family:Helvetica'>"+st+"</div>");
 			var boardDiv = $("<div style='border:1px solid #aaa;'></div>");
 				$(board).each( function(ir,r) {
