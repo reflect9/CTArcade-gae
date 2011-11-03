@@ -1,42 +1,53 @@
 <html>
 <head>
 	<meta name = "viewport" content = "width=device-width">
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	<link rel="stylesheet" type="text/css" href="css/jquery.qtip.css"/>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/jquery.qtip.js"></script>
+	
+	<script type="text/javascript" src="js/util.js"></script>
 	<script type="text/javascript">
+	    var p1 = "{{p1}}";   var p1_color = "paleGreen";   
+	    var p2 = "{{p2}}";   var p2_color = "violetPink";  
+	    var playerColor = {};
+	           playerColor[p1]=p1_color;   playerColor[p2] = p2_color;
 	    var {{p1}}_AI = JSON.parse("{{p1_AI}}".replace(/&quot;/g,'"'));
         var {{p2}}_AI = JSON.parse("{{p2_AI}}".replace(/&quot;/g,'"'));
 		var matches = JSON.parse("{{ matches }}".replace(/&quot;/g,'"'));
 
         var currentRound = 0;    
        
-		function createMiniBoard(board,st,loc) {
+		function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy) {
 			var miniBoard = $("<div style='width:100px; float:left; margin:2px 5px 15px 2px;  '></div>"); 
-			if (st=="0") st = "";
-			$(miniBoard).append("<div style='font-size:14px; font-family:Helvetica'>"+st+"</div>");
-			var boardDiv = $("<div style='border:1px solid #aaa;'></div>");
+			if (showStrategy) $(miniBoard).append("<div id='strategy' style='font-size:14px; font-family:Helvetica'>"+st+"</div>");
+			else  $(miniBoard).append("<div id='strategy' style='font-size:14px; font-family:Helvetica'></div>");
+			var boardDiv = $("<div></div>");
 				$(board).each( function(ir,r) {
 					//alert(r);
-					var row = $("<div style='height:30px; font-size:15px;'></div>");
+					var row = $("<div style='font-size:15px;'></div>");
 					$(r).each( function(ic,c) {
-						var col = $("<div style='float:left; width:30px; height:30px; border:1px solid #eee;'>"+c+"</div>");
-						if (loc!=undefined && loc[0]==ir && loc[1]==ic) {
-							//$(col).css('background-color:#ddd');
-							if (c=='{{p1}}') $(col).css("background-color","blue");
-							else  $(col).css("background-color","red");
-							if (st=='takeWin') {
-								if (c=='{{p1}}') $(boardDiv).css('border','2px solid blue');
-								else $(boardDiv).css('border','2px solid red');
-							} else {
-							     $(boardDiv).css('border','2px solid white');
-							}
-						}
-						
+					    var col = $("<div class='review_cell "+ir+"_"+ic+"'><p>"+movesInOrder[ir][ic]+"</p></div>");
+						if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
+							if (c==p1) $(col).css("background-color",color.paleGreen);  
+                            else if (c==p2) $(col).css("background-color",color.violetPink);
+						} else {
+                            if (c==p1) $(col).css("background-color",getColor("paleGreen",0.25));  
+                            else if (c==p2) $(col).css("background-color",getColor("violetPink",0.25));
+						}		
+						if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
 						$(row).append(col);
 					});
 					$(row).append("<div style='clear:both'></div>");
 					$(boardDiv).append(row);
 				});
+			if (st=='takeWin') {
+				$(findWinningCells(board)).each(function(i,wloc) {
+					$(boardDiv).find("."+wloc[0]+"_"+wloc[1]).css('border','2px solid black');
+				});
+            }			
+			$(boardDiv).css('border','2px solid white');
 			$(boardDiv).append("<div style='clear:both'></div>");
 			$(miniBoard).append(boardDiv);
 			$(miniBoard).append("<div style='clear:both;'></div>");
@@ -48,24 +59,40 @@
             $(matchList).each( function(i,m) {
                 //alert(e.message);
                 var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0; border-top:2px dotted'></div>");
-                $(matchDIV).append("<div> Winner : "+ m.winner + "</div>");
+                $(matchDIV).append("<div> Winner : <span class='user'>"+ m.winner + "</span></div>");
+                var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
+                var strategyInOrder = [["","",""],["","",""],["","",""]];
                 $(m.history).each(function(bi,turn) {
-                    var matchBoard = createMiniBoard(turn.board,turn.message,turn.loc);
+                	if (turn.loc==undefined) return;
+                    movesInOrder[turn.loc[0]][turn.loc[1]]=bi+1;
+                    strategyInOrder[turn.loc[0]][turn.loc[1]]=turn.message;
+                });
+//                alert(movesInOrder);
+                $(m.history).each(function(bi,turn) {
+                    var matchBoard = createMiniBoard(turn.board,turn.message,turn.loc,movesInOrder,strategyInOrder,true);
                     $(matchDIV).append(matchBoard);
                 });
                 $(matchDIV).append("<div style='clear:both'/>");
                 $("#container").append(matchDIV);
             });
+            colorizeUser();
 		}
 		function showMatchesAsAnimation(matchList) {
 		  $("#container").empty();
 		  $("#container").append("<div><input type='button' value='<' onclick='prev();'/><input type='button' value='>' onclick='next();'/>"+currentRound+"</div>");
 		  $(matchList).each( function(i,m) {
-		      var matchDIV = $("<div style='float:left'></div>");
-		      matchDIV.append("<div style='font-size:13px;'>match "+i+"</div>");
+		      var matchDIV = $("<div style='float:left; width:110px; height:145px;'></div>");
+		      matchDIV.append("<div style='font-size:11px;'>match "+i+"</div>");
 		      var turn = m.history[currentRound];
 		      if (turn==undefined) turn=m.history[m.history.length-1];
-		      var matchBoard = createMiniBoard(turn.board, turn.message, turn.loc);
+              var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
+              var strategyInOrder = [["","",""],["","",""],["","",""]];
+              $(m.history).each(function(bi,turn) {
+              	if (turn.loc==undefined) return;
+                  movesInOrder[turn.loc[0]][turn.loc[1]]=bi+1;
+                  strategyInOrder[turn.loc[0]][turn.loc[1]]=turn.message;
+              });
+		      var matchBoard = createMiniBoard(turn.board, turn.message, turn.loc,movesInOrder,strategyInOrder,true);
 		      $(matchDIV).append(matchBoard);
 		      $("#container").append(matchDIV);
 		  });
@@ -81,14 +108,109 @@
           showMatchesAsAnimation(matches);
 		}
 		
+		function showMatchesAsGroups(matchList) {
+			$("#container").empty();
+			$("#container").append("<div id='winningGames' style='clear:both; margin:10px;'><div>Winning games</div></div>");
+			$("#container").append("<div id='losingGames' style='clear:both; margin:10px;'><div>Losing games</div></div>");
+			$("#container").append("<div id='tieGames' style='clear:both; margin:10px;'><div>Tie games</div></div>");
+			$(matchList).each( function(i,m) {
+				var matchDIV = $("<div style='float:left; width:110px; height:145px;'></div>");
+				var lastTurn = m.history[m.history.length-1];
+	            var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
+	            var strategyInOrder = [["","",""],["","",""],["","",""]];
+	            $(m.history).each(function(bi,turn) {
+	            	if (turn.loc==undefined) return;
+	                movesInOrder[turn.loc[0]][turn.loc[1]]=bi+1;
+	                strategyInOrder[turn.loc[0]][turn.loc[1]]=turn.message;
+	            });
+				var matchBoard = createMiniBoard(lastTurn.board, lastTurn.message, lastTurn.loc,movesInOrder,strategyInOrder,false);
+				$(matchDIV).append(matchBoard);
+				if (m.winner==p1) {
+					$("#winningGames").append(matchDIV);
+				}
+				if (m.winner==p2) {
+					$("#losingGames").append(matchDIV);
+				}
+				if (m.winner=="Tie Game") {
+					$("#tieGames").append(matchDIV);
+				}
+			});
+			// lose
+			
+			// group by last move position
+		}
 		
+		
+		
+		
+		
+        // colorize user class with matching colors
+        function colorizeUser() {
+             $("span.user").each(function(i,d) {
+               var userName = $(this).text();
+               var colorName = playerColor[userName];
+               $(this).css("background-color",getColor(colorName,0.3));      
+             }); 
+        }
+
+        
+        
+        // FUNCTIONS FOR GETTING WINNING CELLS //
+        isFull = function() {
+            for (var i = 0; i < 3; i++)
+    			for (var j =0; j<3;j++)
+    			    if (board[i][j] == 0)
+    			        return false;
+            return true;
+        }
+    	checkCol =function(x,board) {
+            if (board[x][0] == board[x][1] && (board[x][0] == board[x][2]) && (board[x][0] != 0)) 
+            	return [[x,0],[x,1],[x,2]];
+            else return false;
+        }
+        
+        checkRow = function(y,board) {
+            if (board[0][y] == board[1][y] && (board[0][y] == board[2][y]) && (board[0][y] != 0))
+            	return [[0,y],[1,y],[2,y]];
+            else return false;
+        }
+        
+        checkDiag1 = function(board)  {
+            if (board[0][0] != 0 && board[0][0] == board[1][1] && board[0][0] == board[2][2]) 
+            	return [[0,0],[1,1],[2,2]];
+            else return false;
+            
+        }
+        checkDiag2 = function(board) {
+            if (board[2][0] != 0 && board[1][1] == board[2][0] && board[0][2] == board[2][0]) 
+            	return [[2,0],[1,1],[0,2]];
+            else return false;
+        }
+        function findWinningCells(board) {
+            /* Check the top row */
+            var result = false;
+            for (var i=0; i < 3; i++) {
+                result = checkRow(i,board);
+                if (result != false)
+                    return result;
+                result = checkCol(i,board);
+                if (result != false)
+                    return result;
+            }
+            result = checkDiag1(board);
+            if (result != false)
+                return result;
+            result = checkDiag2(board);
+            if (result != false)
+                return result;
+            return false;
+        }
+        
 		$(document).ready( function() {
-			$("#desc").append("<div> {{p1}} : " + {{p1}}_AI +"</div>");
-			$("#desc").append("<div> {{p2}} : " + {{p2}}_AI +"</div>");
+			$("#desc").append("<div> <span style='color:"+getColor(p1_color,1)+"'>{{p1}}</span> : " + {{p1}}_AI +"</div>");
+			$("#desc").append("<div> <span style='color:"+getColor(p2_color,1)+"'>{{p2}}</span> : " + {{p2}}_AI +"</div>");
 			$("#desc").append("<div> RESULT : {{winners}} </div>");
 			
-		    //showMatchesAsList(matches);
-		
 		});
 	
 	</script>
@@ -102,11 +224,12 @@
 	</style>
 </head>
 <body>
-	Match result between {{p1}} and {{p2}}
+	Match result between {{p1}} and <span id="ff">{{p2}}</span>
 	<div id='desc'></div>
 	<div>  
-	   <input type="button" onclick="showMatchesAsList(matches)" value="Show Matches as a List"/>
-	   <input type="button" onclick="showMatchesAsAnimation(matches)" value="Show Matches as a Animation"/>
+	   <input type="button" onclick="showMatchesAsList(matches)" value="List view"/>
+	   <input type="button" onclick="showMatchesAsAnimation(matches)" value="Stepwise animation"/>
+	   <input type="button" onclick="showMatchesAsGroups(matches)" value="Grouped by pattern"/>
 	
 	</div>
 	

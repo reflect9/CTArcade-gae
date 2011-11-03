@@ -107,7 +107,7 @@ li {
 	cursor:pointer;
 }
 
-.bigButton {
+/* .bigButton {
 	position:absolute; 
 	cursor:pointer; 
 	display:table; 
@@ -119,8 +119,7 @@ li {
 	opacity:0.6; 
 	color:red; 
 	background-color:#fff;
-	
-}
+} */
 
 .tile {
 	border: 2px silver solid;
@@ -173,9 +172,25 @@ list-style:none;
 	cursor:pointer;
 }
 
-
 .tabnav li a:hover, .tabnav li a:active  {
 	background: #dedbd1;
 	color: #222;
 	text-decoration: none;
 }
+
+/*  review page */
+
+.review_cell {
+	float:left; 
+	width:25px; 
+	height:25px; 
+	border:2px solid #ddd; 
+	
+}
+.review_cell p {
+	text-align:center;
+	color:#fff;
+	font: 12px Helvetica, Arial, sans-serif;
+	margin-top:5px;
+}
+
