@@ -2,8 +2,8 @@ from google.appengine.ext import db
 from django.utils import simplejson as json
 import sys, datetime, time
 
-class Counter(db.Model):
-    c = db.IntegerProperty(indexed=False)
+class TournamentLog(db.Model):
+    message = db.StringProperty()
 
 class Game(db.Model):
     title = db.StringProperty()

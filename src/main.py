@@ -15,6 +15,8 @@ from TicTacToeMatch import TicTacToeMatch
 from TicTacToeTrainer import TicTacToeTrainer
 from appengine_utilities import sessions
 from google.appengine.api import taskqueue
+import urllib2
+from google.appengine.api import urlfetch
 
 class Lobby(webapp.RequestHandler):
     def get(self):
@@ -42,7 +44,6 @@ class Lobby(webapp.RequestHandler):
             'users': users,
             'logged' : logged,
             'loggedInAs': loggedID,
-			'counters': Counter.all()
         }  # map of variables to be handed to html template
 
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')
@@ -233,10 +234,14 @@ class ReviewMatch(webapp.RequestHandler):
 class CounterWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
         users = User.all()
+        tournament_entries = []
+        tournament_winners = []
+        tournmanet_loser = []
         for id in users:
-			id.score = id.score + 1;
-			id.put()
-		
+			tournament_entries.append(id)
+        result = urllib2.urlopen("http://127.0.0.1:8080/playMatch?p1=mattm401&p2=mattm402")
+        log = TournamentLog(message = result)
+        result = log.put()
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
                                           ('/init', Init),
