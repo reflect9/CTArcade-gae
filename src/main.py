@@ -232,16 +232,25 @@ class ReviewMatch(webapp.RequestHandler):
         self.response.out.write('Hello world!')
 
 class CounterWorker(webapp.RequestHandler):
-    def post(self): # should run at most 1/s
-        users = User.all()
+    def get(self): # should run at most 1/s
+        users = User.all().fetch(1000)
+        print >>sys.stderr, len(users)
         tournament_entries = []
         tournament_winners = []
         tournmanet_loser = []
-        for id in users:
-			tournament_entries.append(id)
-        result = urllib2.urlopen("http://127.0.0.1:8080/playMatch?p1=mattm401&p2=mattm402")
+        for p1 in users:
+            for p2 in users:
+                tournament_entries.append(id)
+#        result = urllib2.urlopen("http://127.0.0.1:8080/playMatch?p1=mattm401&p2=mattm402")
+                match = TicTacToeMatch(p1.id,p2.id,game='tictactoe',turn=p1.id)
+                matchResult = match.run()
+                if matchResult['winner']!="Tie Game":
+                    tournament_winners.append(matchResult['winner'])
+        # what is the result? 
+        result = json.dumps({'winners':tournament_winners})
         log = TournamentLog(message = result)
         result = log.put()
+        
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
                                           ('/init', Init),
