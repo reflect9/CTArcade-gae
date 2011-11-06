@@ -134,9 +134,11 @@ class PlayMatch(webapp.RequestHandler):
         p2 = self.request.get('p2')
         firstTurn = p1
         for i in range(0,30):
+            if i<15:    firstTurn = p1
+            else:       firstTurn = p2
             match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=firstTurn)
             matches.append(match.run())
-            firstTurn = p2 if firstTurn==p1 else p1
+#            firstTurn = p2 if firstTurn==p1 else p1
 #        self.response.out.write(pprint.pprint(result['history']))
 #        self.response.out.write(result['history'])
 #        self.response.out.write( result['winner'])
