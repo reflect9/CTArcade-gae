@@ -234,24 +234,39 @@ class ReviewMatch(webapp.RequestHandler):
         self.response.out.write('Hello world!')
 
 class CounterWorker(webapp.RequestHandler):
-    def get(self): # should run at most 1/s
+    def post(self): # should run at most 1/s
+        log = TournamentLog(message = "Tournament Start")
+        log.put()
         users = User.all().fetch(1000)
         print >>sys.stderr, len(users)
         tournament_entries = []
         tournament_winners = []
         tournmanet_loser = []
         for p1 in users:
-            for p2 in users:
-                tournament_entries.append(id)
-#        result = urllib2.urlopen("http://127.0.0.1:8080/playMatch?p1=mattm401&p2=mattm402")
-                match = TicTacToeMatch(p1.id,p2.id,game='tictactoe',turn=p1.id)
-                matchResult = match.run()
-                if matchResult['winner']!="Tie Game":
-                    tournament_winners.append(matchResult['winner'])
-        # what is the result? 
-        result = json.dumps({'winners':tournament_winners})
-        log = TournamentLog(message = result)
-        result = log.put()
+                tournament_entries.append(str(p1.id))
+		
+    	log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
+    	log.put()		
+        while len(tournament_entries) >= 2:
+			player1 = tournament_entries.pop()
+			player2 = tournament_entries.pop()
+			match = TicTacToeMatch(player1,player2,game='tictactoe',turn=player1)
+			result = match.run()
+			while result["winner"] == "Tie Game":
+				result = match.run()
+			updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",result["winner"]).get()
+			updateUser.score += 1
+			updateUser.put()
+			tournament_entries.append(str(result["winner"]))
+			log = TournamentLog(message = str(("Round Winner:", result["winner"])))
+			log.put()			
+        if len(tournament_entries) == 1:
+			tournament_winner = tournament_entries.pop();
+			updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",tournament_winner).get()
+			updateUser.score += 10
+			updateUser.put()
+			log = TournamentLog(message = str(("Tournament Winner:", tournament_winner)))
+			log.put()
         
 def main():
     application = webapp.WSGIApplication([('/', Lobby),

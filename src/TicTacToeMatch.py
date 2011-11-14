@@ -46,12 +46,12 @@ class TicTacToeMatch:
 #                print self.board
                 winner = self.checkWinner();
                 if winner:
-#                    print >>sys.stderr, winner + " win!"
+#                   print >>sys.stderr, winner + " win!"
                     result = winner
                     return {'history':self.history, 'winner': result}       
                 self.turn = self.flip(self.turn)
             counter = counter+1
-            if counter>9: break
+            if counter>9: break			
         return {'history':self.history, 'winner': result}       
     
     ''' BASIC FUNCTIONS '''

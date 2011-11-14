@@ -3,7 +3,7 @@ from django.utils import simplejson as json
 import sys, datetime, time
 
 class TournamentLog(db.Model):
-    message = db.StringProperty()
+    message = db.TextProperty()
 
 class Game(db.Model):
     title = db.StringProperty()
