@@ -126,45 +126,24 @@ class UpdateRule(webapp.RequestHandler):
                     data = self.request.get("strategy")   
                     )
         self.response.out.write(rule.put())
-  
+
+
 class PlayMatch(webapp.RequestHandler):
     def get(self):
-        matches = []
-        p1 = self.request.get('p1')
-        p2 = self.request.get('p2')
-        firstTurn = p1
-        for i in range(0,30):
-            if i<15:    firstTurn = p1
-            else:       firstTurn = p2
-            match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=firstTurn)
-            matches.append(match.run())
-#            firstTurn = p2 if firstTurn==p1 else p1
-#        self.response.out.write(pprint.pprint(result['history']))
-#        self.response.out.write(result['history'])
-#        self.response.out.write( result['winner'])
-        winners = {}
-        for m in matches:
-            if m['winner'] in winners:
-                winners[m['winner']] = winners[m['winner']] + 1
-            else:
-                winners[m['winner']] = 1
-        p1_AI = json.dumps(getUserStrategy(self.request.get('p1'),'tictactoe'))
-        p2_AI = json.dumps(getUserStrategy(self.request.get('p2'),'tictactoe'))
+        session = appengine_utilities.sessions.Session()
+        try:
+            userID = session['loggedInAs']
+        except KeyError:
+            userID = "Guest"   
+        opponent = self.request.get("opponent") 
         template_values = {
-            'p1' : self.request.get('p1'),
-            'p2' : self.request.get('p2'),
-            'winners' : winners,
-            'p1_AI' : p1_AI,
-            'p2_AI' : p2_AI,      
-            'matches': json.dumps(matches).replace("&quot;","'")
+            'userID' : userID,
+            'opponent' : opponent
+#            'matches': json.dumps(matches).replace("&quot;","'")
         }  # map of variables to be handed to html template
-#        print json.dumps(getUserStrategy(self.request.get('p2'),'tictactoe'))
-
         path = os.path.join(os.path.dirname(__file__), 'playMatch.html')
         self.response.out.write(template.render(path, template_values))        
-
-        ''' http://localhost:8080/playMatch?p1=tak&p2=ben '''
-        
+       
 class Trainer(webapp.RequestHandler):
     def get(self):
 #        try:
@@ -181,6 +160,34 @@ class Trainer(webapp.RequestHandler):
         }  
         path = os.path.join(os.path.dirname(__file__), 'trainer.html')
         self.response.out.write(template.render(path, template_values))
+
+class AjaxCall(webapp.RequestHandler):
+    def get(self):
+        action = self.request.get('action')
+        if action== 'getUserList':
+            users = db.GqlQuery("SELECT * FROM User").fetch(5000)
+            result = []
+            for user in users:
+                result.append([user.id,user.score])
+            self.response.out.write('{"data":'+json.dumps(result)+'}')
+        if action== 'runMatch':
+            matches = []
+            p1 = self.request.get('p1')
+            p2 = self.request.get('p2')
+            firstTurn = p1
+            for i in range(0,30):
+                if i<15:    firstTurn = p1
+                else:       firstTurn = p2
+                match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=firstTurn)
+                matches.append(match.run())
+            p1_AI = getUserStrategy(self.request.get('p1'),'tictactoe')
+            p2_AI = getUserStrategy(self.request.get('p2'),'tictactoe') 
+            result = {}
+            result['players'] = {"p1":p1, "p2":p2}
+            result['AI'] = {p1:p1_AI, p2:p2_AI}
+            result['matches'] = matches 
+            self.response.out.write('{"result":'+json.dumps(result)+'}')
+
 
 class AjaxTrainer(webapp.RequestHandler):
     def get(self):
@@ -261,6 +268,7 @@ def main():
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
+                                          ('/ajaxCall',AjaxCall),
                                           ('/ajaxTrainer',AjaxTrainer),
                                           ('/reviewMatch',ReviewMatch), 
 										  ('/worker', CounterWorker),                                   

@@ -1,39 +1,110 @@
+<!DOCTYPE html>
+
 <html>
 <head>
 	<meta name = "viewport" content = "width=device-width">
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<link rel="stylesheet" type="text/css" href="css/jquery.qtip.css"/>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/jquery-1.7.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
 	<script type="text/javascript" src="js/jquery.qtip.js"></script>
 	<script type="text/javascript" src="js/util.js"></script>
+	<script type="text/javascript" src="js/MemberList.js"></script>
 	<script type="text/javascript">
-	   var p1 = "{{p1}}";   var p1_color = "paleGreen";   
-	    var p2 = "{{p2}}";   var p2_color = "violetPink";  
+	   	var memberList, currentMode;
+	    var matches, p1, p2, p1_AI, p2_AI;
+	   	p1 = "{{userID}}";   p2 = "{{opponent}}";
+	   	var p1_color = "paleGreen";   
+	    var p2_color = "violetPink";  
 	    var playerColor = {};
-	           playerColor[p1]=p1_color;   playerColor[p2] = p2_color;
-	    var {{p1}}_AI = JSON.parse("{{p1_AI}}".replace(/&quot;/g,'"'));
-       var {{p2}}_AI = JSON.parse("{{p2_AI}}".replace(/&quot;/g,'"'));
-		var matches = JSON.parse("{{ matches }}".replace(/&quot;/g,'"'));
+	    var canvasElement, ctx;
+//	    var {{p1}}_AI = JSON.parse("{{p1_AI}}".replace(/&quot;/g,'"'));
+//	    var {{p2}}_AI = JSON.parse("{{p2_AI}}".replace(/&quot;/g,'"'));
+//		var matches = JSON.parse("{{ matches }}".replace(/&quot;/g,'"'));
 
-       var currentRound = 0;    
+		var currentRound = 0;    
       
+		function init(opponent) {
+	       		if(p1=="Guest") {
+	       			alert("Log in first.");
+	       			return;
+	       		}
+				$("#matches").empty();
+				$("#desc").empty();
+				p2=opponent;
+				currentRound = 0;
+				playerColor[p1]=p1_color;   playerColor[p2] = p2_color;
+		}
+       	// request server to run match and get response
+       	function runMatch(pl1,pl2) {
+       		if(pl1=="Guest") {
+       			return;
+       		}
+       		$.get('ajaxCall',{ action:'runMatch', p1:pl1, p2:pl2 }, function(data) {
+
+       			var res = JSON.parse(data);
+       			var result = res.result;
+
+       			matches = result.matches;
+       			p1_AI = result.AI[p1];
+       			p2_AI = result.AI[p2];
+       			// count who wins how many times
+       			var p1_wins = 0;  var p2_wins= 0;  var tie_games = 0;
+       			$.each(matches, function(i,match) {
+       				if (match.winner==result.players.p1) p1_wins++;
+       				if (match.winner==result.players.p2) p2_wins++;
+       				if (match.winner=="Tie Game") tie_games++;
+       			});
+       			//  show the player's strategy
+       			var aiDIV = $("#desc").append("<DIV id='p1_ai'><ul id='p1_ai_sortable' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+       			$(aiDIV).prepend("<h2>"+p1+"'s AI has strategies...</h2>");
+       			$.each(p1_AI, function(i,strategy) {
+       				$(aiDIV).find("#p1_ai_sortable").append("<li class='ai_sortable_item'>"+strategy+"</li>");
+       			});
+       			$("#p1_ai_sortable").sortable();
+       			$("#p1_ai_sortable").disableSelection();
+       			// show description of the match
+       			$("#desc").append("<h2 style='margin-top:15px;'>Result of 30 matches</h2>");
+       			var html = 	"<SPAN style='background-color:"+getColor(playerColor[result.players.p1],1)+"; color:white; padding:2px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p1+"</SPAN>"
+       					+	"<SPAN style='margin:0 10px 0 10px;'>"+p1_wins+"</SPAN>"
+       					+	" : "
+       					+	"<SPAN style='margin:0 10px 0 10px;'>"+p2_wins+"</SPAN>"
+       					+	"<SPAN style='background-color:"+getColor(playerColor[result.players.p2],1)+"; color:white; padding:2px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p2+"</SPAN>"
+       					+	"<SPAN style='margin:0 10px 0 20px;'>and "+tie_games+" tie games</SPAN>";
+     
+       			$("#desc").append("<DIV style='font-size:21px; margin:10px;'>"+html+"</DIV>");
+       			
+       		});
+       	}
+       	function createMiniBoard_singleRound(match,iR) {
+       		var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
+            var strategyInOrder = [["","",""],["","",""],["","",""]];
+            $(match.history).each(function(bi,turn) {
+            	if (turn.loc==undefined) return;
+                movesInOrder[turn.loc[0]][turn.loc[1]]=bi+1;
+                strategyInOrder[turn.loc[0]][turn.loc[1]]=turn.message;
+            });
+            var turn = match.history[iR];
+            var matchBoard = createMiniBoard(turn.board,turn.message,turn.loc,movesInOrder,strategyInOrder,false);
+            return matchBoard;
+       	}
+       
 		function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy) {
-			var miniBoard = $("<div style='width:100px; float:left; margin:2px 5px 15px 2px;  '></div>"); 
-			if (showStrategy) $(miniBoard).append("<div id='strategy' style='font-size:14px; font-family:Helvetica'>"+st+"</div>");
-			else  $(miniBoard).append("<div id='strategy' style='font-size:14px; font-family:Helvetica'></div>");
+			var miniBoard = $("<div class='miniboard'></div>"); 
+			if (showStrategy) $(miniBoard).append("<div id='strategy' style='font-size:12px; font-family:Helvetica; '>"+"</div>");
+			else  $(miniBoard).append("<div id='strategy' style='font-size:12px; font-family:Helvetica'></div>");
 			var boardDiv = $("<div></div>");
 				$(board).each( function(ir,r) {
 					//alert(r);
-					var row = $("<div style='font-size:15px;'></div>");
+					var row = $("<div></div>");
 					$(r).each( function(ic,c) {
 					    var col = $("<div class='review_cell "+ir+"_"+ic+"'><p>"+movesInOrder[ir][ic]+"</p></div>");
 						if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
 							if (c==p1) $(col).css("background-color",color.paleGreen);  
                            else if (c==p2) $(col).css("background-color",color.violetPink);
 						} else {
-                           if (c==p1) $(col).css("background-color",getColor("paleGreen",0.25));  
-                           else if (c==p2) $(col).css("background-color",getColor("violetPink",0.25));
+                           if (c==p1) $(col).css("background-color",getColor("paleGreen",0.3));  
+                           else if (c==p2) $(col).css("background-color",getColor("violetPink",0.3));
 						}		
 						if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
 						$(row).append(col);
@@ -54,7 +125,8 @@
 		}
 		
 		function showMatchesAsList(matchList) {
-		    $("#container").empty();
+			currentMode = "list";
+		    $("#matches").empty();
            $(matchList).each( function(i,m) {
                //alert(e.message);
                var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0; border-top:2px dotted'></div>");
@@ -72,15 +144,16 @@
                    $(matchDIV).append(matchBoard);
                });
                $(matchDIV).append("<div style='clear:both'/>");
-               $("#container").append(matchDIV);
+               $("#matches").append(matchDIV);
            });
            colorizeUser();
 		}
 		function showMatchesAsAnimation(matchList) {
-		  $("#container").empty();
-		  $("#container").append("<div><input type='button' value='<' onclick='prev();'/><input type='button' value='>' onclick='next();'/>"+currentRound+"</div>");
+			currentMode = "animation";
+		  $("#matches").empty();
+		  $("#matches").append("<div><input type='button' value='<' onclick='prev();'/><input type='button' value='>' onclick='next();'/>"+currentRound+"</div>");
 		  $(matchList).each( function(i,m) {
-		      var matchDIV = $("<div style='float:left; width:110px; height:145px;'></div>");
+		      var matchDIV = $("<div id='match_"+i+"' class='match'></div>");
 		      matchDIV.append("<div style='font-size:11px;'>match "+i+"</div>");
 		      var turn = m.history[currentRound];
 		      if (turn==undefined) turn=m.history[m.history.length-1];
@@ -93,7 +166,7 @@
              });
 		      var matchBoard = createMiniBoard(turn.board, turn.message, turn.loc,movesInOrder,strategyInOrder,true);
 		      $(matchDIV).append(matchBoard);
-		      $("#container").append(matchDIV);
+		      $("#matches").append(matchDIV);
 		  });
 		}
 		function prev() {
@@ -108,12 +181,13 @@
 		}
 		
 		function showMatchesAsGroups(matchList) {
-			$("#container").empty();
-			$("#container").append("<div id='winningGames' style='clear:both; margin:10px;'><div>Winning games</div></div>");
-			$("#container").append("<div id='losingGames' style='clear:both; margin:10px;'><div>Losing games</div></div>");
-			$("#container").append("<div id='tieGames' style='clear:both; margin:10px;'><div>Tie games</div></div>");
+			currentMode = "group";
+			$("#matches").empty();
+			$("#matches").append("<div id='winningGames' style='clear:both; margin:10px;'><div>Winning games</div></div>");
+			$("#matches").append("<div id='losingGames' style='clear:both; margin:10px;'><div>Losing games</div></div>");
+			$("#matches").append("<div id='tieGames' style='clear:both; margin:10px;'><div>Tie games</div></div>");
 			$(matchList).each( function(i,m) {
-				var matchDIV = $("<div style='float:left; width:110px; height:145px;'></div>");
+				var matchDIV = $("<div class='match'></div>");
 				var lastTurn = m.history[m.history.length-1];
 	            var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
 	            var strategyInOrder = [["","",""],["","",""],["","",""]];
@@ -139,8 +213,92 @@
 			// group by last move position
 		}
 		
+		// graph (from left to right). Each column represents round. In a column, similar matches are clustered. Edges between two clusters in adjacent columns are strategy used. 
+		function showMatchesAsGraph(matchList) {
+			currentMode = "graph";
+			$("#matches").empty();
+			graph = [];
+			// for each round, 
+			for(var iR=0;iR<9;iR++) {
+				var allMatchesWithinARound = [];
+				$(matchList).each( function(iM,match) {
+					if (match.history.length>iR)  {
+						var b = match.history[iR];
+						b.iM = iM;
+						allMatchesWithinARound.push(b);
+					}
+				});
+				var cluster = findCluster(allMatchesWithinARound);  // key-value pair.  key:fingerprint of each cluster, value:index of matches in the cluster
+				graph.push(cluster);
+			}
+			
+			var result = sugiyama(graph);
+			graph = result.graph;
+			var cM = result.connectivity;
+			
+			// draw graph representation
+			$(graph).each(function(iR,round){
+				var columnDiv = $("<div id='graph_round_"+iR+"' class='matchGraphRound clearfix'></div>");
+				$.each(round, function(boardShape,data) { // iterate clusters
+//					var board = JSON.parse(boardShape);
+					var sampleMatch = matches[data['matches'][0]];  // use the first game in the list, generate representative miniboard
+					var matchBoard = createMiniBoard_singleRound(sampleMatch,iR);
+					$(matchBoard).attr("shape",boardShape.replace(/"/gi,''));
+					var listOfMatches = ""+data.matches;
+					$(matchBoard).append("<div style='font-size:9px;'>"+listOfMatches.replace(/,/gi,' ')+"</div>")
+					$(columnDiv).append(matchBoard);
+					
+				});
+				$("#matches").append(columnDiv);
+			});
+			// draw lines
+			$("#matches").append("<canvas id='canvas' style='position:absolute; top:0px; left:0px;' width='500px' height='500px'></canvas>");
+			canvasElement = $("#canvas")[0];
+			ctx = canvasElement.getContext("2d");
+			ctx.canvas.width = $("#matches").width();
+			ctx.canvas.height = $("#matches").height();
+			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+			ctxOffset = $("#canvas").offset();
+			
+			$.each(cM, function(iR, round) {
+				$.each(round, function(j, connection){
+					$.each(connection, function(shapeA, connectedShapesB){
+						$.each(connectedShapesB, function(iB, shapeB) {
+							var sA = shapeA.replace(/"/gi,''); 	var sB = shapeB.replace(/"/gi,'');
+							var offsetA = $('#matches div[shape="'+sA+'"]').offset();
+							var offsetB = $('#matches div[shape="'+sB+'"]').offset();
+							ctx.moveTo(offsetA.left-ctxOffset.left,offsetA.top-ctxOffset.top);
+							ctx.lineTo(offsetB.left-ctxOffset.left,offsetB.top-ctxOffset.top);
+							ctx.stroke();
+						});
+					});
+				});
+			});
+			
+			
+		}
 		
+		function findCluster(matches) {
+			var cluster = {};
+			$(matches).each(function(i,match) {
+				var variations = getBoardVariations(match.board);
+				var patternExist = false;
+				var shapeOfBoard = "";
+				$(variations).each(function(iV,variation) {
+					shapeOfBoard = JSON.stringify(variation);
+					if ( shapeOfBoard in cluster) {
+						cluster[shapeOfBoard].push(match.iM);
+						patternExist = true;
+						return false;
+					} 
+				}); 
+				if (patternExist==false) 
+					cluster[shapeOfBoard] = [match.iM];
+			});
+			return cluster;
+		}
 		
+
 		
 		
        // colorize user class with matching colors
@@ -206,35 +364,82 @@
        }
        
 		$(document).ready( function() {
-			$("#desc").append("<div> <span style='color:"+getColor(p1_color,1)+"'>{{p1}}</span> : " + {{p1}}_AI +"</div>");
-			$("#desc").append("<div> <span style='color:"+getColor(p2_color,1)+"'>{{p2}}</span> : " + {{p2}}_AI +"</div>");
-			$("#desc").append("<div> RESULT : {{winners}} </div>");
+			memberList = new MemberList();
+			memberList.init("#memberListDIV");
+//			memberList.close();
 			
+			if(p1=="Guest") {
+				$("#welcome").append("Welcome, Guest!  You need to <a href='javascript:showLogIn();'>log in</a> to play matches with others.");
+			} else {
+				$("#welcome").append("Welcome, "+p1+"! Select an opponent to play matches.");
+				if(p2!="") {
+					init(p2);
+					runMatch(p1,p2);
+				}
+			}
+			
+			
+//			
+//			$("#desc").append("<div> <span style='color:"+getColor(p1_color,1)+"'>{{p1}}</span> : " + {{p1}}_AI +"</div>");
+//			$("#desc").append("<div> <span style='color:"+getColor(p2_color,1)+"'>{{p2}}</span> : " + {{p2}}_AI +"</div>");
+//			$("#desc").append("<div> RESULT : {{winners}} </div>");
+//			
 		});
 	
 	
 	</script>
-	<style>
-		.miniBoard {
-			height:30px;
-			width:30px;
-			border: 1px solid #ddd;
-		}
-	
-	</style>
+
 </head>
 <body>
-	Match result between {{p1}} and <span id="ff">{{p2}}</span>
-	<div id='desc'></div>
-	<div>  
-	   <input type="button" onclick="showMatchesAsList(matches)" value="List view"/>
-	   <input type="button" onclick="showMatchesAsAnimation(matches)" value="Stepwise animation"/>
-	   <input type="button" onclick="showMatchesAsGroups(matches)" value="Grouped by pattern"/>
-	</div>
+	<!-- header -->
+	<div class='header'>
+		<div class='header_bg'></div>
+		<div class='header_inner clearfix'>
+			<a href='/' class='emblem' style='margin-top:7px; float:left;'>&nbsp;</a>
+			<select id='game_select'>
+				<option selected="selected" value="TicTacToe">Tic Tac Toe</option>
+			</select>
+			<a href='/' class='link'>Intro</a>
+			<a href='/' class='link'>Lobby</a>
+			<a href='/trainer' class='link'>Trainer</a>
+			<span class='ui_user' style='float:right;'>	
+				<span id='user_name'></span>
+				<span id='user_name_dropdown'>&nbsp;</span>
+			</span>
+			<script type="text/javascript">
+				if(p1 != undefined) $(".header #user_name").text(p1); 
+			</script>
+		</div>
+	</div>	<!-- end of header -->
+	<!-- container : main stuff -->
+	<div class='container'>
+		<div class='pageContent'>
+			<div class="wrapper clearfix">
+				<div class="innerHeader">
+					<div id='desc' style='margin-bottom:10px;'>
+						<div id='welcome'></div>
+					</div>
+					<div id='memberListDIV' style='position:absolute; right:10px; top:10px; width:100px;'></div>
+				</div>
+				<div>  
+				   <input type="button" onclick="showMatchesAsList(matches)" value="List view"/>
+				   <input type="button" onclick="showMatchesAsAnimation(matches)" value="Stepwise animation"/>
+				   <input type="button" onclick="showMatchesAsGroups(matches)" value="Grouped by winner"/>
+				   <input type="button" onclick="showMatchesAsGraph(matches)" value="Game tree graph"/>
+				</div>	
+				
+				<div id='matches' class='clearfix' style='min-height:200px; position:relative;'></div>
+				
+				
+				
+			</div> <!--wrapper clearfix-->
+		</div>	<!--pageContent-->
+		
+		
+		
+		
 	
-	<div id='container'></div>
-
-
+	</div>		<!-- end of container-->
 
 </body>
 

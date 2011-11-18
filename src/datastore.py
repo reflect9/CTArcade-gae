@@ -103,8 +103,12 @@ def initSampleData():
     Strategy(name='Take Random',code='takeRandom',key_name='takeRandom',description='Take any empty cell.',game='tictactoe').put()
     Strategy(name='Take Opposite Corner',code='takeOppositeCorner',key_name='takeOppositeCorner',description='Take a corner cell if its opposite corner is occupied by another player',game='tictactoe').put()
     
-    User(id='tak',password='tak',email='tak@umd.edu',key_name='tak').put()
-    User(id='ben',password='ben',email='ben@umd.edu',key_name='ben').put()
+    User(id='tak',password='tak',email='tak@umd.edu',score=0,key_name='tak').put()
+    User(id='ben',password='ben',email='ben@umd.edu',score=0,key_name='ben').put()
+    User(id='aaa',password='aaa',email='aaa@umd.edu',score=0,key_name='aaa').put()
+    
       
-    AI(user='tak',game='tictactoe',key_name='tak_tictactoe',data='{"data":["takeWin","takeRandom","takeAnySide"]}').put()
-    AI(user='ben',game='tictactoe',key_name='ben_tictactoe',data='{"data":["takeWin","takeBlockWin","takeRandom"]}').put()
+    AI(user='tak',game='tictactoe',key_name='tak_tictactoe',data='{"data":["takeWin","takeBlockWin","takeAnySide","takeRandom"]}').put()
+    AI(user='ben',game='tictactoe',key_name='ben_tictactoe',data='{"data":["takeWin","takeBlockWin","takeAnyCorner","takeCenter","takeRandom"]}').put()
+    AI(user='aaa',game='tictactoe',key_name='aaa_tictactoe',data='{"data":["takeWin","takeAnySide","takeRandom"]}').put()
+    
