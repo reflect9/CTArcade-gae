@@ -134,7 +134,14 @@ p {
 	vertical-align:top;
 	width: 7px;
 }
-
+.icon_star {
+    background: url(image/sprite-icons.png) no-repeat scroll -64px -0px transparent;
+    display: inline-block; 
+    height: 15px;
+    margin: 0px 2px 0px 0px;
+    vertical-align:top;
+    width: 15px;
+}
 .container {
 	margin: 0 auto;
     padding: 0 40px;

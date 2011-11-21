@@ -56,20 +56,45 @@
        				if (match.winner=="Tie Game") tie_games++;
        			});
        			//  show the player's strategy
-       			var aiDIV = $("#desc").append("<DIV id='p1_ai_list' style='clear:both;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
-       			$(aiDIV).prepend("<h2 style='float:left;'>"+p1+"'s AI</h2><div style='float:left; margin:2px 0px 0px 10px; cursor:pointer;'><span class='icon_edit'>&nbsp;</span><span style='float:left; margin:4px 0px 0px 2px; font-weight:bold;'>Edit</span></span>");
+       			var aiDIV = $("#desc").append("<DIV id='p1_ai_div' class='clearfix' style='clear:both;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+       			$(aiDIV).prepend("<h2 style='float:left;'>"+p1+"'s AI</h2><div id='button_ai_edit' style='float:left; margin:2px 0px 0px 10px; cursor:pointer;'><span class='icon_edit'>&nbsp;</span><span style='float:left; margin:4px 0px 0px 2px; font-weight:bold;'>Edit</span></span>");
        			$.each(p1_AI, function(i,strategy) {
        				$(aiDIV).find("#p1_ai").append("<li class='ai_item'>"+strategy+"</li>");
        			});
-//       			$("#p1_ai_sortable").sortable();
-//       			$("#p1_ai_sortable").disableSelection();
+       			$("#p1_ai").sortable({
+       				update : function(event, ui) {
+       					var codeList = [];
+       					$("#p1_ai li").each(function(i,e) {
+       						var code = $(e).text();
+       						codeList.push(code);
+       					});
+       			    	$.ajax({
+       			    		type : "GET",
+       			    		url: "/ajaxTrainer",
+       			    		async: true,
+       			    		data: 	{ 	action: 'changeOrder',
+       			    					player: p1,
+       			    					game: 'tictactoe',
+       			    					newStrategy : JSON.stringify(codeList)
+       			    				},
+       			    		success: function(response) {
+       			    			init(p2);
+       			    			runMatch(p1,p2);
+       			    		}
+       			    	});
+       				}
+       			});
+       			$("#p1_ai").disableSelection();
+       			$("#button_ai_edit").click(function() {
+       				
+       			});
        			// show description of the match
        			$("#desc").append("<h2 style='margin-top:15px;'>Result of 30 matches</h2>");
-       			var html = 	"<SPAN style='background-color:"+getColor(playerColor[result.players.p1],1)+"; color:white; padding:2px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p1+"</SPAN>"
+       			var html = 	"<SPAN style='background-color:"+getColor(playerColor[result.players.p1],1)+"; color:white; padding:0px 4px 0px 4px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p1+"</SPAN>"
        					+	"<SPAN style='margin:0 10px 0 10px;'>"+p1_wins+"</SPAN>"
        					+	" : "
        					+	"<SPAN style='margin:0 10px 0 10px;'>"+p2_wins+"</SPAN>"
-       					+	"<SPAN style='background-color:"+getColor(playerColor[result.players.p2],1)+"; color:white; padding:2px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p2+"</SPAN>"
+       					+	"<SPAN style='background-color:"+getColor(playerColor[result.players.p2],1)+"; color:white; padding:0px 4px 0px 4px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p2+"</SPAN>"
        					+	"<SPAN style='margin:0 10px 0 20px;'>and "+tie_games+" tie games</SPAN>";
      
        			$("#desc").append("<DIV style='font-size:21px; margin:10px;'>"+html+"</DIV>");
@@ -130,7 +155,10 @@
            $(matchList).each( function(i,m) {
                //alert(e.message);
                var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0; border-top:2px dotted'></div>");
-               $(matchDIV).append("<div> Winner : <span class='user'>"+ m.winner + "</span></div>");
+               var p1tag = "<span style='background-color:"+getColor(playerColor[p1],0.6)+";border-radius:2px; padding:1px 3px 1px 3px;'>"+p1+"</span>";
+               var p2tag = "<span style='background-color:"+getColor(playerColor[p2],0.6)+";border-radius:2px; padding:1px 3px 1px 3px;'>"+p2+"</span>";
+               if (m.winner==p1) $(matchDIV).append("<div><span>"+"<div class='icon_star' style=''></div>"+p1tag+" vs. "+p2tag+"</span></div>");
+               else if(m.winner==p2) $(matchDIV).append("<div><span>"+p1tag+" vs. "+p2tag+"<div class='icon_star' style=''></div>"+"</span></div>");
                var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
                var strategyInOrder = [["","",""],["","",""],["","",""]];
                $(m.history).each(function(bi,turn) {
