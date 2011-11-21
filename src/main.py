@@ -15,7 +15,6 @@ from TicTacToeMatch import TicTacToeMatch
 from TicTacToeTrainer import TicTacToeTrainer
 from appengine_utilities import sessions
 from google.appengine.api import taskqueue
-import urllib2
 from google.appengine.api import urlfetch
 
 class Lobby(webapp.RequestHandler):
@@ -236,38 +235,77 @@ class ReviewMatch(webapp.RequestHandler):
 class CounterWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
         log = TournamentLog(message = "Tournament Start")
+        print >>sys.stderr, "Tournament Start"
         log.put()
-        users = User.all().fetch(1000)
-        print >>sys.stderr, len(users)
+        users = User.all()
         tournament_entries = []
-        tournament_winners = []
-        tournmanet_loser = []
         for p1 in users:
                 tournament_entries.append(str(p1.id))
-		
     	log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
-    	log.put()		
-        while len(tournament_entries) >= 2:
-			player1 = tournament_entries.pop()
-			player2 = tournament_entries.pop()
+    	log.put()
+        print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
+        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=60)
+		
+class RoundWorker(webapp.RequestHandler):
+    def post(self): # should run at most 1/s
+        Message = "%s%s" % ("Round Start: ", self.request.get('tournament_entries'))
+        print >>sys.stderr, Message
+        log = TournamentLog(message = Message)
+        log.put()
+        	
+        round_entries = []
+        print >>sys.stderr, "Round Entries Created"
+        round_winners = []
+        print >>sys.stderr, "Round Winners Created"
+        round_entries = json.loads(self.request.get('tournament_entries'))
+        print >>sys.stderr, "Round Entries Loaded"
+        while len(round_entries) >= 2:
+			player1 = round_entries.pop()
+			player2 = round_entries.pop()
 			match = TicTacToeMatch(player1,player2,game='tictactoe',turn=player1)
 			result = match.run()
 			while result["winner"] == "Tie Game":
 				result = match.run()
-			updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",result["winner"]).get()
-			updateUser.score += 1
-			updateUser.put()
-			tournament_entries.append(str(result["winner"]))
-			log = TournamentLog(message = str(("Round Winner:", result["winner"])))
-			log.put()			
-        if len(tournament_entries) == 1:
-			tournament_winner = tournament_entries.pop();
+			round_winners.append(str(result["winner"]))
+			Message = "%s%s" % ("Round Winner: ", str(result["winner"]))
+			print >>sys.stderr, Message
+			log = TournamentLog(message = Message)
+			log.put()
+		# Need to do something about adding basic scores with person who gets the by
+        by = "None"				
+        if len(round_entries) == 1:
+			by = round_entries.pop()
+			Message = "%s%s" % ("Assigning By:", str(by))			
+			print >>sys.stderr, Message
+			log = TournamentLog(message = Message)
+			log.put()
+		# Determine if another round is necessary or if winner can be declared	
+        taskqueue.add(url='/score', params={'tournament_entries': json.dumps(round_winners), 'by': by}, countdown=60)
+
+class ScoreWorker(webapp.RequestHandler):
+    def post(self): # should run at most 1/s
+        print >>sys.stderr, "Scoring"
+        next_round = json.loads(self.request.get('tournament_entries'))
+        score_entries = json.loads(self.request.get('tournament_entries'))
+        if len(score_entries) == 1 and self.request.get('by') == "None":
+			Message = "%s%s" % ("Tournament Winner:", str(score_entries))	
+			print >>sys.stderr, Message
+			log = TournamentLog(message = Message)
+			log.put()
+			tournament_winner = score_entries.pop()
 			updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",tournament_winner).get()
 			updateUser.score += 10
-			updateUser.put()
-			log = TournamentLog(message = str(("Tournament Winner:", tournament_winner)))
-			log.put()
-        
+			updateUser.put()		
+        while len(score_entries) >= 2 or (len(score_entries) == 1 and self.request.get('by') != "None"):	
+            score_entry = score_entries.pop()
+            updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",score_entry).get()
+            updateUser.score += 1
+            updateUser.put()
+        if 	self.request.get('by') != "None":
+            next_round.append(self.request.get('by'))
+        if len(next_round) >= 2: 	
+            taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=60)
+			        
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
                                           ('/init', Init),
@@ -278,7 +316,9 @@ def main():
                                           ('/trainer',Trainer),
                                           ('/ajaxTrainer',AjaxTrainer),
                                           ('/reviewMatch',ReviewMatch), 
-										  ('/worker', CounterWorker),                                   
+										  ('/worker', CounterWorker), 
+										  ('/round', RoundWorker),
+										  ('/score', ScoreWorker),                                  
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
