@@ -1,0 +1,79 @@
+
+    <div class='header'>
+        <div class='header_bg'></div>
+        <div class='header_inner clearfix'>
+            <a href='/' class='emblem' style='margin-top:7px; float:left;'>&nbsp;</a>
+            <select id='game_select'>
+                <option selected="selected" value="TicTacToe">Tic Tac Toe</option>
+            </select>
+            <a href='/' class='link'>Intro</a>
+            <a href='/' class='link'>Lobby</a>
+            <a href='/trainer' class='link'>Trainer</a>
+            <div class='ui_user' style='float:right;'> 
+                <div id='ui_user_loggedIn' style='margin:0px 15px 0px 15px;'>
+                    <span>Welcome, <a id='user_name' href='' style='margin-left:3px;'></a></span>
+                    <span><a href='javascript:logOut();'>Log Out</a></span>
+                </div>
+                <div id='ui_user_notLoggedIn' style='margin:0px 0px 0px 5px;'>
+                    <span><a href='javascript:openCreateAccount();'>Create New Account</a></span>
+                    <span><a href='javascript:openSignIn();'>Sign In
+                            <span class='icon_dropdown'>&nbsp;</span></a></span>
+                    
+                </div>
+                <div id='login_form_div' style='display:none; float:right; margin-top:8px; width:auto; padding:10px; background-color:#333; border:1px solid #555; border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.1) inset;'>
+                    <form id='login_form' name='login' action='#'>
+                    <div class='clearfix'>
+                        <span style='float:left; width:75px;'>User Name</span>
+                        <span style='float:left; '><input type='text' id='userID' name='id' size='10'/></span>
+                    </div>
+                    <div class='clearfix' style='margin-top:3px;'>
+                        <span style='float:left; width:75px;'>Password</span>
+                        <span style='float:left; '><input type='password' id='password' name='password' size='10'/></span>
+                    </div>
+                    <div class='clearfix;' style='margin-top:5px;'>
+                        <input id='login_submit' type='button' class='btn' value='Log In' style='width:60px; display:block; text-align:center; margin:auto;' ></input>
+                    </div>
+                    </form>
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        function openSignIn() {
+            $("#login_form_div").toggle();
+            $("#userID").focus();
+        }
+        function openCreateAccount() {
+            window.location.href = "/";
+        }
+        function logOut() {
+            window.location.href = "/logOut?redirect="+document.URL;
+        }
+	    $("#login_submit").click(function() {
+	        var id = $("input#userID").val();
+	        var password = $("input#password").val();
+	        if (id=="" || password=="") { alert("id and password must be filled in."); return; }
+	        var param = 'name=' + id + "&password=" + password;
+	        $.get("LogIn",param,function(response) {
+	            if(response.indexOf("You are now logged in ")!=-1) {
+	                p1 = response.replace("You are now logged in as","");
+	                $("#login_form_div").append("<DIV>"+response+"</DIV>");
+	                window.location.reload()
+	            } else {
+	                $("#login_form_div").append("<DIV>"+response+"</DIV>");
+	            }
+	        });
+	    });
+	    $(document).ready(function() {
+	       if (p1=='Guest' || p1==undefined) {
+	           $("#ui_user_loggedIn").hide();
+	           $("#ui_user_notLoggedIn").show();
+	       }else{
+	           $("#user_name").text(p1);
+               $("#ui_user_loggedIn").show();
+               $("#ui_user_notLoggedIn").hide();        
+	       }
+	    });
+    </script>

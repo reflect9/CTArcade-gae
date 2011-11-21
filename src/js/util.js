@@ -217,7 +217,7 @@ function ordering_phase1(oM,cM){	// downward->upward run of reordering by baryce
 	return oM;
 }
 function ordering_phase2(oM,cM) {
-	var counter = 0;	var maxCounter = 3;	// try 5 times to maximum
+	var counter = 0;	var maxCounter = 5;	// try 5 times to maximum
 	while(true) {
 		var newOM = jQuery.extend(true, {}, oM);
 		// downward run of swapping equal barycenter nodes
@@ -248,13 +248,102 @@ function ordering_phase2(oM,cM) {
 	}
 }
 
+function findKeyOfValueInObject(value,obj) {
+	var index = -1;
+	for (key in obj) {
+		if(obj[key]==value) index = key;
+	} 
+	return index;
+}
+
+// 
+function position_row(upDown,rI,oM,cM,xM) {
+	var tempXM = jQuery.extend(true, {}, xM);
+	var numberOfConnectedNodes = {};
+	var dir = upDown;  
+	if (dir=='downward') {
+		var rdir = 'upward';
+		var srcIndex = rI;  var tarIndex = rI+1;
+	} else {
+		var rdir='downward';
+		var srcIndex = rI+1;  var tarIndex = rI;
+	}
+	for (shape in cM[rI][rdir])  numberOfConnectedNodes[shape] = cM[rI][rdir][shape].length;  // check priority
+	var shapesOrderByPriority = getKeysSortedByValue(numberOfConnectedNodes);
+	for (i in shapesOrderByPriority) {
+		// get target position
+		var shape = shapesOrderByPriority[i];
+		var current_position = parseInt(tempXM[tarIndex][shape]);
+		var current_priority = numberOfConnectedNodes[shape];
+		var connectedShapes = cM[rI][rdir][shape];
+		var avg_position = 0;	
+		for (cS in connectedShapes) 
+			avg_position += parseInt(tempXM[srcIndex][connectedShapes[cS]]);
+		var target_position = Math.round(avg_position/connectedShapes.length);
+		// push it to the target position
+		while(true) {
+			if(target_position > current_position) var direction=1;
+			else if(target_position < current_position) var direction=-1;
+			else 	{tempXM[tarIndex][shape]=current_position;	break;}
+			var pointer= current_position; var blocked=false;	var emptyFound=undefined;	
+			while(true) {	// 	iterate toward direction until there's empty slot and 
+							//	check it's blocked by higher priority node
+				pointer += direction;
+				if(findKeyOfValueInObject(pointer,tempXM[tarIndex])==-1) {  
+					emptyFound=pointer;  break; 
+				}	else{
+					var adjacentShape = findKeyOfValueInObject(pointer,tempXM[tarIndex]);
+					var adj_shape_priority = numberOfConnectedNodes[adjacentShape];
+					if(current_priority<=adj_shape_priority) { blocked=true;  break;}
+				}
+			}
+			if (emptyFound!=undefined) {  /* push one step toward the direction */
+				pointer = emptyFound;
+				var counter=0;
+				while(true) {
+					pointer+=direction*(-1);	// move cursor opposite direction 
+					tempXM[tarIndex][findKeyOfValueInObject(pointer,xM[tarIndex])] += direction; // push the adjacent node to the direction
+					if (pointer==current_position) break;
+					if (counter<50) counter++; else {alert("omg"); break;}
+				}
+			}
+			if (blocked==true) {
+				break;
+			}
+		}
+	}
+	return tempXM;
+}
+
+function horizontal_positioning(oM,cM) {
+	var xM = [];
+	for (rI in oM) {	// initialize xM(position) to integers(1,2,3,4...)
+		var xRow={};
+		for (shapeIndex in oM[rI]) {
+			xRow[oM[rI][shapeIndex]]= parseInt(shapeIndex);	// key:shape, value:horizontal position
+		}
+		xM.push(xRow);
+	}
+	for(var i=0; i<3;i++) {
+		for (var rI=0;rI<graph.length-1;rI++) {  // downrun
+			xM = position_row('downward',rI,oM,cM,xM);
+		}
+		for (var rI=graph.length-2;rI>-1;rI--) {  // uprun
+			xM = position_row('upward',rI,oM,cM,xM);
+		}
+		for (var rI=2;rI<graph.length-1;rI++) {  // t- downrun
+			xM = position_row('downward',rI,oM,cM,xM);
+		}
+	}
+	return xM; // return array(rounds) of array(horizontal positions)
+}
+
 // hierarchical graph layout algorithm
 // input: graph > [{[[0,0,"ben"][][]]:listOfMatches}, round2,..]
 // output: [{[shapeofBoard]:{position:{x,y},matches}}, round2, ...]
 function sugiyama(graph) {
 	var cM = []; 	// connectivity;  cM[1] = r1 key->[r2 keys] 
 	var oM = [];	// horizontal order; oM[1] := array of keys(shapeString) in r1
-	var bC = [];	// bC[roundIndex] := 
 	// create basic datastructure
 	for (var rI=0;rI<graph.length;rI++) {  // for each round, 
 		if (rI<graph.length-1) {
@@ -273,6 +362,13 @@ function sugiyama(graph) {
 	oM = ordering_phase1(oM,cM);
 	// step2. swapping rows/columns of equal barycenters
 	oM = ordering_phase2(oM,cM);
+
+	// step2. horizontal positioning
+	var xM = []; 	// horizontal position of every row
+	// downrun from 2nd to the last round
+	xM = horizontal_positioning(oM,cM);
+
+	// step3. add x position and return graph
 	// apply result into graph
 	for (var rI=0;rI<graph.length;rI++) {
 		var curRound = graph[rI];
@@ -283,22 +379,27 @@ function sugiyama(graph) {
 			if($.inArray(shape,oM[rI])==-1) {
 				alert(rI + " th round doesn't have "+shape);
 			}
-			newRound[shape]['order']= oM[rI][shape];
+			newRound[shape]['order']= $.inArray(shape,oM[rI]);
+			newRound[shape]['position']= xM[rI][shape];
 		}
 		graph[rI] = newRound;
 	}
 	return {'graph':graph,'connectivity':cM};
-	
-	// step2. horizontal positioning
-	
-	
-	// step3. add x position and return graph
 }
 
 
 
 //log in & sign up module
 function showLogIn() {
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	var blackMat = $("<DIV class='blackMat'></DIV>");
 	var logInDIV = $("<DIV id='logIn' class='panel_floating' style='position:absolute; z-index:1001; top:50%; left:50%; margin:-150px 0 0 -150px; width:300px; height:300px;'></DIV>");
 	$("body").append(blackMat);

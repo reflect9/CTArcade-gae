@@ -102,6 +102,11 @@ class LogIn(webapp.RequestHandler):
         else:
             self.response.out.write("We could not find your user information,<br />please try again.")    
             return      
+class LogOut(webapp.RequestHandler):
+    def get(self):
+        self.sess = sessions.Session()
+        self.sess.delete()
+        self.redirect(self.request.get("redirect"))
 
 class UpdateRule(webapp.RequestHandler):
     def get(self):
@@ -265,6 +270,7 @@ def main():
                                           ('/init', Init),
                                           ('/signUp',SignUp),
                                           ('/LogIn',LogIn),
+                                          ('/logOut',LogOut),
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),
