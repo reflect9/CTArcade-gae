@@ -222,10 +222,10 @@ li {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
-.panel {
+.console_panel {
 	border: 0px silver solid;
 	float:left;
-	width: 320px;	
+	width: 420px;	
 	height: 500px;
 	margin-left: 15px; margin-right:15px;
 }
@@ -243,7 +243,7 @@ li {
 	border: 1px solid #ccc;
 	background-color:#eee;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 0.8em;
+	font-size: 1em;
 	overflow-y:scroll;
 }
 .rule_inactive {

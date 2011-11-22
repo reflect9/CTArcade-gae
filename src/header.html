@@ -67,13 +67,19 @@
 	        });
 	    });
 	    $(document).ready(function() {
-	       if (p1=='Guest' || p1==undefined) {
-	           $("#ui_user_loggedIn").hide();
-	           $("#ui_user_notLoggedIn").show();
+	       if (typeof p1 == 'undefined') {   
+	            $("#ui_user_loggedIn").hide();
+	            $("#ui_user_notLoggedIn").show();
 	       }else{
-	           $("#user_name").text(p1);
-               $("#ui_user_loggedIn").show();
-               $("#ui_user_notLoggedIn").hide();        
+	           if (p1=='Guest') {
+	                $("#ui_user_loggedIn").hide();
+                    $("#ui_user_notLoggedIn").show();
+	           } else {
+	                $("#user_name").text(p1);
+                    $("#ui_user_loggedIn").show();
+                    $("#ui_user_notLoggedIn").hide(); 
+	           }
+	                  
 	       }
 	    });
     </script>
