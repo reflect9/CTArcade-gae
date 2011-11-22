@@ -31,15 +31,15 @@ class Lobby(webapp.RequestHandler):
                 
         query = User.all()
         users = query.fetch(10)
-		
-	#key = self.request.get('key')
-	#q = taskqueue.Queue('tournament-queue')
-	#tasks = []
-	#payload_str = 'hello world'
-	#tasks.append(taskqueue.Task(payload=payload_str, countdown=5))
-	#q.add(tasks)
+        
+    #key = self.request.get('key')
+    #q = taskqueue.Queue('tournament-queue')
+    #tasks = []
+    #payload_str = 'hello world'
+    #tasks.append(taskqueue.Task(payload=payload_str, countdown=5))
+    #q.add(tasks)
 
-		
+        
         template_values = {
             'users': users,
             'logged' : logged,
@@ -55,7 +55,7 @@ class Lobby(webapp.RequestHandler):
         # Add the task to the default queue.
         taskqueue.add(url='/worker', params={'key': key}, countdown=0)
 
-        self.redirect('/')	
+        self.redirect('/')    
 
 class Init(webapp.RequestHandler):
     def get(self):
@@ -77,7 +77,7 @@ class SignUp(webapp.RequestHandler):
                     id = self.request.get('name'),
                     email = self.request.get('email'),
                     password = self.request.get('password'),
-					score = 0)            
+                    score = 0)            
         result = user.put()                
         if result:
             ai_rec = AI(key_name=self.request.get('name')+"_tictactoe",
@@ -198,19 +198,15 @@ class AjaxTrainer(webapp.RequestHandler):
     def get(self):
         action  = self.request.get('action')
         if action == 'getStrategy':
-#            ai = db.Query(AI.get_by_key_name(self.request.get('player')+"_"+self.request.get('game'))).get()
             self.response.out.write(json.dumps(getUserStrategy(self.request.get('player'),self.request.get('game'))))
         elif action == 'getPublicStrategyDict':
             dict = getPublicStrategyDict(self.request.get('game'))
-#            print >>sys.stderr, dict
             self.response.out.write(json.dumps(dict))
         elif action == 'findBestStrategy':
             trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
             result = trainer.findBestStrategy()
-            self.response.out.write(json.dumps(result))
-            # result is an array. each element has 'st':strategy, 'result':['success']true/false and 'loc':[[x,y],.] 
+            self.response.out.write(json.dumps(result)) 
         elif action == 'findMatchingStrategy':
-#            print >>sys.stderr, self.request.get('board')
             trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
             result = trainer.findMatchingStrategy(json.loads(self.request.get('loc')))
             self.response.out.write(json.dumps(result))
@@ -254,18 +250,18 @@ class CounterWorker(webapp.RequestHandler):
         tournament_entries = []
         for p1 in users:
                 tournament_entries.append(str(p1.id))
-    	log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
-    	log.put()
+        log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
+        log.put()
         print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
         taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=60)
-		
+        
 class RoundWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
         Message = "%s%s" % ("Round Start: ", self.request.get('tournament_entries'))
         print >>sys.stderr, Message
         log = TournamentLog(message = Message)
         log.put()
-        	
+            
         round_entries = []
         print >>sys.stderr, "Round Entries Created"
         round_winners = []
@@ -273,26 +269,26 @@ class RoundWorker(webapp.RequestHandler):
         round_entries = json.loads(self.request.get('tournament_entries'))
         print >>sys.stderr, "Round Entries Loaded"
         while len(round_entries) >= 2:
-			player1 = round_entries.pop()
-			player2 = round_entries.pop()
-			match = TicTacToeMatch(player1,player2,game='tictactoe',turn=player1)
-			result = match.run()
-			while result["winner"] == "Tie Game":
-				result = match.run()
-			round_winners.append(str(result["winner"]))
-			Message = "%s%s" % ("Round Winner: ", str(result["winner"]))
-			print >>sys.stderr, Message
-			log = TournamentLog(message = Message)
-			log.put()
-		# Need to do something about adding basic scores with person who gets the by
-        by = "None"				
+            player1 = round_entries.pop()
+            player2 = round_entries.pop()
+            match = TicTacToeMatch(player1,player2,game='tictactoe',turn=player1)
+            result = match.run()
+            while result["winner"] == "Tie Game":
+                result = match.run()
+            round_winners.append(str(result["winner"]))
+            Message = "%s%s" % ("Round Winner: ", str(result["winner"]))
+            print >>sys.stderr, Message
+            log = TournamentLog(message = Message)
+            log.put()
+        # Need to do something about adding basic scores with person who gets the by
+        by = "None"                
         if len(round_entries) == 1:
-			by = round_entries.pop()
-			Message = "%s%s" % ("Assigning By:", str(by))			
-			print >>sys.stderr, Message
-			log = TournamentLog(message = Message)
-			log.put()
-		# Determine if another round is necessary or if winner can be declared	
+            by = round_entries.pop()
+            Message = "%s%s" % ("Assigning By:", str(by))            
+            print >>sys.stderr, Message
+            log = TournamentLog(message = Message)
+            log.put()
+        # Determine if another round is necessary or if winner can be declared    
         taskqueue.add(url='/score', params={'tournament_entries': json.dumps(round_winners), 'by': by}, countdown=60)
 
 class ScoreWorker(webapp.RequestHandler):
@@ -301,24 +297,24 @@ class ScoreWorker(webapp.RequestHandler):
         next_round = json.loads(self.request.get('tournament_entries'))
         score_entries = json.loads(self.request.get('tournament_entries'))
         if len(score_entries) == 1 and self.request.get('by') == "None":
-			Message = "%s%s" % ("Tournament Winner:", str(score_entries))	
-			print >>sys.stderr, Message
-			log = TournamentLog(message = Message)
-			log.put()
-			tournament_winner = score_entries.pop()
-			updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",tournament_winner).get()
-			updateUser.score += 10
-			updateUser.put()		
-        while len(score_entries) >= 2 or (len(score_entries) == 1 and self.request.get('by') != "None"):	
+            Message = "%s%s" % ("Tournament Winner:", str(score_entries))    
+            print >>sys.stderr, Message
+            log = TournamentLog(message = Message)
+            log.put()
+            tournament_winner = score_entries.pop()
+            updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",tournament_winner).get()
+            updateUser.score += 10
+            updateUser.put()        
+        while len(score_entries) >= 2 or (len(score_entries) == 1 and self.request.get('by') != "None"):    
             score_entry = score_entries.pop()
             updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",score_entry).get()
             updateUser.score += 1
             updateUser.put()
-        if 	self.request.get('by') != "None":
+        if     self.request.get('by') != "None":
             next_round.append(self.request.get('by'))
-        if len(next_round) >= 2: 	
+        if len(next_round) >= 2:     
             taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=60)
-			        
+                    
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
                                           ('/init', Init),
@@ -331,9 +327,9 @@ def main():
                                           ('/ajaxCall',AjaxCall),
                                           ('/ajaxTrainer',AjaxTrainer),
                                           ('/reviewMatch',ReviewMatch), 
-										  ('/worker', CounterWorker), 
-										  ('/round', RoundWorker),
-										  ('/score', ScoreWorker),                                  
+                                          ('/worker', CounterWorker), 
+                                          ('/round', RoundWorker),
+                                          ('/score', ScoreWorker),                                  
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
