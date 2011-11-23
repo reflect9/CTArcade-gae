@@ -101,7 +101,7 @@
        			
        		});
        	}
-       	function createMiniBoard_singleRound(match,iR) {
+       	function createMiniBoard_singleRound(match,iR) {	// used by graph mode only
        		var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
             var strategyInOrder = [["","",""],["","",""],["","",""]];
             $(match.history).each(function(bi,turn) {
@@ -110,7 +110,7 @@
                 strategyInOrder[turn.loc[0]][turn.loc[1]]=turn.message;
             });
             var turn = match.history[iR];
-            var matchBoard = createMiniBoard(turn.board,turn.message,turn.loc,movesInOrder,strategyInOrder,false);
+            var matchBoard = createTinyBoard(turn.board,turn.message,turn.loc,movesInOrder,strategyInOrder,false);
             return matchBoard;
        	}
        
@@ -124,7 +124,8 @@
 					var row = $("<div></div>");
 					$(r).each( function(ic,c) {
 					    var col = $("<div class='review_cell "+ir+"_"+ic+"'><p>"+movesInOrder[ir][ic]+"</p></div>");
-						if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
+						col.css({'width':miniBoard.width()/4,'height':miniBoard.width()/4});
+					    if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
 							if (c==p1) $(col).css("background-color",color.paleGreen);  
                            else if (c==p2) $(col).css("background-color",color.violetPink);
 						} else {
@@ -148,6 +149,41 @@
 			$(miniBoard).append("<div style='clear:both;'></div>");
 			return miniBoard;
 		}
+		function createTinyBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy) {
+			var miniBoard = $("<div class='tinyboard'></div>"); 
+			var cellSize = Math.floor((miniBoard.width()-10)/3);
+			var boardDiv = $("<div style='position:absolute; margin:2px 0 0 2px;'></div>");
+				$(board).each( function(ir,r) {
+					//alert(r);
+					var row = $("<div></div>");
+					$(r).each( function(ic,c) {
+					    var col = $("<div class='review_cell "+ir+"_"+ic+"'>&nbsp;</div>");
+						col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee'});
+					    if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
+							if (c==p1) $(col).css("background-color",color.paleGreen).css("border","1px solid white");  
+                           else if (c==p2) $(col).css("background-color",color.violetPink).css("border","1px solid white");
+						} else {
+                           if (c==p1) $(col).css("background-color",getColor("paleGreen",0.25));  
+                           else if (c==p2) $(col).css("background-color",getColor("violetPink",0.25));
+						}		
+						if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
+						$(row).append(col);
+					});
+					$(row).append("<div style='clear:both'></div>");
+					$(boardDiv).append(row);
+				});
+			if (st=='takeWin') {
+				$(findWinningCells(board)).each(function(i,wloc) {
+					$(boardDiv).find("."+wloc[0]+"_"+wloc[1]).css('border','1px solid black');
+				});
+           }			
+			$(boardDiv).append("<div style='clear:both'></div>");
+			$(miniBoard).append(boardDiv);
+			$(miniBoard).append("<div style='clear:both;'></div>");
+			return miniBoard;
+		}
+		
+		
 		
 		function showMatchesAsList(matchList) {
 			currentMode = "list";
@@ -242,9 +278,9 @@
 		}
 		
 		// graph (from left to right). Each column represents round. In a column, similar matches are clustered. Edges between two clusters in adjacent columns are strategy used. 
-		function showMatchesAsGraph(matchList) {
+		function showMatchesAsGraph(matchList, direction) {
 			currentMode = "graph";
-			$("#matches").empty();
+			
 			graph = [];
 			// for each round, 
 			for(var iR=0;iR<9;iR++) {
@@ -261,7 +297,14 @@
 			}
 			
 			var result = sugiyama(graph);
-			graph = result.graph;
+			$("#matches").empty();
+			if (direction=="horizontal")
+				drawGraph_horizontal(result,"#matches");
+			else 
+				drawGraph_vertical(result,"#matches");
+		}
+		function drawGraph_horizontal(result, targetDivID) {
+			var graph = result.graph;
 			var cM = result.connectivity;
 			// find max, min position (integer)
 			var min_pos = 100000;	var max_pos = -100000;
@@ -270,11 +313,83 @@
 					if (graph[rI][nodeI]['position'] <min_pos) min_pos = graph[rI][nodeI]['position'];
 					if (graph[rI][nodeI]['position'] >max_pos) max_pos = graph[rI][nodeI]['position'];
 				}
+			// horizontal flow
 			var gap = max_pos-min_pos;
-			var interval = $("#matches").width()/(gap+1);
-			var hor_offset = -min_pos*interval;
+			var interval = 45;
+			var totalHeight = (gap+2)*interval;
+			var vertical_offset = (-1*min_pos*interval) + (interval/2);
 			
-			// draw graph representation
+			// place tinyboard representation
+			$(graph).each(function(iR,round){
+				var columnDiv = $("<div id='graph_round_"+iR+"' class='matchGraphColumn clearfix'></div>");
+				columnDiv.css('height',totalHeight);
+				$.each(round, function(boardShape,data) { // iterate clusters
+					var sampleMatch = matches[data['matches'][0]];  // use the first game in the list, generate representative miniboard
+					var matchBoard = createMiniBoard_singleRound(sampleMatch,iR);
+					$(matchBoard).removeClass('miniboard');  $(matchBoard).addClass('miniboard_graph');
+					$(matchBoard).css("top",vertical_offset+data.position*interval);
+					$(matchBoard).css("left",0);
+					$(matchBoard).attr("shape",boardShape.replace(/"/gi,''));
+					var listOfMatches = data.matches.length;
+					$(matchBoard).append("<div class='board_frequency' style='position:absolute; top:0; left:0; margin-left:-15px; font-size:9px; display:none'>"+listOfMatches+"</div>")
+					$(columnDiv).append(matchBoard);
+				});
+				$(targetDivID).append(columnDiv);
+			});
+			// draw lines
+			$(targetDivID).prepend("<canvas id='canvas' style='position:absolute; top:0px; left:0px;' width='"+$(targetDivID).width()+"px' height='"+$(targetDivID).height()+"px'></canvas>");
+			ctx = $("canvas")[0].getContext("2d");
+//			ctx.canvas.width = $(targetDivID).width();
+//			ctx.canvas.height = $(targetDivID).height();
+			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);	
+			$.each(cM, function(iR, round) {
+//				$.each(round, function(j, connection){
+					$.each(round.downward, function(shapeA, connectedShapesB){
+						$.each(connectedShapesB, function(iB, shapeB) {
+							var sA = $(targetDivID+' div[shape="'+shapeA.replace(/"/gi,'')+'"]');
+							var sB = $(targetDivID+' div[shape="'+shapeB.replace(/"/gi,'')+'"]');
+							var offsetA = sA.offset();
+							var offsetB = sB.offset();
+							var widthA = $(targetDivID+' div[shape="'+sA+'"]').width();
+							var widthB = $(targetDivID+' div[shape="'+sA+'"]').width();
+							var gap = 15; // how strong bezierCurve tends to go straight
+							var startPoint = {'x':sA.offset().left+sA.width()-$("#canvas").offset().left, 'y':sA.offset().top+sA.height()/2-$("#canvas").offset().top};
+							var endPoint = {'x':sB.offset().left-$("#canvas").offset().left, 'y':sB.offset().top+sB.height()/2-$("#canvas").offset().top};
+							var ctrA = {'x':startPoint.x+gap,'y':startPoint.y};
+							var ctrB = {'x':endPoint.x-gap, 'y':endPoint.y};
+							ctx.beginPath();
+							ctx.moveTo(startPoint.x,startPoint.y);
+							ctx.bezierCurveTo(ctrA.x,ctrA.y,ctrB.x,ctrB.y,endPoint.x,endPoint.y);
+							if(parseInt($(sA).find(".board_frequency").text()) < parseInt($(sB).find(".board_frequency").text())) {
+								ctx.lineWidth = 1+parseInt($(sA).find(".board_frequency").text())/2;
+							} else {
+								ctx.lineWidth = 1+parseInt($(sB).find(".board_frequency").text())/2;
+							}
+						    ctx.strokeStyle ="#eee"; // line color
+						    ctx.stroke();
+						});
+					});
+//				});
+			});
+		}	
+		function drawGraph_vertical(result, targetDivID) {
+			var graph = result.graph;
+			var cM = result.connectivity;
+			// find max, min position (integer)
+			var min_pos = 100000;	var max_pos = -100000;
+			for(var rI in graph) 
+				for(var nodeI in graph[rI]) {
+					if (graph[rI][nodeI]['position'] <min_pos) min_pos = graph[rI][nodeI]['position'];
+					if (graph[rI][nodeI]['position'] >max_pos) max_pos = graph[rI][nodeI]['position'];
+				}
+
+//			 vertical flow
+			var gap = max_pos-min_pos;
+			var interval = $(targetDivID).width()/(gap+1);
+			if (interval<$(".tinyboard:first").width()) interval = $(".tinyboard:first").width()+10;
+			var hor_offset = (-1*min_pos*interval) + (interval/2);
+			
+			// place tinyboard representation
 			$(graph).each(function(iR,round){
 				var columnDiv = $("<div id='graph_round_"+iR+"' class='matchGraphRound clearfix'></div>");
 				$.each(round, function(boardShape,data) { // iterate clusters
@@ -284,39 +399,47 @@
 					$(matchBoard).css("left",data.position*interval+hor_offset);
 					$(matchBoard).css("top",0);
 					$(matchBoard).attr("shape",boardShape.replace(/"/gi,''));
-					var listOfMatches = ""+data.matches;
-					$(matchBoard).append("<div style='font-size:9px;'>"+listOfMatches.replace(/,/gi,' ')+"</div>")
+					var listOfMatches = data.matches.length;
+					$(matchBoard).append("<div class='board_frequency' style='position:absolute; bottom:0; left:0; margin-bottom:-15px; font-size:9px;'>"+listOfMatches+"</div>")
 					$(columnDiv).append(matchBoard);
 				});
-				$()
-				$("#matches").append(columnDiv);
+				$(targetDivID).append(columnDiv);
 			});
 			// draw lines
-			$("#matches").append("<canvas id='canvas' style='position:absolute; top:0px; left:0px;' width='500px' height='500px'></canvas>");
-			canvasElement = $("#canvas")[0];
-			ctx = canvasElement.getContext("2d");
-			ctx.canvas.width = $("#matches").width();
-			ctx.canvas.height = $("#matches").height();
-			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
-			ctxOffset = $("#canvas").offset();
-			offsetX = ctxOffset.left-$("#matches .miniboard:first").width()/2;
-			offsetY = ctxOffset.top-$("#matches .miniboard:first").height()/2;	
+			$(targetDivID).prepend("<canvas id='canvas' style='position:absolute; top:0px; left:0px;' width='"+$(targetDivID).width()+"px' height='"+$(targetDivID).height()+"px'></canvas>");
+			ctx = $("canvas")[0].getContext("2d");
+//			ctx.canvas.width = $(targetDivID).width();
+//			ctx.canvas.height = $(targetDivID).height();
+			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);	
 			$.each(cM, function(iR, round) {
-				$.each(round, function(j, connection){
-					$.each(connection, function(shapeA, connectedShapesB){
+//				$.each(round, function(j, connection){
+					$.each(round.downward, function(shapeA, connectedShapesB){
 						$.each(connectedShapesB, function(iB, shapeB) {
-							var sA = shapeA.replace(/"/gi,''); 	var sB = shapeB.replace(/"/gi,'');
-							var offsetA = $('#matches div[shape="'+sA+'"]').offset();
-							var offsetB = $('#matches div[shape="'+sB+'"]').offset();
-							ctx.moveTo(offsetA.left-offsetX,offsetA.top-offsetY);
-							ctx.lineTo(offsetB.left-offsetX,offsetB.top-offsetY);
-							ctx.stroke();
+							var sA = $(targetDivID+' div[shape="'+shapeA.replace(/"/gi,'')+'"]');
+							var sB = $(targetDivID+' div[shape="'+shapeB.replace(/"/gi,'')+'"]');
+							var offsetA = sA.offset();
+							var offsetB = sB.offset();
+							var widthA = $(targetDivID+' div[shape="'+sA+'"]').width();
+							var widthB = $(targetDivID+' div[shape="'+sA+'"]').width();
+							var gap = 15; // how strong bezierCurve tends to go straight
+							var startPoint = {'x':sA.offset().left+sA.width()/2-$("#canvas").offset().left, 'y':sA.offset().top+sA.height()-$("#canvas").offset().top};
+							var endPoint = {'x':sB.offset().left+sB.width()/2-$("#canvas").offset().left, 'y':sB.offset().top-$("#canvas").offset().top};
+							var ctrA = {'x':startPoint.x,'y':startPoint.y+gap};
+							var ctrB = {'x':endPoint.x, 'y':endPoint.y-gap};
+							ctx.beginPath();
+							ctx.moveTo(startPoint.x,startPoint.y);
+							ctx.bezierCurveTo(ctrA.x,ctrA.y,ctrB.x,ctrB.y,endPoint.x,endPoint.y);
+							if(parseInt($(sA).find(".board_frequency").text()) < parseInt($(sB).find(".board_frequency").text())) {
+								ctx.lineWidth = 1+parseInt($(sA).find(".board_frequency").text())/2;
+							} else {
+								ctx.lineWidth = 1+parseInt($(sB).find(".board_frequency").text())/2;
+							}
+						    ctx.strokeStyle ="#eee"; // line color
+						    ctx.stroke();
 						});
 					});
-				});
+//				});
 			});
-			
-			
 		}
 		
 		function findCluster(matches) {
@@ -426,7 +549,7 @@
 //			$("#desc").append("<div> RESULT : {{winners}} </div>");
 //			
 		});
-	
+		
 	
 	</script>
 
@@ -449,22 +572,20 @@
 				   <input type="button" onclick="showMatchesAsList(matches)" value="List view"/>
 				   <input type="button" onclick="showMatchesAsAnimation(matches)" value="Stepwise animation"/>
 				   <input type="button" onclick="showMatchesAsGroups(matches)" value="Grouped by winner"/>
-				   <input type="button" onclick="showMatchesAsGraph(matches)" value="Game tree graph"/>
+				   <input type="button" onclick="showMatchesAsGraph(matches,'horizontal')" value="Game tree graph(horizontal)"/>
+				   <input type="button" onclick="showMatchesAsGraph(matches,'vertical')" value="Game tree graph(vertical)"/>
 				</div>	
 				
 				<div id='matches' class='clearfix' style='min-height:200px; position:relative;'></div>
-				
+
 				
 				
 			</div> <!--wrapper clearfix-->
 		</div>	<!--pageContent-->
-		
-		
-		
-		
-	
 	</div>		<!-- end of container-->
 
+	
+	
 </body>
 
 </html>

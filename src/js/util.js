@@ -297,15 +297,16 @@ function position_row(upDown,rI,oM,cM,xM) {
 					if(current_priority<=adj_shape_priority) { blocked=true;  break;}
 				}
 			}
-			if (emptyFound!=undefined) {  /* push one step toward the direction */
+			if (typeof emptyFound != 'undefined') {  /* push one step toward the direction */
 				pointer = emptyFound;
 				var counter=0;
 				while(true) {
 					pointer+=direction*(-1);	// move cursor opposite direction 
-					tempXM[tarIndex][findKeyOfValueInObject(pointer,xM[tarIndex])] += direction; // push the adjacent node to the direction
+					tempXM[tarIndex][findKeyOfValueInObject(pointer,tempXM[tarIndex])] += direction; // push the adjacent node to the direction
 					if (pointer==current_position) break;
 					if (counter<50) counter++; else {alert("omg"); break;}
 				}
+				current_position += direction;	// move the cursor to the direction, for next round
 			}
 			if (blocked==true) {
 				break;
@@ -314,8 +315,31 @@ function position_row(upDown,rI,oM,cM,xM) {
 	}
 	return tempXM;
 }
+//
+//function visualize_positioning_step(graph,xM,oM,cM) {
+//	// step3. add x position and return graph
+//	// apply result into graph
+//	var newGraph = jQuery.extend(true, [], graph);
+//	for (var rI=0;rI<newGraph.length;rI++) {
+//		var curRound = graph[rI];
+//		var newRound = {};
+//		for (var shape in curRound) {
+//			newRound[shape]={};
+//			newRound[shape]['matches'] = curRound[shape];
+//			if($.inArray(shape,oM[rI])==-1) {
+//				alert(rI + " th round doesn't have "+shape);
+//			}
+//			newRound[shape]['order']= $.inArray(shape,oM[rI]);
+//			newRound[shape]['position']= xM[rI][shape];
+//		}
+//		newGraph[rI] = newRound;
+//	}
+//	var result = {'graph':newGraph,'connectivity':cM};
+//	drawGraph(result,"#matches");
+////	alert("haha");
+//}
 
-function horizontal_positioning(oM,cM) {
+function horizontal_positioning(oM,cM,graph) {
 	var xM = [];
 	for (rI in oM) {	// initialize xM(position) to integers(1,2,3,4...)
 		var xRow={};
@@ -327,12 +351,15 @@ function horizontal_positioning(oM,cM) {
 	for(var i=0; i<3;i++) {
 		for (var rI=0;rI<graph.length-1;rI++) {  // downrun
 			xM = position_row('downward',rI,oM,cM,xM);
+//			visualize_positioning_step(graph,xM,oM,cM);
 		}
 		for (var rI=graph.length-2;rI>-1;rI--) {  // uprun
 			xM = position_row('upward',rI,oM,cM,xM);
+//			visualize_positioning_step(graph,xM,oM,cM);
 		}
-		for (var rI=2;rI<graph.length-1;rI++) {  // t- downrun
+		for (var rI=4;rI<graph.length-1;rI++) {  // t- downrun
 			xM = position_row('downward',rI,oM,cM,xM);
+//			visualize_positioning_step(graph,xM,oM,cM);
 		}
 	}
 	return xM; // return array(rounds) of array(horizontal positions)
@@ -366,7 +393,7 @@ function sugiyama(graph) {
 	// step2. horizontal positioning
 	var xM = []; 	// horizontal position of every row
 	// downrun from 2nd to the last round
-	xM = horizontal_positioning(oM,cM);
+	xM = horizontal_positioning(oM,cM,graph);
 
 	// step3. add x position and return graph
 	// apply result into graph
