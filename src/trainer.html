@@ -65,7 +65,7 @@
 		for(i in strategy) {
 			code = strategy[i].st;
 			strt = game.publicStrategyDict[code];  
-			name = strt['name'];
+			name = code;
 			html = html+"<li class='ui-state-default'><div style='margin:10px 0 0 10px; ' id='ai_"+code+"' class='ai_"+ code +" rule_inactive'>"+ name +"</div></li>";
 		}
 		html = html+"</ul>";
@@ -253,6 +253,13 @@
 				}).appendTo($(cons.target));
 			if ($.inArray(rule['code'],game.strategy)==-1) {$(r).append("<span style='font-size:13px;' title='your AI does not know this rule.'> <b>[?]</b></span>");} else {$(r).append("<span style='font-size:13px;' title='your AI knows this rule.'> <b>[!]</b></span>");}
 		});
+		var c = $('<div></div>',{
+			id : 'mR_createYourOwn',
+			class : 'mR',
+			style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
+		})	.text("Create Your Own")
+			.click(function() {startCreationInterface(game.cloneBoard(game.board)); $(".mR").unbind().css('cursor','default').css('color','#aaa');})
+			.appendTo($(cons.target));
 		cons.appendButton("CONTINUE","$(this).hide(); game.findBestStrategy(game.board,game.turn,computerMove);");
 	}
 	
@@ -278,6 +285,7 @@
 		});
 	});
 	</script>
+	<script type="text/javascript" src="js/Creation.js"> </script>
 </head>
 <body>	
 <!-- header -->
