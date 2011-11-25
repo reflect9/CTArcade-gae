@@ -335,6 +335,11 @@ parseRule = function(ruleBoard, name, desc, translationInvariant, flipping,
 		}
 	}
 	
+	/* I'm not sure if this approach is really necessary - an easier approach would
+		 * perhaps be to generate new rules like I do with the other options and then apply them
+		 * via the "no translation invariance" function below, but since this method should not cause
+		 * any repeat boards and should be faster, maybe its not a bad way to go, especially once
+		 * we generalize to larger games like connect4 */
 	// if translation invariance is activated, convert the rule to a relative format
 	if (translationInvariant){
 		var hMin = ruleBoard.length;
