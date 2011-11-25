@@ -1,0 +1,58 @@
+.consider{
+	background-color: #FFFFFF;
+}
+
+.ignore{
+	background-color: transparent;
+}
+
+.consider_demonstrate{
+	background-color: #FFFFFF;
+}
+
+.ignore_demonstrate{
+	background-color: #737373;
+}
+
+.create_ignore{
+	border: solid 2px black;
+}
+
+.create_p1{
+	background-image: url(image/icon_human_40.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	border: solid 2px black;
+}
+
+.create_p2{
+	background-image: url(image/icon_computer_40.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	border: solid 2px black;
+}
+
+.create_empty{
+	border: solid 2px black;
+}
+
+.create_there{
+	border: dashed 2px black;
+}
+
+.create_selected{
+	background-color: #FFFFFF;
+	border: solid 2px red;
+}
+
+#overlayConsole > .message {
+	margin-top:5px;
+	height:400px;
+	padding:10px;
+	line-height:1.3em;
+	border: 1px solid #ccc;
+	background-color:#eee;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 0.8em;
+	overflow-y:scroll;
+}

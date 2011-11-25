@@ -9,6 +9,8 @@
 	<script type="text/javascript" src="js/Console.js"> </script>
 	<script type="text/javascript" src="js/util.js"> </script>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	<link rel="stylesheet" type="text/css" href="css/Creation.css"/>
+	<script type="text/javascript" src="js/Creation.js"> </script>
 	<script type="text/javascript">
 	var p1='{{user_id}}';
 	var game=null; 	// trainer object created from TicTacToeTrainer.js
@@ -174,6 +176,13 @@
 				.click(function() { game.enableStrategy(game.user,rule['code']);})
 				.appendTo($(cons.target));
 		});
+		$('<div></div>',{
+			id : 'mR_createYourOwn',
+			class : 'mR',
+			style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
+		})	.text("Create Your Own")
+			.click(function() {startGuidedCreationInterface(tempBoard['board']);})
+			.appendTo($(cons.target));
 	}
 	function historyMode(flag) {
 		if(flag=='on') {
@@ -258,7 +267,7 @@
 			class : 'mR',
 			style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
 		})	.text("Create Your Own")
-			.click(function() {startCreationInterface(game.cloneBoard(game.board)); $(".mR").unbind().css('cursor','default').css('color','#aaa');})
+			.click(function() {startCreationInterface(game.cloneBoard(game.board));})
 			.appendTo($(cons.target));
 		cons.appendButton("CONTINUE","$(this).hide(); game.findBestStrategy(game.board,game.turn,computerMove);");
 	}
@@ -285,7 +294,6 @@
 		});
 	});
 	</script>
-	<script type="text/javascript" src="js/Creation.js"> </script>
 </head>
 <body>	
 <!-- header -->

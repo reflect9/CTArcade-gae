@@ -31,30 +31,33 @@ changeType = function(index1, index2){
 }
 
 startCreationInterface = function(board) {
+	var pageContentHandle = $(".pageContent");
 	$("<div></div>",{
 		id : 'overlay',
-		style : 'width: 100%;\
-				height: 100%;\
+		style : 'width: '+pageContentHandle.width()+'px;\
+				height: '+pageContentHandle.height()+'px;\
 				z-index: 1;\
 				background-color: #444444;\
 				position: absolute;\
-				left: 0;\
-				top: 0;\
+				left: '+pageContentHandle.offset()['left']+'px;\
+				top: '+pageContentHandle.offset()['top']+'px;\
 				opacity: 0.0;\
-				filter: alpha(opacity=0.5);'
-	}).appendTo($("html"));
+				filter: alpha(opacity=0.0);'
+	}).attr("class","pageContent").appendTo("html");
 	
 	// clone, create an overlaid console
 	var consoleHandle = $("#console");
-	consoleHandle.clone().attr("id","overlayConsole").appendTo("html");
-	$("#overlayConsole").css({"position":"absolute",
-							 "left":consoleHandle.offset()["left"]-parseInt(consoleHandle.css("margin-left")),
-							 "top":consoleHandle.offset()["top"]-parseInt(consoleHandle.css("margin-top")),
-							 "width":consoleHandle.width(),
+	var left = consoleHandle.offset()['left']-parseInt(consoleHandle.css("margin-left"));
+	var top = consoleHandle.offset()["top"]-parseInt(consoleHandle.css("margin-top"));
+	consoleHandle.clone().css({"width":consoleHandle.width(),
 							 "height":consoleHandle.height(),
+							 "position":"absolute",
+							 "left":left,
+							 "top":top,
 							 "z-index":2,
 							 "opacity":1.0,
-							 "filter":"alpha(opacity=1.0)"});
+							 "filter":"alpha(opacity=1.0)"})
+	.attr("id","overlayConsole").appendTo("html");
 	overlayConsole = new Console();
 	overlayConsole.init("#overlayConsole > .message");
 	overlayConsole.clear();
@@ -605,30 +608,31 @@ var switchState = function(){
 
 // also want a way to create rules within a guide
 startGuidedCreationInterface = function(board) {
+	var pageContentHandle = $(".pageContent");
 	$("<div></div>",{
 		id : 'overlay',
-		style : 'width: 100%;\
-				height: 100%;\
+		style : 'width: '+pageContentHandle.width()+'px;\
+				height: '+pageContentHandle.height()+'px;\
 				z-index: 1;\
 				background-color: #444444;\
 				position: absolute;\
-				left: 0;\
-				top: 0;\
+				left: '+pageContentHandle.offset()['left']+'px;\
+				top: '+pageContentHandle.offset()['top']+'px;\
 				opacity: 0.0;\
-				filter: alpha(opacity=0.5);'
-	}).appendTo($("html"));
+				filter: alpha(opacity=0.0);'
+	}).attr("class","pageContent").appendTo($("html"));
 	
 	// clone, create an overlaid console
 	var consoleHandle = $("#console");
-	consoleHandle.clone().attr("id","overlayConsole").appendTo("html");
-	$("#overlayConsole").css({"position":"absolute",
+	consoleHandle.clone().css({"position":"absolute",
 							 "left":consoleHandle.offset()["left"]-parseInt(consoleHandle.css("margin-left")),
 							 "top":consoleHandle.offset()["top"]-parseInt(consoleHandle.css("margin-top")),
 							 "width":consoleHandle.width(),
 							 "height":consoleHandle.height(),
 							 "z-index":2,
 							 "opacity":1.0,
-							 "filter":"alpha(opacity=1.0)"});
+							 "filter":"alpha(opacity=1.0)"})
+	.attr("id","overlayConsole").appendTo("html");
 	overlayConsole = new Console();
 	overlayConsole.init("#overlayConsole > .message");
 	overlayConsole.clear();
