@@ -347,6 +347,32 @@ function TicTacToeTrainer() {
 //    	alert(data);
     	this.publicStrategyDict = JSON.parse(data);
     }
+	
+	this.makeNewStrategy = function(board, turn, ruleBoard, name, desc,
+									translationInvariant, flipping, rowPermutation,
+									columnPermutation,rotation){
+		$.ajax({
+			type : "GET",
+			url : "/ajaxTrainer",
+			async : true,
+			data : 	{	action : 'makeNewStrategy',
+						user: this.user,
+						player1: this.p1,
+						player2: this.p2,
+						turn: turn, 
+ 	 					game: this.gameTitle,
+ 	 					board: JSON.stringify(board),
+						ruleBoard : JSON.stringify(ruleBoard),
+						name : name,
+						desc : desc,
+						translationInvariant : translationInvariant,
+						flipping : flipping,
+						rowPermutation : rowPermutation,
+						columnPermutation : columnPermutation,
+						rotation : rotation				
+					}
+		});
+	}
     
     
 	this.init = function(user) {

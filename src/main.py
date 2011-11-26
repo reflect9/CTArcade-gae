@@ -224,9 +224,12 @@ class AjaxTrainer(webapp.RequestHandler):
                 self.response.out.write('True')
             else:
                 self.response.out.write('False')
-        elif action == 'createStrategy':
-            # TBD : creating a new strategy. add it to Strategy model
-            pass
+        elif action == 'makeNewStrategy':
+            # it seems that a non-persistent TicTacToeTrainer variable breaks my approach...but to keep form:
+            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
+            ruleBoard = list(self.request.get('ruleBoard'))
+            trainer.makeNewStrategy(ruleBoard, self.request.get('name'), self.request.get('desc'), self.request.get('translationInvariant'), self.request.get('flipping'), self.request.get('rowPermutation'), self.request.get('columnPermutation'), self.request.get('rotation'))
+            self.response.out.write('success')
         elif action == 'changeOrder':
             # change the user's AI's data which is JSON string of an array that contains 
             # codes of strategies

@@ -197,7 +197,7 @@ class TicTacToeTrainer:
 
     def makeNewStrategy(self, ruleBoard, name, desc, translationInvariant,
                         flipping, rowPermutation, columnPermutation, rotation):
-        class Tile:
+        class Type:
             EMPTY = 0
             P1 = 1
             P2 = 2
@@ -219,7 +219,13 @@ class TicTacToeTrainer:
                     flipped[xIndex][yIndex] = ruleBoard[i][j]
             return flipped
         def rotate(ruleBoard):
-            rotated = list(ruleBoard)
+            # rotated will start as the transpose of ruleBoard
+            rotated = [];
+            for i in range(len(ruleBoard[0])):
+                rotated.append([])
+                for j in range(len(ruleBoard)):
+                    rotated[i].append(0)
+            # now define the values appropriately
             for i in range(len(ruleBoard)):
                 for j in range(len(ruleBoard[0])):
                     xIndex = j
@@ -231,14 +237,14 @@ class TicTacToeTrainer:
             for i in range(len(ruleBoard)):
                 for j in range(len(ruleBoard[0])):
                     xIndex = (i + offset) % len(ruleBoard)
-                    permuted[xIndex][j] = board[i][j]
+                    permuted[xIndex][j] = ruleBoard[i][j]
             return permuted
         def rowPermute(ruleBoard,offset):
             permuted = list(ruleBoard)
             for i in range(len(ruleBoard)):
                 for j in range(len(ruleBoard[0])):
                     yIndex = (i + offset) % len(ruleBoard[0])
-                    permuted[i][yIndex] = board[i][j]
+                    permuted[i][yIndex] = ruleBoard[i][j]
             return permuted
         def minimize(ruleBoard):
             hMin = len(ruleBoard)
@@ -289,13 +295,13 @@ class TicTacToeTrainer:
             for i in range(len(boardList)):
                 rotated = rotate(boardList[i])
                 addRule(boardList,rotated)
-                addRule(boardList,flip(boardList[i],true,true))
-                addRule(boardList,flip(rotated,true,true))
+                addRule(boardList,flip(boardList[i],True,True))
+                addRule(boardList,flip(rotated,True,True))
 
         # define the function that will eventually process this rule
         def newRule(board, player):
             result = {'success':True,'loc':[]}
-            pushFlag = false
+            pushFlag = False
             for ruleBoard in boardList:
                 width = len(ruleBoard)
                 height = len(ruleBoard[0])
@@ -318,7 +324,7 @@ class TicTacToeTrainer:
                         pushFlag = False
                         result['success'] = True
             if len(result['loc']) == 0:
-                result['success'] = false
+                result['success'] = False
             return result
 
         # add the function to the trainer class

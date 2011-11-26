@@ -2,17 +2,16 @@ var overlayBoard;
 var overlayConsole;
 
 var TYPE = {
-	IGNORE : {value: 0, css: "create_ignore", ignorecss: "ignore", description:
-		"These tiles are ignored by the rule"},
+	EMPTY : {value: 0, css: "create_empty", ignorecss: "consider", description:
+		"This tile needs to be empty to apply the rule"},
 	P1 : {value: 1, css: "create_p1", ignorecss: "consider", description:
 		"This tile needs to have P1 in it to apply the rule"},
 	P2 : {value: 2, css: "create_p2", ignorecss: "consider", description:
 		"This tile needs to have P2 in it to apply the rule"},
-	EMPTY : {value: 3, css: "create_empty", ignorecss: "consider", description:
-		"This tile needs to be empty to apply the rule"},
-	SELECTED : {value: 5, css: "create_selected", ignorecss: "consider", description:
-		"This is where the current player could go next"}
-	//THERE : {value: 4, css: "create_there"},
+	SELECTED : {value: 3, css: "create_selected", ignorecss: "consider", description:
+		"This is where the current player could go next"},
+	IGNORE : {value: 4, css: "create_ignore", ignorecss: "ignore", description:
+		"These tiles are ignored by the rule"}
 };
 
 changeType = function(index1, index2){
@@ -186,15 +185,22 @@ checkNameAndDesc = function(){
 	var name = $("#ruleName").val();
 	if (name == null || name == "") {
 		alert("Please write a name for your new rule!");
-	} else if (eval("game."+name+"!=null")){
+	}/* else if (name already taken)){
 		alert("This name has already been taken - can you choose another?");
-	} else {
+	}*/ else {
 		var desc = $("#ruleDesc").val();
 		if (desc == "My rule..." || desc == "")
 			desc = "No description";
 		console.log($("#transInv").attr('checked'));
 		console.log($("#flipping").attr('checked'));
-		parseRule(overlayBoard, name, desc, $("#transInv").attr('checked'), $("#flipping").attr('checked'),
+		var ruleBoard = new Array(overlayBoard.length);
+		for (var i=0; i<overlayBoard.length; i++){
+			ruleBoard[i] = new Array(overlayBoard[0].length);
+			for (var j=0; j<overlayBoard[0].length; j++)
+				ruleBoard[i][j] = overlayBoard[i][j].value;
+		}
+		console.log(ruleBoard);
+		game.makeNewStrategy(game.board, game.turn, ruleBoard, name, desc, $("#transInv").attr('checked'), $("#flipping").attr('checked'),
 				  $("#rowPermute").attr('checked'), $("#colPermute").attr('checked'), $("#rotation").attr('checked'));
 		endCreationInterface();
 	}
@@ -224,10 +230,10 @@ ruleIsValid = function(){
 	return null;
 }
 
-parseRule = function(ruleBoard, name, desc, translationInvariant, flipping,
+/*parseRule = function(ruleBoard, name, desc, translationInvariant, flipping,
 					 rowPermutation, columnPermutation, rotation)
 {
-	/* --------------- local helper functions ---------------*/
+	/* --------------- local helper functions ---------------
 	var min = function(n,m){
 		return (n<m ? n : m);
 	}
@@ -320,7 +326,7 @@ parseRule = function(ruleBoard, name, desc, translationInvariant, flipping,
 		}
 		return permutedBoard;
 	}
-	/* ------------- end local helper functions -------------*/
+	/* ------------- end local helper functions -------------
 	
 	// if the rule was created from the creation guide, flip the players
 	// my rule evaluation function assumes that P1 represents the current player
@@ -339,7 +345,7 @@ parseRule = function(ruleBoard, name, desc, translationInvariant, flipping,
 		 * perhaps be to generate new rules like I do with the other options and then apply them
 		 * via the "no translation invariance" function below, but since this method should not cause
 		 * any repeat boards and should be faster, maybe its not a bad way to go, especially once
-		 * we generalize to larger games like connect4 */
+		 * we generalize to larger games like connect4 
 	// if translation invariance is activated, convert the rule to a relative format
 	if (translationInvariant){
 		var hMin = ruleBoard.length;
@@ -528,10 +534,7 @@ parseRule = function(ruleBoard, name, desc, translationInvariant, flipping,
 	console.log('new strategy '+name+' pushed');	
 	
 	// a generic addRule() function would definitely be preferred to this method
-}
-
-// want a way to break down rules into textual representation
-// and building them back up to a rule function
+}*/
 
 // states of the guided rule creation
 var GUIDE_STATE = {
