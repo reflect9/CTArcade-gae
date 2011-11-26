@@ -194,4 +194,132 @@ class TicTacToeTrainer:
             if board[c2[0]][c1[1]]!=0 and board[c1[0]][c2[1]]==0:
                 return {'success':True, 'loc':[c1]}      
         return {'success':False}
-        
+
+    def makeNewStrategy(self, ruleBoard, name, desc, translationInvariant,
+                        flipping, rowPermutation, columnPermutation, rotation):
+        class Tile:
+            EMPTY = 0
+            P1 = 1
+            P2 = 2
+            SELECTED = 3
+            IGNORE = 4
+        def addRule(container, toBeAdded):
+            if toBeAdded not in container:
+                container.append(toBeAdded)
+        def flip(ruleBoard, horizontally, vertically):
+            flipped = list(ruleBoard)
+            for i in range(len(ruleBoard)):
+                for j in range(len(ruleBoard[0])):
+                    xIndex = i
+                    yIndex = j
+                    if horizontally:
+                        xIndex = len(ruleBoard)-i-1
+                    if vertically:
+                        yIndex = len(ruleBoard[0])-j-1
+                    flipped[xIndex][yIndex] = ruleBoard[i][j]
+            return flipped
+        def rotate(ruleBoard):
+            rotated = list(ruleBoard)
+            for i in range(len(ruleBoard)):
+                for j in range(len(ruleBoard[0])):
+                    xIndex = j
+                    yIndex = len(ruleBoard)-i-1
+                    rotated[xIndex][yIndex] = ruleBoard[i][j]
+            return rotated
+        def colPermute(ruleBoard,offset):
+            permuted = list(ruleBoard)
+            for i in range(len(ruleBoard)):
+                for j in range(len(ruleBoard[0])):
+                    xIndex = (i + offset) % len(ruleBoard)
+                    permuted[xIndex][j] = board[i][j]
+            return permuted
+        def rowPermute(ruleBoard,offset):
+            permuted = list(ruleBoard)
+            for i in range(len(ruleBoard)):
+                for j in range(len(ruleBoard[0])):
+                    yIndex = (i + offset) % len(ruleBoard[0])
+                    permuted[i][yIndex] = board[i][j]
+            return permuted
+        def minimize(ruleBoard):
+            hMin = len(ruleBoard)
+            hMax = 0
+            vMin = len(ruleBoard[0])
+            vMax = 0
+            for i in range(len(ruleBoard)):
+                for j in range(len(ruleBoard[0])):
+                    if ruleBoard[i][j] != Type.IGNORE:
+                        hMin = min(hMin,i)
+                        hMax = max(hMax,i)
+                        vMin = min(vMin,j)
+                        vMax = max(vMax,j)
+            width = hMax-hMin+1
+            height = vMax-vMin+1
+
+            newBoard = []
+            for i in range(hMin,hMin+width):
+                newBoard.append([])
+                for j in range(vMin,vMin+height):
+                    newBoard[i].append(ruleBoard[i][j])
+            return newBoard
+
+        # Here is the start of the actual processing function
+        if translationInvariant:
+            ruleBoard = minimize(ruleBoard)
+
+        boardList = []
+        boardList.append(ruleBoard)
+
+        if flipping:
+            for i in range(len(boardList)):
+                addRule(boardList,flip(boardList[i],True,False))
+                addRule(boardList,flip(boardList[i],False,True))
+                addRule(boardList,flip(boardList[i],True,True))
+
+        if rowPermutation:
+            for i in range(len(boardList)):
+                for j in range(len(boardList[i][0])):
+                    addRule(boardList,rowPermute(boardList[i],j))
+
+        if columnPermutation:
+            for i in range(len(boardList)):
+                for j in range(len(boardList[i])):
+                    addRule(boardList,colPermute(boardList[i],j))
+
+        if rotation:
+            for i in range(len(boardList)):
+                rotated = rotate(boardList[i])
+                addRule(boardList,rotated)
+                addRule(boardList,flip(boardList[i],true,true))
+                addRule(boardList,flip(rotated,true,true))
+
+        # define the function that will eventually process this rule
+        def newRule(board, player):
+            result = {'success':True,'loc':[]}
+            pushFlag = false
+            for ruleBoard in boardList:
+                width = len(ruleBoard)
+                height = len(ruleBoard[0])
+                for i in range(len(board)-width):
+                    for j in range(len(board[0])-height):
+                        for k in range(i,i+width):
+                            for l in range(j,j+height):
+                                tile = ruleBoard[k-i][l-j]
+                                if (tile == Type.P1 and board[k][l] != player):
+                                    result['success'] = False
+                                elif (tile == Type.P2 and board[k][l] != self.flip(player)):
+                                    result['success'] = False
+                                elif (tile == Type.EMPTY and board[k][l] != Type.EMPTY):
+                                    result['success'] = False
+                                elif (tile == Type.SELECTED and board[k][l] == Type.EMPTY):
+                                    result['loc'].append([k,l])
+                                    pushFlag = True
+                        if pushFlag and not result['success']:
+                            result['loc'].pop()
+                        pushFlag = False
+                        result['success'] = True
+            if len(result['loc']) == 0:
+                result['success'] = false
+            return result
+
+        # add the function to the trainer class
+        setattr(self, name, newRule)

@@ -344,7 +344,7 @@ parseRule = function(ruleBoard, name, desc, translationInvariant, flipping,
 	if (translationInvariant){
 		var hMin = ruleBoard.length;
 		var hMax = 0;
-		var vMin = ruleBoard.length;
+		var vMin = ruleBoard[0].length;
 		var vMax = 0;
 		for (var i=0; i<ruleBoard.length; i++){
 			for (var j=0; j<ruleBoard[0].length; j++){
