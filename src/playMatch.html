@@ -367,6 +367,14 @@
 							}
 						    ctx.strokeStyle ="#eee"; // line color
 						    ctx.stroke();
+						    // assign rollover feature
+						    $(sA).mouseover(function() {
+						    	alert("haha");
+						    	alert($(this).attr('shape') + " is connected to" + sB.attr('shape'));
+						    });
+						    $(sB).mouseover(function() {
+						    	
+						    });
 						});
 					});
 //				});

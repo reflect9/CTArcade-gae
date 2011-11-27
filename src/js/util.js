@@ -15,7 +15,6 @@ function getColor(name,alpha) {
 	return c.replace("rgb","rgba").replace(")",","+alpha+")");
 }
 
-
 /* assuming that dA and dB (jquery selection) are within a same parent DIV, 
  * it creates a new canvas DIV and draw line connecting the center of dA and dB
  * */
@@ -315,29 +314,6 @@ function position_row(upDown,rI,oM,cM,xM) {
 	}
 	return tempXM;
 }
-//
-//function visualize_positioning_step(graph,xM,oM,cM) {
-//	// step3. add x position and return graph
-//	// apply result into graph
-//	var newGraph = jQuery.extend(true, [], graph);
-//	for (var rI=0;rI<newGraph.length;rI++) {
-//		var curRound = graph[rI];
-//		var newRound = {};
-//		for (var shape in curRound) {
-//			newRound[shape]={};
-//			newRound[shape]['matches'] = curRound[shape];
-//			if($.inArray(shape,oM[rI])==-1) {
-//				alert(rI + " th round doesn't have "+shape);
-//			}
-//			newRound[shape]['order']= $.inArray(shape,oM[rI]);
-//			newRound[shape]['position']= xM[rI][shape];
-//		}
-//		newGraph[rI] = newRound;
-//	}
-//	var result = {'graph':newGraph,'connectivity':cM};
-//	drawGraph(result,"#matches");
-////	alert("haha");
-//}
 
 function horizontal_positioning(oM,cM,graph) {
 	var xM = [];
@@ -401,13 +377,15 @@ function sugiyama(graph) {
 		var curRound = graph[rI];
 		var newRound = {};
 		for (var shape in curRound) {
-			newRound[shape]={};
+			newRound[shape]={};	newRound[shape]['connection']={};
 			newRound[shape]['matches'] = curRound[shape];
 			if($.inArray(shape,oM[rI])==-1) {
 				alert(rI + " th round doesn't have "+shape);
 			}
 			newRound[shape]['order']= $.inArray(shape,oM[rI]);
 			newRound[shape]['position']= xM[rI][shape];
+			newRound[shape]['connection']['down']= cM[rI]['downward'][shape];
+			if(rI>0) newRound[shape]['connection']['up']=cM[rI-1]['upward'][shape];
 		}
 		graph[rI] = newRound;
 	}
@@ -418,15 +396,6 @@ function sugiyama(graph) {
 
 //log in & sign up module
 function showLogIn() {
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	var blackMat = $("<DIV class='blackMat'></DIV>");
 	var logInDIV = $("<DIV id='logIn' class='panel_floating' style='position:absolute; z-index:1001; top:50%; left:50%; margin:-150px 0 0 -150px; width:300px; height:300px;'></DIV>");
 	$("body").append(blackMat);
