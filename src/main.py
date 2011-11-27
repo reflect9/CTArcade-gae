@@ -18,32 +18,37 @@ from google.appengine.api import taskqueue
 import urllib2
 from google.appengine.api import urlfetch
 
+class Intro(webapp.RequestHandler):
+    def get(self):
+        session = appengine_utilities.sessions.Session()
+        try:
+            userID = session['loggedInAs']
+        except KeyError:
+            userID = "Guest"   
+        template_values = {
+            'userID' : userID,
+        }  # map of variables to be handed to html template
+        path = os.path.join(os.path.dirname(__file__), 'intro.html')
+        self.response.out.write(template.render(path, template_values))     
+
 class Lobby(webapp.RequestHandler):
     def get(self):
-        self.sess = sessions.Session()
+        session = appengine_utilities.sessions.Session()
         logged=True
         loggedID = ""
         try:
-            loggedID = self.sess['loggedInAs']
+            loggedID = session["loggedInAs"]
         except KeyError:
             logged =False
             loggedID = "Guest"
                 
-        query = User.all()
-        users = query.fetch(10)
-        
-    #key = self.request.get('key')
-    #q = taskqueue.Queue('tournament-queue')
-    #tasks = []
-    #payload_str = 'hello world'
-    #tasks.append(taskqueue.Task(payload=payload_str, countdown=5))
-    #q.add(tasks)
-
+        users = User.all()
+        users.order('-score')
         
         template_values = {
             'users': users,
             'logged' : logged,
-            'loggedInAs': loggedID,
+            'user_id': loggedID,
         }  # map of variables to be handed to html template
 
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')
@@ -71,7 +76,7 @@ class SignUp(webapp.RequestHandler):
         # send back success message
         existingUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",self.request.get('name')).get()
         if existingUser:
-            self.response.out.write("However, the name is already being used. Try a different name please.")
+            self.response.out.write("Try a different name please.")
             return
         user = User(key_name=self.request.get('name'),
                     id = self.request.get('name'),
@@ -247,6 +252,7 @@ class CounterWorker(webapp.RequestHandler):
         print >>sys.stderr, "Tournament Start"
         log.put()
         users = User.all()
+        users.order('-score')
         tournament_entries = []
         for p1 in users:
                 tournament_entries.append(str(p1.id))
@@ -329,7 +335,8 @@ def main():
                                           ('/reviewMatch',ReviewMatch), 
                                           ('/worker', CounterWorker), 
                                           ('/round', RoundWorker),
-                                          ('/score', ScoreWorker),                                  
+                                          ('/score', ScoreWorker),
+										  ('/intro', Intro),                               
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

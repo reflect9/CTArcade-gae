@@ -12,7 +12,7 @@ class User(db.Model):
     id = db.StringProperty()
     password = db.StringProperty()
     email = db.StringProperty()
-    score = db.IntegerProperty(indexed=False)
+    score = db.IntegerProperty(indexed=True)
     
 class Match(db.Model):
     user_a = db.StringProperty()

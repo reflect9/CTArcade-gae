@@ -4,18 +4,20 @@ Updates:
 	-Testing GIT Configuration
 	-Testing GitHub posting as "unknown" author
 --->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+
+<html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<meta name = "viewport" content = "width=device-width">
 	<title>Lobby - CTArcade</title>
-	<!--<meta name = "viewport" content = "width=device-width">-->
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
 	<script type="text/javascript">
-	   var currentUser = "{{loggedInAs}}";
+	   var p1='{{user_id}}';
+	   var currentUser = "{{user_id}}";
 	   function playMatch(p1, p2) {
-	       window.open("/playMatch?p1="+p1+"&p2="+p2);
+	       location.href = self.location.href + "playMatch?p1="+p1+"&p2="+p2;
 	   }
 	   function challenge(opponent) {
 	       if (currentUser=="Guest") {
@@ -27,369 +29,74 @@ Updates:
 	</script>
 	
 </head>
+<body>	
+<!-- header -->
+{% include "header.html" %}
+<!-- end of header -->
 
-<body>
-<!-- here's lobby, showing list of all the users. a small sign-up/login UI will be here as well. -->
-<div id="main_container" align="center">
-    <div id="banner">
-    	<h1>CTarcade Lobby</h1>
-    </div>
-    <div id="col_container" style="width: 900px;border:1px solid black;">
-        <div id="left_col" style="width:60%;float:left;border:1px solid black;">
-        <div style="text-align:left; margin:15px 15px 5px 15px;">Welcome, {{loggedInAs}}</div>
-        <div style="width:100%;">
+<!-- container : main stuff -->
+<div class='container'>
+<div class='pageContent'>
+		<div class="wrapper clearfix">
+			<div class="innerHeader">
+				<div id='desc' style='margin-bottom:10px;'>
+					<div id='welcome'>Welcome to the lobby!<br />
+                    You can review you rank and score against other players using CT Arcade.<br />
+                    You can also select a player to challenge from the list below.<br />
+				    <hr /></div>
+				</div>
+			</div>
+			 <!-- container_board -->
+		<div style="width:100%;" align="center">
             <div style="width:33%;float:left;">
-            <p>User List<br />
+            <p><strong>Players</strong><br /><br />
             	{% for user in users %}
                   {% if user.id %}
-                    <strong>{{ user.id }}</strong><br />
+                    {{ user.id }}<br />
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
-                {% endfor %}</p>
+              {% endfor %}</p>
                 </div>
             <div style="width:33%;float:left;">
-            <p>Score<br />
+            <p><strong>Score/Rank</strong><br /><br />
              {% for user in users %}
                   {% if user.id %}
-                    <strong>{{ user.score }}</strong><br />
+                    {{ user.score }}<br />
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
-                {% endfor %}</p>
+              {% endfor %}</p>
                 </div>
             <div style="width:33%;float:left;">
-            <p>Actions<br />
+            <p><strong>Actions</strong><br /><br />
+			{% if user_id != "Guest"%}  
              {% for user in users %}
-                  {% if user.id %}
-                    <strong><a href="javascript:challenge('{{user.id}}')">Challenge</a></strong><br />
+                  {% if user.id != user_id%}
+                    <a href="javascript:challenge('{{user.id}}')">Challenge</a><br />
                   {% else %}
-            		<!--- Do Nothing --->
+            		<br />
                   {% endif %}
-                {% endfor %}</p>
+              {% endfor %}
+			 {% endif %}</p>
                 </div>
                 </div>
          	<div style="width:100%;clear:both;">
                 <hr />
-                <p align="left" style="padding-left:60px;width:40%;float:left">
-                <form action="/" method="post">
-                <input type="hidden" name="key" id="key" value="Test"/>
-                <img src="css/image/expand.png"/><input type="submit" value="Run Server Tournament" />
-                </form>
-                </p>
                 <p align="left" id="accessTrainer" style="padding-top:8px; cursor:pointer;">
-                	<span style='margin:0 10px 0 10px'></span><a href="trainer">Trainer</a></span>
-                	<span style='margin:0 10px 0 10px'></span><a href="playMatch">Play Match</a></span>
+                {% if user_id != "Guest"%}
+                	<strong>Administration:</strong><br /><form action="/" method="post">
+                	<input type="submit" value="Run Server Tournament" />
+                	<input type="hidden" name="key" id="key" value="Test"/>
+                	</form>
+                  {% endif %}  
                 </p>
             </div>
         </div>
-        <div id="right_col" style="width:39%;float:left;border:1px solid black;">
-        	<div id="menu_item_1" style="overflow:hidden;">
-            <div id="toppanel">
-                <div id="panel" style="height: 0px;">
-                  <div id="panel_contents"> </div>
-                  <br />
-                  <div class="border" id="login"><p>
-                  <strong>CTAracade Registration:</strong><br /><br />
-					<form name="contact_form" action="">  
-                      	<fieldset>  
-                        <label for="name" id="name_label">Username:</label>  
-                        <input type="text" name="name" id="name" size="20" value="" class="text-input" />  
-                        <label class="error" for="name" id="name_error"> *Required</label>  
-                      	<br /> 
-                        <label for="name" id="password_label">Password:</label>  
-                        <input type="text" name="password" id="password" size="20" value="" class="text-input" />  
-                        <label class="error" for="password" id="password_error"> *Required</label>  
-                      	<br />
-                        <label for="email" id="email_label">Email:</label>
-                        <input type="text" name="email" id="email" size="20" value="" class="text-input" />  
-                        <label class="error" for="email" id="email_error"> *Required</label>  
-                        <br />  
-                        <input type="submit" name="submit" class="button" id="submit_btn" value="Send" />  
-                      </fieldset>  
-                    </form></p>
-                  </div>
-                </div>
-	<div class="panel_button" style="display: visible;padding-top:8px;"><div style="width:50%;float:left;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Register</a></div></div>
-	<div class="panel_button" id="hide_button" style="display:none;"><div style="width:50%;float:left;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
-              </div>
-              </div>
-              <hr />
-              <div id="menu_item_2" style="overflow:hidden;">
-              <div id="toppanel2">
-                <div id="panel2" style="height: 0px;">
-                  <div id="panel_contents2"> </div>
-                  <br />
-                  <div class="border" id="login2"><p>
-                  <strong>CTAracade Login:</strong><br /><br />
-					<form name="login" action="#">  
-                      	<fieldset>  
-                        <label for="name2" id="name_label2">Name:</label>  
-                        <input type="text" name="name2" id="name2" size="20" value="" class="text-input" />  
-                        <label class="error2" for="name2" id="name_error2"> *Required</label>  
-                      	<br />
-                        <label for="password2" id="password_label2">Password:</label>
-                        <input type="password" name="password2" id="password2" size="20" value="" class="text-input" />  
-                        <label class="error2" for="password2" id="password_error2"> *Required</label>  
-                        <br />  
-                        <input type="submit" name="submit2" class="button2" id="submit_btn2" value="Send" />  
-                      </fieldset>  
-                    </form><br />
-                    <a href="">Forgotten Login Information</a></p>
-                  </div>
-                </div>
-	<div class="panel_button2" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Login</a></div></div>
-	<div class="panel_button2" id="hide_button2" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
-              </div>
-        	  </div>
-                            <hr />
-              <div id="menu_item_3" style="overflow:hidden;">
-              <div id="toppanel3">
-                <div id="panel3" style="height: 0px;">
-                  <div id="panel_contents3"> </div>
-                  <br />
-                  <div class="border" id="login3"><p>
-                  <strong>User Info:</strong><br /><br />
-                    <strong>{{ loggedInAs }}</strong>
-                    </p>
-                  </div>
-                </div>
-	<div class="panel_button3" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">User Info</a></div></div>
-	<div class="panel_button3" id="hide_button3" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
-              </div>
-              </div>
-		<hr />
-		<div id="menu_item_4" style="overflow:hidden;">
-              <div id="toppanel4">
-                <div id="panel4" style="height: 0px;">
-                  <div id="panel_contents4"> </div>
-                  <br />
-                  <div class="border" id="login4" align="center"><p align="left" style="padding-left:20px;">
-                    <strong>Recent CTAracade Activity:</strong><br /><br />
-                    <strong>mattm401 has logged in.</strong><br />
-                    <strong>mattm402 has logged in.</strong><br />
-                    <strong>mattm403 has logged in.</strong><br />
-                    <strong>mattm401 is training.</strong><br />
-                    <strong>mattm402 challenged mattm403</strong><br />
-                    </p>
-                  </div>
-                </div>
-	<div class="panel_button4" style="display:visible;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/expand.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">History</a></div></div>
-	<div class="panel_button4" id="hide_button4" style="display: none;"><div style="width:50%;float:left;padding-bottom:8px;"><img src="css/image/collapse.png"/></div><div style="width:50%;float:left;" align="left"><a href="#">Hide</a></div></div>
-              </div>
-              </div>
-        </div>
-    </div>
-</div>
-<script language="javascript" type="text/javascript">
-$(document).ready(function() {
-	$("div.panel_button").click(function(){
-		$('#login').show()
-		$("div#panel").animate({
-			height: "350px"
-		})
-		.animate({
-			height: "300px"
-		}, "fast");
-		$("div.panel_button").toggle();
-	});	
-   $("div#hide_button").click(function(){
-	   	$('#panel_contents').html(""); 
-		$("div#panel").animate({
-			height: "0px"
-		}, "fast");
-   });	
-});
-</script>
-<script language="javascript" type="text/javascript">
-$(document).ready(function() {
-	$("div.panel_button2").click(function(){
-		$('#login2').show()
-		$("div#panel2").animate({
-			height: "350px"
-		})
-		.animate({
-			height: "300px"
-		}, "fast");
-		$("div.panel_button2").toggle();
-	});		
-   $("div#hide_button2").click(function(){
-	    $('#panel_contents2').html(""); 
-		$("div#panel2").animate({
-			height: "0px"
-		}, "fast");
-   });	
-});
-</script>
-<script language="javascript" type="text/javascript">
-$(document).ready(function() {
-	$("div.panel_button3").click(function(){
-		$("div#panel3").animate({
-			height: "350px"
-		})
-		.animate({
-			height: "300px"
-		}, "fast");
-		$("div.panel_button3").toggle();
-	});		
-   $("div#hide_button3").click(function(){
-		$("div#panel3").animate({
-			height: "0px"
-		}, "fast");
-   });	
-});
-</script>
-<script language="javascript" type="text/javascript">
-$(document).ready(function() {
-	$("div.panel_button4").click(function(){
-		$("div#panel4").animate({
-			height: "350px"
-		})
-		.animate({
-			height: "300px"
-		}, "fast");
-		$("div.panel_button4").toggle();
-	});		
-   $("div#hide_button4").click(function(){
-		$("div#panel4").animate({
-			height: "0px"
-		}, "fast");
-   });	
-});
-</script>
-<script language="javascript" type="text/javascript">
-    $(function() {  
-      $('.error').hide();  
-      $(".button").click(function() {  
-        // validate and process form here  
-        $('.error').hide();  
-		var name = $("input#name").val();  
-		if (name == "") {  
-          $("label#name_error").show();  
-          $("input#name").focus();  
-          return false;  
-        }
-		var password = $("input#password").val();  
-		if (password == "") {  
-          $("label#password_error").show();  
-          $("input#password").focus();  
-          return false;  
-        }  
-		var email = $("input#email").val();  
-		if (email == "") {  
-          $("label#email_error").show();  
-          $("input#email").focus();  
-          return false;  
-        }  
-        var dataString = 'name=' + name + '&password=' + password + '&email=' + email;  
-		$.ajax({  
-		  type: "GET",  
-		  url: "/signUp",  
-		  data: dataString,  
-		  success: function(response) { 
-		  	if(response == "You may now login."){ 
-				$('#login').hide();
-				$("div#panel").animate({
-					height: "200px"
-				})
-				.animate({
-					height: "150px"
-				}, "fast");
-		  	} else {
-				$("div#panel").animate({
-					height: "450px"
-				})
-				.animate({
-					height: "400px"
-				}, "fast");
-			}
-			$('#panel_contents').html("<div id='message'></div>");  
-			$('#message').html("<strong>Registration Submitted</strong>")  
-			.append("<p>"+response+"</p>")  
-			.hide()  
-			.fadeIn(1500, function() {  
-				if(response == "You may now login."){
-					$("input#name").val("");  
-					$("input#email").val("");  
-					$("input#password").val("");  
-			  		$('#message').append("<img id='checkmark' src='css/image/icon_y.png' />");  
-				} else {
-					$('#message').append("<img id='checkmark' src='css/image/icon_x.png' />");  
-				}
-			}); 
-		  }  
-		});  
-		return false;    
-		  });  
-		});   
-</script>
-<script language="javascript" type="text/javascript">
-    $(function() {  
-      $('.error2').hide(); 
-	  $(".button2").click(function() {  
-        // validate and process form here  
-        $('.error').hide();  
-		var name = $("input#name2").val();  
-		if (name == "") {  
-          $("label#name_error2").show();  
-          $("input#name2").focus();  
-          return false;  
-        }
-		var password = $("input#password2").val();  
-		if (password == "") {  
-          $("label#password_error2").show();  
-          $("input#password2").focus();  
-          return false;  
-        }
-		var dataString = 'name=' + name + '&password=' + password;  
-		$.ajax({  
-		  type: "GET",  
-		  url: "/LogIn",  
-		  data: dataString,  
-		  success: function(response) {   // response string format is "You are now logged in as [id]"
-		  	if(response.indexOf("You are now logged in ")!=-1){   // if the string contains 'You are now logged in" as substring
-				$('#login2').hide();
-				$("div#panel2").animate({
-					height: "200px"
-				})
-				.animate({
-					height: "150px"
-				}, "fast");
-		  		// update clickEvent on accessTrainer button
-		  		$("#accessTrainer").click( function() {
-		  			window.open('/trainer?id='+$.trim(response.replace("You are now logged in as ","")),"_self"); 
-		  		});
-		  	} else {
-				$("div#panel2").animate({
-					height: "450px"
-				})
-				.animate({
-					height: "400px"
-				}, "fast");
-			}
-			$('#panel_contents2').html("<div id='message2'></div>");  
-			$('#message2').html("<strong>Login Submitted</strong>")  
-			.append("<p>"+response+"</p>")  
-			.hide()  
-			.fadeIn(1500, function() {  
-				if(response.indexOf("You are now logged in") != -1){
-					$("input#name2").val("");  
-					$("input#email2").val("");  
-					$("input#password2").val("");  
-			  		$('#message2').append("<img id='checkmark' src='css/image/icon_y.png' />");  
-			  		window.location.reload();
-				} else {
-					$('#message2').append("<img id='checkmark' src='css/image/icon_x.png' />");  
-				}
-			}); 
-
-			
-		  }  
-		});  
-		return false;  
-	  });
-	});
-</script>
-
-</body>
+			<div style="clear:both;"></div>
+		</div> <!--wrapper clearfix-->
+	</div>	<!--pageContent-->
+</div>		<!-- end of container-->
+</div
+></body>
 </html>
