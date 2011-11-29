@@ -113,7 +113,7 @@ class _AppEngineUtilities_Session(db.Model):
         """
         if session_obj.sid == None:
             return None
-        session_key = session_obj.sid.split(u'_')[0]
+        session_key = session_obj.sid.rsplit(u'_', 1)[0]
         session = memcache.get(u"_AppEngineUtilities_Session_%s" % \
             (str(session_key)))
         if session:
@@ -139,7 +139,10 @@ class _AppEngineUtilities_Session(db.Model):
  
         # Not in memcache, check datastore
         
-        ds_session = db.get(str(session_key))
+        try:
+            ds_session = db.get(str(session_key))
+        except:
+            ds_session = None
         if ds_session:
           sessionAge = datetime.datetime.now() - ds_session.last_activity
           if sessionAge.seconds > session_obj.session_expire_time:
@@ -229,7 +232,7 @@ class _AppEngineUtilities_Session(db.Model):
                 u"_AppEngineUtilities_SessionData_%s" % \
                 (str(self.key()))])
         except:
-            mc = memcache.get(u"_AppEngineUtilities_Session_%s" %+ \
+            mc = memcache.get(u"_AppEngineUtilities_Session_%s" % \
                 (str(self.key())))
             if mc:
                 mc.deleted = True
@@ -612,11 +615,13 @@ class Session(object):
                 if self.sid != None or self.sid != u"":
                     self.session.put()
 
-        if self.set_cookie_expires:
-            if not self.output_cookie.has_key("%s_data" % (cookie_name)):
-                self.output_cookie["%s_data" % (cookie_name)] = u""
-            self.output_cookie["%s_data" % (cookie_name)]["expires"] = \
-                self.session_expire_time
+        # Only set the "_data" cookie if there is actual data
+        if self.output_cookie.has_key("%s_data" % (cookie_name)):
+            # Set the path of the "_data" cookie
+            self.output_cookie["%s_data" % (cookie_name)]["path"] = cookie_path
+            if self.set_cookie_expires:
+                self.output_cookie["%s_data" % (cookie_name)]["expires"] = \
+                    self.session_expire_time
         print self.output_cookie.output()
 
         # fire up a Flash object if integration is enabled
@@ -725,6 +730,9 @@ class Session(object):
         if self.cookie_domain:
             self.output_cookie["%s_data" % \
                 (self.cookie_name)]["domain"] = self.cookie_domain
+        # Delete the cookies (session & data) in the browser
+        self.output_cookie[self.cookie_name]["expires"] = 0
+        self.output_cookie["%s_data" % (self.cookie_name)]["expires"] = 0
 
         print self.output_cookie.output()
         # if the event class has been loaded, fire off the sessionDelete event
@@ -859,13 +867,15 @@ class Session(object):
         # delete from memcache
         self.cache = {}
         self.cookie_vals = {}
-        self.output_cookie["%s_data" %s (self.cookie_name)] = \
+        self.output_cookie["%s_data" % (self.cookie_name)] = \
             simplejson.dumps(self.cookie_vals)
         self.output_cookie["%s_data" % (self.cookie_name)]["path"] = \
             self.cookie_path
         if self.cookie_domain:
             self.output_cookie["%s_data" % \
                 (self.cookie_name)]["domain"] = self.cookie_domain
+        # Delete the "_data" cookie in the browser
+        self.output_cookie["%s_data" % (self.cookie_name)]["expires"] = 0
 
         print self.output_cookie.output()
         return True

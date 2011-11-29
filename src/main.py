@@ -9,7 +9,6 @@ from datastore import *
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from django.utils import simplejson as json
-import appengine_utilities
 import pprint, os, sys
 from TicTacToeMatch import TicTacToeMatch
 from TicTacToeTrainer import TicTacToeTrainer
@@ -20,7 +19,7 @@ from google.appengine.api import urlfetch
 
 class Intro(webapp.RequestHandler):
     def get(self):
-        session = appengine_utilities.sessions.Session()
+        session = sessions.Session()
         try:
             userID = session['loggedInAs']
         except KeyError:
@@ -33,7 +32,7 @@ class Intro(webapp.RequestHandler):
 
 class Lobby(webapp.RequestHandler):
     def get(self):
-        session = appengine_utilities.sessions.Session()
+        session = sessions.Session()
         logged=True
         loggedID = ""
         try:
@@ -140,15 +139,16 @@ class UpdateRule(webapp.RequestHandler):
 
 class PlayMatch(webapp.RequestHandler):
     def get(self):
-        session = appengine_utilities.sessions.Session()
+        session = sessions.Session()
         try:
             userID = session['loggedInAs']
         except KeyError:
             userID = "Guest"   
-        opponent = self.request.get("opponent") 
+        opponent = self.request.get("p2") 
+        print >>sys.stderr, userID
         template_values = {
             'userID' : userID,
-            'opponent' : opponent
+            'p2' : opponent
 #            'matches': json.dumps(matches).replace("&quot;","'")
         }  # map of variables to be handed to html template
         path = os.path.join(os.path.dirname(__file__), 'playMatch.html')
@@ -157,7 +157,7 @@ class PlayMatch(webapp.RequestHandler):
 class Trainer(webapp.RequestHandler):
     def get(self):
 #        try:
-        session = appengine_utilities.sessions.Session()
+        session = sessions.Session()
         if session["loggedInAs"]:
             current_user_id = session["loggedInAs"]
         else:

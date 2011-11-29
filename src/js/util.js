@@ -207,10 +207,10 @@ function swap_eq_barycenter(direction,upperOrder,lowerOrder,connectivity) {
 	else return getKeysSwappedBySameValue(barycenters['a']);
 }
 function ordering_phase1(oM,cM){	// downward->upward run of reordering by barycenter
-	for (var rI=0;rI<graph.length-1;rI++) {
+	for (var rI=0;rI<cM.length-1;rI++) {
 		oM[rI+1] = reorder_barycenter('down',oM[rI],oM[rI+1],cM[rI]); // modify below row based on its barycenter of above row(oM[rI])
 	}
-	for (var rI=graph.length-2;rI>-1;rI--) {
+	for (var rI=cM.length-2;rI>-1;rI--) {
 		oM[rI] = reorder_barycenter('up',oM[rI],oM[rI+1],cM[rI]);  // upward
 	}
 	return oM;
@@ -220,21 +220,21 @@ function ordering_phase2(oM,cM) {
 	while(true) {
 		var newOM = jQuery.extend(true, {}, oM);
 		// downward run of swapping equal barycenter nodes
-		for (var rI=0;rI<graph.length-1;rI++) {
+		for (var rI=0;rI<cM.length-1;rI++) {
 			newOM[rI+1] = swap_eq_barycenter('down',oM[rI],oM[rI+1],cM[rI]);
 		}
 		if (JSON.stringify(newOM)!=JSON.stringify(oM)) {	// run phase1-downward to refresh
-			for (var rI=0;rI<graph.length-1;rI++) {
+			for (var rI=0;rI<cM.length-1;rI++) {
 				newOM[rI+1] = reorder_barycenter('down',newOM[rI],newOM[rI+1],cM[rI]); // modify below row based on its barycenter of above row(oM[rI])
 			}
 		}
 		var newOM2 = jQuery.extend(true, {}, newOM);
 		// upward run
-		for (var rI=graph.length-2;rI>-1;rI--) {
+		for (var rI=cM.length-2;rI>-1;rI--) {
 			newOM2[rI] = swap_eq_barycenter('up',newOM2[rI],newOM2[rI+1],cM[rI]);
 		}
 		if (JSON.stringify(newOM2)!=JSON.stringify(newOM)) {	// run phase1-downward to refresh
-			for (var rI=0;rI<graph.length-1;rI++) {
+			for (var rI=0;rI<cM.length-1;rI++) {
 				newOM2[rI+1] = reorder_barycenter('down',newOM2[rI],newOM2[rI+1],cM[rI]); // modify below row based on its barycenter of above row(oM[rI])
 			}
 		}
@@ -325,15 +325,15 @@ function horizontal_positioning(oM,cM,graph) {
 		xM.push(xRow);
 	}
 	for(var i=0; i<3;i++) {
-		for (var rI=0;rI<graph.length-1;rI++) {  // downrun
+		for (var rI=0;rI<cM.length-1;rI++) {  // downrun
 			xM = position_row('downward',rI,oM,cM,xM);
 //			visualize_positioning_step(graph,xM,oM,cM);
 		}
-		for (var rI=graph.length-2;rI>-1;rI--) {  // uprun
+		for (var rI=cM.length-2;rI>-1;rI--) {  // uprun
 			xM = position_row('upward',rI,oM,cM,xM);
 //			visualize_positioning_step(graph,xM,oM,cM);
 		}
-		for (var rI=4;rI<graph.length-1;rI++) {  // t- downrun
+		for (var rI=4;rI<cM.length-1;rI++) {  // t- downrun
 			xM = position_row('downward',rI,oM,cM,xM);
 //			visualize_positioning_step(graph,xM,oM,cM);
 		}

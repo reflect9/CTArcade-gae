@@ -29,7 +29,7 @@
                     </div>
                     <div class='clearfix' style='margin-top:3px;'>
                         <span style='float:left; width:75px;'>Password</span>
-                        <span style='float:left; '><input type='password' id='password' name='password' size='10'/></span>
+                        <span style='float:left; '><input type='password' id='password' name='password' size='10' onKeyPress="return submitFormWithEnter('login',event)"/></span>
                     </div>
                     <div class='clearfix;' style='margin-top:5px;'>
                         <input id='login_submit' type='button' class='btn' value='Log In' style='width:60px; display:block; text-align:center; margin:auto;' ></input>
@@ -37,7 +37,7 @@
                     </form>
                 </div>
                 <!--- Registration Form --->
-                 <div id='registration_form_div' style='display:none; float:right; margin-top:8px; width:auto; padding:10px; background-color:#333; border:1px solid #555; border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.1) inset;'>
+                 <div id='registration_form_div' style='display:none; float:right; margin-top:8px; margin-right:25px; width:auto; padding:10px; background-color:#333; border:1px solid #555; border-radius: 0 0 8px 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.1) inset;'>
                     <form id='register_form' name='register' action='#'>
                     <div class='clearfix'>
                         <span style='float:left; width:75px;'>User Name</span>
@@ -49,7 +49,7 @@
                     </div>
                     <div class='clearfix' style='margin-top:3px;'>
                         <span style='float:left; width:75px;'>Email</span>
-                        <span style='float:left; '><input type='text' id='registerEmail' name='registerEmail' size='10'/></span>
+                        <span style='float:left; '><input type='text' id='registerEmail' name='registerEmail' size='10' onKeyPress="return submitFormWithEnter('register',event)"/></span>
                     </div>
                     <div class='clearfix;' style='margin-top:5px;'>
                         <input id='register_submit' type='button' class='btn' value='Register' style='width:60px; display:block; text-align:center; margin:auto;' ></input>
@@ -62,50 +62,64 @@
     </div>
     <script type="text/javascript">
         function openSignIn() {
+            $("#registration_form_div").hide();
             $("#login_form_div").toggle();
             $("#userID").focus();
         }
         function openCreateAccount() {
+            $("#login_form_div").hide();
             $("#registration_form_div").toggle();
             $("#userID").focus();
         }
         function logOut() {
             window.location.href = "/logOut?redirect="+document.URL;
-        }
-	    $("#login_submit").click(function() {
-	        var id = $("input#userID").val();
-	        var password = $("input#password").val();
-	        if (id=="" || password=="") { alert("id and password must be filled in."); return; }
-	        var param = 'name=' + id + "&password=" + password;
-	        $.get("LogIn",param,function(response) {
-	            if(response.indexOf("You are now logged in ")!=-1) {
-	                p1 = response.replace("You are now logged in as","");
-	                $("#login_form_div").append("<DIV>"+response+"</DIV>");
-	                window.location.reload()
-	            } else {
-	                $("#login_form_div").append("<DIV>"+response+"</DIV>");
-	            }
-	        });
-	    });
-		$("#register_submit").click(function() {
-	        var id = $("input#registerID").val();
-	        var password = $("input#registerPassword").val();
-			var email = $("input#registerEmail").val();
-	        if (id=="" || password=="") { alert("id, password, and email must be filled in."); return; }
-	        var param = 'name=' + id + "&password=" + password + "&email=" + email;
-	        $.get("signUp",param,function(response) {
-	            if(response.indexOf("You may now login.")!=-1) {
-	                p1 = response.replace("You are now logged in as","");
-	                $("#registration_form_div").append("<DIV>"+response+"</DIV>");
-	                 $("input#registerID").val("");
-					  $("input#registerPassword").val("");
-					   $("input#registerEmail").val("");
-					window.location.reload()
-	            } else {
-	                $("#registration_form_div").append("<DIV>"+response+"</DIV>");
-	            }
-	        });
-	    });
+        }    
+		function submitFormWithEnter(whichForm,e)    {
+		                   var keycode;
+		                   if (window.event) { keycode = window.event.keyCode; }else if (e)  {
+		                      keycode = e.which;  }   else   {  return true;  }
+		                   if (keycode == 13) {
+		                      if (whichForm=='login') submitLoginForm();
+		                      else if(whichForm=='register') submitRegisterForm();
+		                      return false;
+		                   }   else  {    return true;         }
+		}
+		function submitLoginForm() {
+            var id = $("input#userID").val();
+            var password = $("input#password").val();
+            if (id=="" || password=="") { alert("id and password must be filled in."); return; }
+            var param = 'name=' + id + "&password=" + password;
+            $.get("LogIn",param,function(response) {
+                if(response.indexOf("You are now logged in ")!=-1) {
+                    p1 = response.replace("You are now logged in as","");
+                    $("#login_form_div").append("<DIV>"+response+"</DIV>");
+                    window.location.reload()
+                } else {
+                    $("#login_form_div").append("<DIV>"+response+"</DIV>");
+                }
+           });
+		}
+		function submitRegisterForm() {
+            var id = $("input#registerID").val();
+            var password = $("input#registerPassword").val();
+            var email = $("input#registerEmail").val();
+            if (id=="" || password=="") { alert("id, password, and email must be filled in."); return; }
+            var param = 'name=' + id + "&password=" + password + "&email=" + email;
+            $.get("signUp",param,function(response) {
+                if(response.indexOf("You may now login.")!=-1) {
+                    p1 = response.replace("You are now logged in as","");
+                    $("#registration_form_div").append("<DIV>"+response+"</DIV>");
+                     $("input#registerID").val("");
+                      $("input#registerPassword").val("");
+                       $("input#registerEmail").val("");
+                    window.location.reload()
+                } else {
+                    $("#registration_form_div").append("<DIV>"+response+"</DIV>");
+                }
+            });
+		}
+	    $("#login_submit").click(submitLoginForm); 
+		$("#register_submit").click(submitRegisterForm);
 	    $(document).ready(function() {
 	       if (typeof p1 == 'undefined') {   
 	            $("#ui_user_loggedIn").hide();
