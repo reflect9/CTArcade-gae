@@ -263,6 +263,19 @@ class CounterWorker(webapp.RequestHandler):
         log.put()
         print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
         taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=60)
+    def get(self): # should run at most 1/s
+        log = TournamentLog(message = "Tournament Start")
+        print >>sys.stderr, "Tournament Start"
+        log.put()
+        users = User.all()
+        users.order('-score')
+        tournament_entries = []
+        for p1 in users:
+                tournament_entries.append(str(p1.id))
+        log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
+        log.put()
+        print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
+        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=60)
         
 class RoundWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
@@ -313,17 +326,17 @@ class ScoreWorker(webapp.RequestHandler):
             tournament_winner = score_entries.pop()
             updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",tournament_winner).get()
             updateUser.score += 10
-            updateUser.put()        
-        while len(score_entries) >= 2 or (len(score_entries) == 1 and self.request.get('by') != "None"):    
-            score_entry = score_entries.pop()
-            updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",score_entry).get()
-            updateUser.score += 1
             updateUser.put()
-        if     self.request.get('by') != "None":
-            next_round.append(self.request.get('by'))
-        if len(next_round) >= 2:     
-            taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=60)
-                    
+        else:	     
+            while len(score_entries) > 0:    
+                score_entry = score_entries.pop()
+                updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",score_entry).get()
+                updateUser.score += 1
+                updateUser.put()
+            if self.request.get('by') != "None":
+                next_round.append(self.request.get('by'))
+            if len(next_round) >= 2:     
+                taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=60)
 def main():
     application = webapp.WSGIApplication([('/', Lobby),
                                           ('/init', Init),
