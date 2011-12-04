@@ -9,7 +9,7 @@ from datastore import *
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from django.utils import simplejson as json
-import pprint, os, sys
+import pprint, os, sys, re
 from TicTacToeMatch import TicTacToeMatch
 from TicTacToeTrainer import TicTacToeTrainer
 from appengine_utilities import sessions
@@ -73,19 +73,24 @@ class SignUp(webapp.RequestHandler):
         # create User object defined in datastore.py
         # assign usr id and password and save it
         # send back success message
-        existingUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",self.request.get('name')).get()
-        if existingUser:
-            self.response.out.write("Try a different name please.")
+        namePattern = re.compile(r"[a-zA-Z][a-zA-Z0-9]{3,16}$")
+        name = self.request.get('name')
+        if namePattern.match(name)==None:
+            self.response.out.write("User name(3~16 characters) should contain only alphabets and numbers(not for the first character).")
             return
-        user = User(key_name=self.request.get('name'),
-                    id = self.request.get('name'),
+        existingUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",name).get()
+        if existingUser:
+            self.response.out.write(name+" already exists. Try a different name please.")
+            return
+        user = User(key_name=name,
+                    id = name,
                     email = self.request.get('email'),
                     password = self.request.get('password'),
                     score = 0)            
         result = user.put()                
         if result:
-            ai_rec = AI(key_name=self.request.get('name')+"_tictactoe",
-                        user = self.request.get('name'),
+            ai_rec = AI(key_name=name+"_tictactoe",
+                        user = name,
                         game = "tictactoe",
                         data =     "{\"data\":[\"takeRandom\"]}")
             result_2 = ai_rec.put()
@@ -180,6 +185,9 @@ class AjaxCall(webapp.RequestHandler):
             for user in users:
                 result.append([user.id,user.score])
             self.response.out.write('{"data":'+json.dumps(result)+'}')
+        if action== 'getUserAI':
+            user_AI = getUserStrategy(self.request.get('userID'),'tictactoe')
+            self.response.out.write('{"result":'+json.dumps(user_AI)+'}')
         if action== 'runMatch':
             matches = []
             p1 = self.request.get('p1')

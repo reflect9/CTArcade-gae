@@ -16,7 +16,7 @@ function MemberList() {
 				}
 				$(userDIV).click(function() {
 //					alert($(this).attr('id')+ " clicked");
-					init(user[0]);
+					init(p1,user[0]);
 					runMatch(p1,user[0]);
 				});
 				userDIV.append(user[0]);

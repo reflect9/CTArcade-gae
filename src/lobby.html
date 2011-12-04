@@ -8,7 +8,6 @@ Updates:
 
 <html>
 <head>
-	<meta name = "viewport" content = "width=device-width">
 	<title>Lobby - CTArcade</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -26,6 +25,10 @@ Updates:
 	       }
 	       playMatch(currentUser,opponent);
 	   }
+	   $(document).ready(function() {
+	      $(".header #header_button_lobby").addClass("currentMode");
+	   });
+	   
 	</script>
 	
 </head>
