@@ -25,9 +25,23 @@ Updates:
 	       }
 	       playMatch(currentUser,opponent);
 	   }
-	   $(document).ready(function() {
-	      $(".header #header_button_lobby").addClass("currentMode");
-	   });
+	   function getTime(zone, success) {
+		var url = 'http://json-time.appspot.com/time.json?tz=' + zone,
+			ud = 'json' + (+new Date());
+
+		window[ud]= function(o){
+			success && success(o);
+		};
+		document.getElementsByTagName('head')[0].appendChild((function(){
+			var s = document.createElement('script');
+			s.type = 'text/javascript';
+			s.src = url + '&callback=' + ud;
+			return s;
+			})());
+		}
+		$(document).ready(function() {
+			$(".header #header_button_lobby").addClass("currentMode");
+		});
 	</script>
 
     
@@ -184,14 +198,14 @@ var javascript_countdown = function () {
 	};
 }();
  
-//time to countdown in seconds, and element ID
-var currentTime = new Date();
-var hours = currentTime.getHours();
-var minutes = currentTime.getMinutes();
-var seconds = currentTime.getSeconds();
-var target_hour = 17;
-var target = target_hour * 60 * 60;
-javascript_countdown.init((target - (hours * 60 * 60  + minutes * 60  + seconds)), target_hour - 1, 'javascript_countdown_time');
+getTime('EST', function(time){
+	var hours = time['hour'];
+	var minutes = time['minute'];
+	var seconds = time['second'];
+	var target_hour = 17;
+	var target = target_hour * 60 * 60;
+	javascript_countdown.init((target - (hours * 60 * 60  + minutes * 60  + seconds)), target_hour - 1, 'javascript_countdown_time');
+});
 </script>
 </body>
 </html>
