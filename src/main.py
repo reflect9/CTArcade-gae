@@ -225,10 +225,18 @@ class AjaxTrainer(webapp.RequestHandler):
             else:
                 self.response.out.write('False')
         elif action == 'makeNewStrategy':
-            # it seems that a non-persistent TicTacToeTrainer variable breaks my approach...but to keep form:
             trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
-            ruleBoard = list(self.request.get('ruleBoard'))
+            # parse the list
+            ruleBoard = eval(self.request.get('ruleBoard'))
             trainer.makeNewStrategy(ruleBoard, self.request.get('name'), self.request.get('desc'), self.request.get('translationInvariant'), self.request.get('flipping'), self.request.get('rowPermutation'), self.request.get('columnPermutation'), self.request.get('rotation'))
+            # have a fail response if the name is already in use
+            #   self.response.out.write('failure') -- name already taken
+            #   return
+            # Otherwise, go ahead and enable the strategy
+            codeList = getUserStrategy(self.request.get('user'),self.request.get('game'))
+            print codeList
+            codeList.append(self.request.get('name'))
+            setUserStrategy(self.request.get('user'),self.request.get('game'),codeList)
             self.response.out.write('success')
         elif action == 'changeOrder':
             # change the user's AI's data which is JSON string of an array that contains 
@@ -238,9 +246,16 @@ class AjaxTrainer(webapp.RequestHandler):
             data = json.loads(self.request.get('newStrategy'))
             setUserStrategy(user_id,game_title,data)
 #            self.response.out.write('updated Rule is '+getUserStrategy(user_id,game_title))
+        elif action == 'a':
+            self.response.out.write("hi")
+            userAI = AI.get_by_key_name('ingrahaj_tictactoe')
+            print userAI
+            self.response.out.write(userAI.data)
         elif action == '':
+            self.response.out.write("no action")
             pass
         else:
+            self.response.out.write("unrecognized action: "+action)
             # ignore this
             pass                               
                                           
