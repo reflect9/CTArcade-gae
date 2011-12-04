@@ -28,9 +28,10 @@ Updates:
 	   $(document).ready(function() {
 	      $(".header #header_button_lobby").addClass("currentMode");
 	   });
-	   
 	</script>
-	
+
+    
+
 </head>
 <body>	
 <!-- header -->
@@ -91,8 +92,12 @@ Updates:
                 </div>
          	<div style="width:100%;clear:both;">
                 <hr />
+	
+
+<div id="javascript_countdown_time"></div>
+                
                 <p align="left" id="accessTrainer" style="padding-top:8px; cursor:pointer;">
-                {% if user_id != "Guest"%}
+                {% if user_id == "mattm401" or user_id == "tak" %}
                 	<strong>Administration:</strong><br /><form action="/lobby" method="post">
                 	<input type="submit" value="Run Server Tournament" />
                 	<input type="hidden" name="key" id="key" value="Test"/>
@@ -105,6 +110,88 @@ Updates:
 		</div> <!--wrapper clearfix-->
 	</div>	<!--pageContent-->
 </div>		<!-- end of container-->
-</div
-></body>
+</div>
+<script type="application/javascript">
+var javascript_countdown = function () {
+	var time_left = 10; //number of seconds for countdown
+	var output_element_id = 'javascript_countdown_time';
+	var keep_counting = 1;
+	var target_hour = 0;
+ 
+	function countdown() {
+		if(time_left < 2) {
+			keep_counting = 0;
+		}
+ 
+		time_left = time_left - 1;
+	}
+ 
+	function add_leading_zero(n) {
+		if(n.toString().length < 2) {
+			return '0' + n;
+		} else {
+			return n;
+		}
+	}
+ 
+	function format_output() {
+		var hours, minutes, seconds, currentTime, target;
+		if (time_left > 0) {
+			seconds = time_left % 60;
+			minutes = Math.floor(time_left / 60) % 60;
+			hours = Math.floor(time_left / 3600);
+			seconds = add_leading_zero( seconds );
+			minutes = add_leading_zero( minutes );
+			hours = add_leading_zero( hours );	
+		} else {
+			target = target_hour + 24;
+			currentTime = new Date();
+			hours = add_leading_zero( target - currentTime.getHours() );
+			minutes = add_leading_zero( 59 -  currentTime.getMinutes() );
+			seconds = add_leading_zero( 59 - currentTime.getSeconds() );
+			
+		}
+ 
+		return '<br /><p align=\"center\"><strong>Time until next tournament: ' + hours + ':' + minutes + ':' + seconds + '</strong></p>';
+	}
+ 
+	function show_time_left() {
+		document.getElementById(output_element_id).innerHTML = format_output();//time_left;
+	}
+  
+	return {
+		count: function () {
+			countdown();
+			show_time_left();
+		},
+		timer: function () {
+			javascript_countdown.count();
+				setTimeout("javascript_countdown.timer();", 1000);
+		},
+
+		setTimeLeft: function (t) {
+			time_left = t;
+			if(keep_counting == 0) {
+				javascript_countdown.timer();
+			}
+		},
+		init: function (t, h, element_id) {
+			time_left = t;
+			target_hour = h;
+			output_element_id = element_id;
+			javascript_countdown.timer();
+		}
+	};
+}();
+ 
+//time to countdown in seconds, and element ID
+var currentTime = new Date();
+var hours = currentTime.getHours();
+var minutes = currentTime.getMinutes();
+var seconds = currentTime.getSeconds();
+var target_hour = 17;
+var target = target_hour * 60 * 60;
+javascript_countdown.init((target - (hours * 60 * 60  + minutes * 60  + seconds)), target_hour - 1, 'javascript_countdown_time');
+</script>
+</body>
 </html>
