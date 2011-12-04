@@ -1,0 +1,6 @@
+# Set the total storage limit for all queues to 120MB
+total_storage_limit: 120M
+queue:
+- name: default
+  rate: 20/s
+  bucket_size: 40

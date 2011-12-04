@@ -43,6 +43,21 @@ p {
     padding: 5px 14px 6px;
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 }
+.btn.active, .btn:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.btn.hover, .btn:hover {
+	}
+.btn.green {
+	background-color: #57A957;
+	color: #fff;
+    background-image: -moz-linear-gradient(center top , #62C462, #57A957);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+
 
 /* header and body basics */
 
@@ -113,6 +128,12 @@ p {
     overflow:hidden;
     text-decoration:none;
 }
+.header .currentMode {
+	border-radius: 3px 3px 3px 3px;
+	padding: 3px;
+	color: #ccc;
+	background: none repeat scroll 0 0 #666;
+}
 .header .ui_user {
     /*background: none repeat scroll 0 0 #666666;*/
     border:2px solid #444;
@@ -182,15 +203,21 @@ div.wrapper {
     width: 12px; height: 12px; 
     margin: 8px 2px 0px 5px;
 }
-
+.icon_downArrow {
+    float:left;
+    background: url(image/sprite-icons.png) no-repeat scroll -188px -159px transparent;
+    display: inline-block; 
+    width: 12px; height: 12px; 
+    margin: 8px 2px 0px 5px;
+}
 /* trainer */
 div#container_game {
 	width: 400px; 
 	float:left;
 }
 div#board {
-	width: 400px;
-	height:400px;
+	width: 330px;
+	height:330px;
 }
 li { 
 	display: list-item;
@@ -241,11 +268,11 @@ li {
 	height:400px;
 	padding:10px;
 	line-height:1.3em;
-	border: 1px solid #ccc;
-	background-color:#eee;
+/* 	border: 1px solid #ccc;
+	background-color:#eee; */
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 1em;
-	overflow-y:scroll;
+	/* overflow-y:scroll; */
 }
 .rule_inactive {
 	color:#aaa;
@@ -282,15 +309,16 @@ li {
 	cursor:pointer;
 }
 .tile {
-	border: 2px silver solid;
+	border: 2px solid #e1e1e1;
 	cursor: pointer;
 	float:left;
-	width: 31%;
-	height: 31%;
+	width: 30%;
+	height: 30%;
 	margin: 2px;
 	line-height:120px;
 	font-size:64px;
 	text-align: center;
+	border-radius: 10px;
 }
 
 div#title_bar {
@@ -334,10 +362,15 @@ div#title_bar {
 .tinyboard {
 	width:40px; height:40px;
 	border-radius : 3px;
-	background-color : #eee;
+	background-color : #e5e5e5;
 	margin:2px;
 	border:1px solid white;
 	/* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); */
+}
+.selectedBoard {
+	-moz-box-shadow: 0px 0px 5px 5px rgba(255, 255, 0, 0.5);
+    -webkit-box-shadow: 0px 0px 5px 5px rgba(255, 255, 0, 0.5);
+    box-shadow: 0px 0px 5px 5px rgba(255, 255, 0, 0.5);
 }
 
 .match {

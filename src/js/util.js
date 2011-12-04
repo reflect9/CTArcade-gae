@@ -164,11 +164,11 @@ function getKeysSortedByValue(obj) {
 	for (var key in obj) tempArray.push([key,obj[key]]);
 	tempArray.sort(function() { return arguments[0][1]>arguments[1][1]});
 	var output = [];
-	for(node in tempArray) {
+	for(var node in tempArray) {
 		output.push(tempArray[node][0]);
 	}
 	if(output.length!=tempArray.length) {
-		alert("oh");
+		alert("ohh");
 	}
 	return output;
 }
@@ -182,7 +182,7 @@ function getKeysSwappedBySameValue(obj) {
 			tempArray[i+1]=tt;
 		}
 	}
-	for (i in tempArray) {
+	for (var i in tempArray) {
 		resultArray.push(tempArray[i][0]);
 	}
 	if(resultArray.length!=tempArray.length) {
@@ -254,6 +254,26 @@ function findKeyOfValueInObject(value,obj) {
 	} 
 	return index;
 }
+function commonElementsFromArrays(arrA,arrB) {
+	var cE = [];
+	$.each(arrA, function(iA,a) {
+		$.each(arrB,function(iB,b) {
+			if(a==b & a!="") cE.push(a);
+		});
+	});
+	return cE;
+}
+//Array.prototype.remove= function(){
+//    var what, a= arguments, L= a.length, ax;
+//    while(L && this.length){
+//        what= a[--L];
+//        while((ax= this.indexOf(what))!= -1){
+//            this.splice(ax, 1);
+//        }
+//    }
+//    return this;
+//}
+
 
 // 
 function position_row(upDown,rI,oM,cM,xM) {

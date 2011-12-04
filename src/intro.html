@@ -13,10 +13,20 @@ Updates:
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
 	<script type="text/javascript">
-	   var p1='{{userID}}';
-	   var currentUser = "{{userID}}";	  
+	  var p1='{{userID}}';
+	  var currentUser = "{{userID}}";
+	   $(document).ready(function() {
+	      $(".header #header_button_intro").addClass("currentMode");
+	   });	 
 	</script>
-	
+	<style type="text/css">
+	body.js #tabs{ margin:10px 0px; }
+	#tabs > div{ padding:8px 10px; }
+	body.js #tabs > div{ display:none; }
+	body.js #tabs div.selected{ display:block; }
+	body.js #tabs .expandable_div{ display:none; }
+	body.js .expandable_heading{ cursor:pointer; }
+	</style>
 </head>
 <body>	
 <!-- header -->
@@ -29,22 +39,84 @@ Updates:
 		<div class="wrapper clearfix">
 			<div class="innerHeader">
 				<div id='desc' style='margin-bottom:10px;'>
-					<div id='welcome'>Welcome! This section is coming soon...<br />
-				    <hr /></div>
+					<div id='welcome'>Welcome to CTArcade!<br />
+				  <hr /></div>
 				</div>
 			</div>
 			 <!-- container_board -->
-		<div style="width:100%;" align="center">
-            
-            
-            
-                </div>
-         	
-        </div>
+		<div style="width:100%;" align="left" id="tabs">
+    <p>The CTArcade project was initiated by Dr. Ben Bederson. Initial research was performed by the Human Computer Interaction Lab (HCIL) at the University of Maryland. The HCIL worked to develop a session's worth of activity that provided challenges for gauging the critical thinking skill of a group of children through the KidsTeam project initative. The initial findings suggested that a critical thinking tool would be of benefit to teachers and students. A complete description of the project is provided in [Ahn. J, 2012], which summarizes the challenges and motivation of this project.</p>
+	<p>The primary motivation behind this project is to develop a framework for a crticial thinking tool that teaches users through a simple interface that utilizes existing skills internalized in the user's mind, as opposed to a complex graphical programming tool. Rather than having users program logical rules directly in a bottom up approach, users will "discover" and rank rules to train an "artificial intelligence" (AI) that will play for them on a tournament server composed of other similarly trained entities. Playing on the server will result in a score and challenging individual AI will provide users with a history of game play to review. These two artifacts are intended to provide motivation for the user to reflect and improve on their AI by learning from their experiences.</p>
+    <p>Below is a list of frequently asked questions about using CTArcade and about the project in general. If you have any problems using CTArcade or if you need any additional information, please send an email to: <a href="mailto:ctarcade@gmail.com">ctarcade@gmail.com</a></p>
+      <h4 class="expandable_heading">What is the CTArcade?</h4>
+      <div class="expandable_div">
+      <p>Design a system that will help to develop a non-programmer's computational thinking (CT) skill through game play while providing motivation for social and competitive interactions.</p>
+      </div>
+		<h4 class="expandable_heading">Is the CTArcade in beta?</h4>
+          <div class="expandable_div">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti.</p>
+          </div>       
+      <h4 class="expandable_heading">How do I sign up and login?</h4>
+     <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti.</p>
+      </div>
+      <h4 class="expandable_heading">How do I train my AI?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum  interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue.  In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis  hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui  tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim  eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui  metus, non venenatis sem. Donec non enim purus. Suspendisse potenti.  Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien  vitae purus varius lobortis. Suspendisse potenti.</p></div>
+      <h4 class="expandable_heading">What is the lobby?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti.</p>
+      </div>
+      <h4 class="expandable_heading">How do I challenge the AIs of other users?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti. </p>
+      </div>
+      <h4 class="expandable_heading">What are the different visualizations?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti. </p>
+      </div>
+      <h4 class="expandable_heading">How can I change my strategy in between challenges?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti. </p>
+      </div>
+      <h4 class="expandable_heading">How is my AI scored and ranked?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti. </p>
+      </div>
+       <h4 class="expandable_heading">What is next for CTArcade?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti.</p>
+      </div> 
+      <h4 class="expandable_heading">What games will be added to CTArcade?</h4>
+      <div class="expandable_div">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras rutrum interdum ipsum convallis varius. Proin a ante nisl, ut hendrerit augue. In justo enim, aliquet at bibendum sed, mollis nec ante. Praesent mollis hendrerit luctus. Sed eget eros mauris. Aenean ornare neque eu dui tristique in malesuada est lacinia. Quisque eget erat lorem. In in enim eros. Donec luctus sapien nec lorem suscipit tincidunt. Nulla a dui metus, non venenatis sem. Donec non enim purus. Suspendisse potenti. Proin vehicula justo eget odio lobortis venenatis. Ut gravida sapien vitae purus varius lobortis. Suspendisse potenti.</p>
+      </div> 
+		</div>
+     	
+    </div>
 			<div style="clear:both;"></div>
 		</div> <!--wrapper clearfix-->
 	</div>	<!--pageContent-->
 </div>		<!-- end of container-->
 </div
-></body>
+>
+<script type="text/javascript">
+	function expandable_divs(){
+		$('#tabs .expandable_heading').append('<span>+</span>');	
+		$('#tabs .expandable_heading').click(function(event) {
+			$(this).next('.expandable_div').toggle();
+			if($(this).hasClass('open')){
+				$(this).find('span').replaceWith('<span>+</span>');
+			} else {
+				$(this).find('span').replaceWith('<span>-</span>').removeClass("open");	
+				$(this).addClass("open")
+			}
+		});
+	}
+	$(document).ready(function(){
+		$("body").addClass("js");
+		expandable_divs();
+	});
+</script>
+</body>
 </html>

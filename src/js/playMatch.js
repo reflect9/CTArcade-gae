@@ -5,42 +5,18 @@ var p2_color = "violetPink";
 var playerColor = {};
 var canvasElement, ctx;
 var currentRound = 0;    
-  
-function init(opponent) {
-       		if(p1=="Guest") {
-   			alert("Log in first.");
-   			return;
-   		}
-		$("#matches").empty();
-		$("#desc").empty();
-		p2=opponent;
-		currentRound = 0;
-		playerColor[p1]=p1_color;   playerColor[p2] = p2_color;
-}
-// request server to run match and get response
-function runMatch(pl1,pl2) {
-	if(pl1=="Guest") {
-		return;
-	}
-	$.get('ajaxCall',{ action:'runMatch', p1:pl1, p2:pl2 }, function(data) {
+var selectedShape = "";
 
-		var res = JSON.parse(data);
-		var result = res.result;
 
-		matches = result.matches;
-		p1_AI = result.AI[p1];
-		p2_AI = result.AI[p2];
-		// count who wins how many times
-		var p1_wins = 0;  var p2_wins= 0;  var tie_games = 0;
-		$.each(matches, function(i,match) {
-			if (match.winner==result.players.p1) p1_wins++;
-			if (match.winner==result.players.p2) p2_wins++;
-			if (match.winner=="Tie Game") tie_games++;
-		});
+function showUserAI(userID, targetDIV) {
+	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
+	else var t = targetDIV;
+	$.get('ajaxCall',{action:'getUserAI', userID:userID}, function(data){
+		var res= JSON.parse(data);  var userAI = res.result;
 		//  show the player's strategy
-		var aiDIV = $("#desc").append("<DIV id='p1_ai_div' class='clearfix' style='clear:both;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
-		$(aiDIV).prepend("<h2 style='float:left;'>"+p1+"'s AI</h2><div id='button_ai_edit' style='float:left; margin:2px 0px 0px 10px; cursor:pointer;'><span class='icon_edit'>&nbsp;</span><span style='float:left; margin:4px 0px 0px 2px; font-weight:bold;'>Edit</span></span>");
-		$.each(p1_AI, function(i,strategy) {
+		$(t).append("<h2 style='float:left;'>"+userID+"'s AI</h2><div id='button_ai_edit' style='float:left; margin:2px 0px 0px 10px; cursor:pointer;'><span class='icon_edit'>&nbsp;</span><span style='float:left; margin:4px 0px 0px 2px; font-weight:bold;'>Edit</span></span>");
+		var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+		$.each(userAI, function(i,strategy) {
 			$(aiDIV).find("#p1_ai").append("<li class='ai_item'>"+strategy+"</li>");
 		});
 		$("#p1_ai").sortable({
@@ -55,7 +31,7 @@ function runMatch(pl1,pl2) {
 		    		url: "/ajaxTrainer",
 		    		async: true,
 		    		data: 	{ 	action: 'changeOrder',
-		    					player: p1,
+		    					player: userID,
 		    					game: 'tictactoe',
 		    					newStrategy : JSON.stringify(codeList)
 		    				},
@@ -68,10 +44,40 @@ function runMatch(pl1,pl2) {
 		});
 		$("#p1_ai").disableSelection();
 		$("#button_ai_edit").click(function() {
-			
+		});
+	});
+}
+function init(pl1,pl2) {
+	currentRound = 0;
+	if(pl1=="Guest") {
+		alert("User should log in first."); return;
+	}
+	p2 = pl2;
+	playerColor[p1]=p1_color;   playerColor[p2] = p2_color;
+}
+ 
+// request server to run match and get response
+function runMatch(pl1,pl2) {
+	$("#welcome").empty();
+	if(pl1=="Guest") {
+		return;
+	}
+	$("#summary").empty();			$("#matches").empty();
+	$.get('ajaxCall',{ action:'runMatch', p1:pl1, p2:pl2 }, function(data) {
+		var res = JSON.parse(data);
+		var result = res.result;
+		matches = result.matches;
+		p1_AI = result.AI[p1];
+		p2_AI = result.AI[p2];
+		// count who wins how many times
+		var p1_wins = 0;  var p2_wins= 0;  var tie_games = 0;
+		$.each(matches, function(i,match) {
+			if (match.winner==result.players.p1) p1_wins++;
+			if (match.winner==result.players.p2) p2_wins++;
+			if (match.winner=="Tie Game") tie_games++;
 		});
 		// show description of the match
-		$("#desc").append("<h2 style='margin-top:15px;'>Result of 30 matches</h2>");
+		$("#summary").append("<h2 style='margin-top:15px;'>Result of 30 matches</h2>");
 		var html = 	"<SPAN style='background-color:"+getColor(playerColor[result.players.p1],1)+"; color:white; padding:0px 4px 0px 4px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p1+"</SPAN>"
 				+	"<SPAN style='margin:0 10px 0 10px;'>"+p1_wins+"</SPAN>"
 				+	" : "
@@ -79,11 +85,23 @@ function runMatch(pl1,pl2) {
 				+	"<SPAN style='background-color:"+getColor(playerColor[result.players.p2],1)+"; color:white; padding:0px 4px 0px 4px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p2+"</SPAN>"
 				+	"<SPAN style='margin:0 10px 0 20px;'>and "+tie_games+" tie games</SPAN>";
  
-   			$("#desc").append("<DIV style='font-size:21px; margin:10px;'>"+html+"</DIV>");
+   			$("#summary").append("<DIV style='font-size:21px; margin:10px;'>"+html+"</DIV>");
    		
    		// draw default graph visualization	
-   		showMatchesAsGraph(matches,'horizontal');
+   		showMatches(currentMode);
 	});
+}
+function showMatches(mode) {
+	if(mode=='list')
+		showMatchesAsList(matches);
+	else if(mode=='animation')
+		showMatchesAsAnimation(matches);
+	else if(mode=='group')
+		showMatchesAsGroups(matches);
+	else if(mode=='graph_vertical')
+		showMatchesAsGraph(matches,'vertical');
+	else if (mode=='graph_horizontal') 
+		showMatchesAsGraph(matches,'horizontal');
 }
 function createMiniBoard_singleRound(match,iR) {	// used by graph mode only
 	var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
@@ -98,6 +116,7 @@ function createMiniBoard_singleRound(match,iR) {	// used by graph mode only
         return matchBoard;
    	}
    
+/* miniBoards are used for layouts except graph*/
 function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy) {
 	var miniBoard = $("<div class='miniboard'></div>"); 
 	if (showStrategy) $(miniBoard).append("<div id='strategy' style='font-size:12px; font-family:Helvetica; '>"+"</div>");
@@ -122,9 +141,10 @@ function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
 			$(row).append("<div style='clear:both'></div>");
 			$(boardDiv).append(row);
 		});
-	var winningCells = findWinningCells(board);
-	if (winningCells!=false) {
-		$(winningCells).each(function(i,wloc) {
+	var winnerAndPattern = findWinningCells(board);
+	if (winnerAndPattern!=false) {
+//		$(miniBoard).css('border','2px solid '+getColor(playerColor[winnerAndPattern.winner],1));
+		$(winnerAndPattern.pattern).each(function(i,wloc) {
 			$(boardDiv).find("."+wloc[0]+"_"+wloc[1]).css('border','2px solid black');
 		});
    }			
@@ -134,6 +154,7 @@ function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
 	$(miniBoard).append("<div style='clear:both;'></div>");
 	return miniBoard;
 }
+// tiny board are used in graph layouts
 function createTinyBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy) {
 	var miniBoard = $("<div class='tinyboard'></div>"); 
 	var cellSize = Math.floor((miniBoard.width()-10)/3);
@@ -157,9 +178,11 @@ function createTinyBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
 			$(row).append("<div style='clear:both'></div>");
 			$(boardDiv).append(row);
 		});
-		var winningCells = findWinningCells(board);
-		if (winningCells!=false) {
-			$(winningCells).each(function(i,wloc) {
+		var winnerAndPattern = findWinningCells(board);
+		if (winnerAndPattern!=false) {
+			$(miniBoard).attr('winner',winnerAndPattern.winner);
+			$(miniBoard).css('border','1px solid '+getColor(playerColor[winnerAndPattern.winner],1));
+			$(winnerAndPattern.pattern).each(function(i,wloc) {
 				$(boardDiv).find("."+wloc[0]+"_"+wloc[1]).css('border','1px solid black');
 			});
 	   }		
@@ -310,13 +333,13 @@ function showMatchesAsGraph(matchList, direction) {
 		$("#matches").append("<div id='"+divID+"' class='clearfix' style='clear:both; position:relative; width:100%;'></div>");
 		drawGraph(layoutResult,selectedMatches,"#"+divID,direction);
 	});
-	
-	
+//	$(".matchGraphColumn_bg").click(function() { alert("asdfdfd"); deselectBoard();});
+//	$(".matchGraphColumn").click(function() { deselectBoard();});
 	
 }
 function drawGraph(layoutResult,selectedMatches,targetDivID, direction) {
 	graph = layoutResult.graph;
-	var cM = layoutResult.connectivity;
+	var connectivityMatrix = layoutResult.connectivity;
 	// find max, min position (integer)
 	var min_pos = 100000;	var max_pos = -100000;
 	for(var rI in graph) 
@@ -350,88 +373,167 @@ function drawGraph(layoutResult,selectedMatches,targetDivID, direction) {
 			if(direction=="horizontal") {	// positioning each board
 				$(matchBoard).css("top",vertical_offset+data.position*interval);
 				$(matchBoard).css("left",0);
-				$(matchBoard).append("<div class='board_frequency' style='position:absolute; top:0; left:0; margin-left:-15px; font-size:9px; display:none'>"+listOfMatches+"</div>")
+				$(matchBoard).append("<div class='board_frequency' style='position:absolute; color:"+getColor(playerColor[$(matchBoard).attr('winner')],1)+"; top:0; left:0; margin-left:42px; padding:0 2px 0 2px; font-size:9px; background-color:rgba(255,255,255,0.75); font-weight:bold; visibility:hidden;'>"+listOfMatches+"</div>");
 			} else {
 				$(matchBoard).css("left",data.position*interval+hor_offset);
 				$(matchBoard).css("top",0);
-				$(matchBoard).append("<div class='board_frequency' style='position:absolute; bottom:0; left:0; margin-bottom:-15px; font-size:9px;'>"+listOfMatches+"</div>")
+				$(matchBoard).append("<div class='board_frequency' style='position:absolute; bottom:0; left:0; margin-bottom:-15px; font-size:9px; font-weight:bold;'>"+listOfMatches+"</div>");
 			}
 			// add some custom attr. to each board div
 			$(matchBoard).attr("shape",boardShape.replace(/"/gi,''));
-			var down_connection = ""+cM[iR]['downward'][boardShape];   
+			if (typeof connectivityMatrix[iR]['downward'][boardShape]==="undefined")
+				var down_connection = "";
+			else 
+				var down_connection = connectivityMatrix[iR]['downward'][boardShape].join("_");   
 			$(matchBoard).attr("down_connection",down_connection.replace(/"/gi,''));
-			if(iR>0) { var up_connection = ""+cM[iR-1]['upward'][boardShape];
+			if(iR>0) { var up_connection = connectivityMatrix[iR-1]['upward'][boardShape].join("_");
 									$(matchBoard).attr("up_connection",up_connection.replace(/"/gi,'')); 	}
 			$(matchBoard).attr("matchIndex",","+data.matches+",");
 			// mouse interaction
+			$(matchBoard).click(function() {
+				selectBoard(matchBoard);
+			});
 			$(matchBoard).mouseover(function() {
-				highlightPath(matchBoard);
 			});
 			$(matchBoard).mouseout(function() {
-				dehighlightPath(matchBoard);
 			});
 			$(columnDiv).append(matchBoard);
 		});
+//		$(columnDiv).append("<div class='matchGraphColumn_bg' style='position:absolute; width:100%; height:100%; z-index:0;'></div>")
 		$(targetDivID).append(columnDiv);
 	});
 	// draw lines
-	$(targetDivID).prepend("<canvas id='canvas_"+targetDivID.replace("#","")+"' style='position:absolute; top:0px; left:0px;' width='"+$(targetDivID).width()+"px' height='"+$(targetDivID).height()+"px'></canvas>");
+	$(targetDivID).prepend("<canvas id='canvas_"+targetDivID.replace("#","")+"' style='position:absolute; top:0px; left:0px;' width='"+$(targetDivID).width()+"px' height='"+$(targetDivID).height()+"px' direction='"+direction+"'></canvas>");
 	var canvas = $("#canvas_"+targetDivID.replace("#",""));
-	drawGraphLine(cM,targetDivID,canvas,direction);
+	drawGraphLinesAll(targetDivID,canvas,direction);
 }	
-function drawGraphLine(cM,targetDivID,canvas,direction) {
+function selectBoard(matchBoard) {
+//	alert("selected");
+	if(typeof selectedBoard=='undefined') selectedBoard = "";
+	if (selectedBoard == matchBoard) {
+		deselectBoard();
+	} else {
+		$(selectedBoard).removeClass('selectedBoard');
+		selectedBoard = matchBoard;
+		$(matchBoard).addClass('selectedBoard');
+		highlightPath(matchBoard);
+	}
+}
+function deselectBoard() {
+	$(selectedBoard).removeClass('selectedBoard');
+	selectedBoard = "";
+	dehighlightPath();
+}
+function drawGraphLinesAll(targetDivID,canvas,direction) {
 	var ctx = $(canvas)[0].getContext("2d");
 	ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);	
-	$.each(cM, function(iR, round) {
-			$.each(round.downward, function(shapeA, connectedShapesB){
-				$.each(connectedShapesB, function(iB, shapeB) {
-					var sA = $(targetDivID+' div[shape="'+shapeA.replace(/"/gi,'')+'"]');
-					var sB = $(targetDivID+' div[shape="'+shapeB.replace(/"/gi,'')+'"]');
-					var offsetA = sA.offset();
-					var offsetB = sB.offset();
-					var widthA = $(targetDivID+' div[shape="'+sA+'"]').width();
-					var widthB = $(targetDivID+' div[shape="'+sA+'"]').width();
-					var gap = 15; // how strong bezierCurve tends to go straight
-					if(direction=="horizontal")  {
-						var startPoint = {'x':sA.offset().left+sA.width()-$(canvas).offset().left, 'y':sA.offset().top+sA.height()/2-$(canvas).offset().top};
-						var endPoint = {'x':sB.offset().left-$(canvas).offset().left, 'y':sB.offset().top+sB.height()/2-$(canvas).offset().top};
-						var ctrA = {'x':startPoint.x+gap,'y':startPoint.y};
-						var ctrB = {'x':endPoint.x-gap, 'y':endPoint.y};
-					} else {
-						var startPoint = {'x':sA.offset().left+sA.width()/2-$(canvas).offset().left, 'y':sA.offset().top+sA.height()-$(canvas).offset().top};
-						var endPoint = {'x':sB.offset().left+sB.width()/2-$(canvas).offset().left, 'y':sB.offset().top-$(canvas).offset().top};
-						var ctrA = {'x':startPoint.x,'y':startPoint.y+gap};
-						var ctrB = {'x':endPoint.x, 'y':endPoint.y-gap};
-					}
-					ctx.beginPath();
-					ctx.moveTo(startPoint.x,startPoint.y);
-					ctx.bezierCurveTo(ctrA.x,ctrA.y,ctrB.x,ctrB.y,endPoint.x,endPoint.y);
-					if(parseInt($(sA).find(".board_frequency").text()) < parseInt($(sB).find(".board_frequency").text())) {
-						ctx.lineWidth = 1+parseInt($(sA).find(".board_frequency").text())/2;
-					} else {
-						ctx.lineWidth = 1+parseInt($(sB).find(".board_frequency").text())/2;
-					}
-				    ctx.strokeStyle ="#eee"; // line color
-				    ctx.stroke();
-				});
-			});
+	var allDivs = $(targetDivID).find("div.tinyboard");
+	$.each(allDivs, function(iD, tinyboard) {
+		var downwardConnectedDivShapes = $(tinyboard).attr('down_connection').split("_");
+		$.each(downwardConnectedDivShapes, function(iCD, connectedShape) {
+			if(connectedShape=="") return true;
+			var downwardConnectedTinyBoard = $(targetDivID).find('div[shape="'+connectedShape+'"]');
+			drawGraphLine(canvas,$(tinyboard),downwardConnectedTinyBoard,direction,"#eee");
+		});
+	});
+//	$.each(connectivityMatrix, function(iR, round) {
+//		$.each(round.downward, function(shapeA, connectedShapesB){
+//			$.each(connectedShapesB, function(iB, shapeB) {
+//				var sA = $(targetDivID+' div[shape="'+shapeA.replace(/"/gi,'')+'"]');
+//				var sB = $(targetDivID+' div[shape="'+shapeB.replace(/"/gi,'')+'"]');
+//				if (sA.length==0)
+//					alert("ahahaha");
+//				drawGraphLine(canvas,sA,sB,direction,"#eee");	// ctx: canvas context, sA: start div jquery var, sB: ending, direction : "horizontal" or vertical, and color
+//			});
+//		});
+//	});
+}
+function clearAllCanvas(){
+	$.each($("canvas"),function(iCanvas,c) {
+		var tempCtx = c.getContext("2d");
+		tempCtx.clearRect(0,0,c.width,tempCtx.canvas.height);
 	});
 }
+function drawGraphLinesSpecificMatches(targetDivID,canvas,direction,listOfSelectedMatches) {	
+	// lines connecting listOfSelectedMatches are stronger than the others. 
+//	clearAllCanvas();
+	var ctx = $(canvas)[0].getContext("2d");
+//	ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+	drawGraphLinesAll("#"+targetDivID,canvas,direction);
+	var allDivs = $("#"+targetDivID).find("div.tinyboard");
+	$.each(allDivs, function(iD, tinyboard) {
+		var matchesOfCurrentBoard = $(tinyboard).attr('matchindex').split(",");
+		if (commonElementsFromArrays(matchesOfCurrentBoard,listOfSelectedMatches).length>0) {
+			var downwardConnectedDivShapes = $(tinyboard).attr('down_connection').split("_");
+			$.each(downwardConnectedDivShapes, function(iCD, connectedShape) {
+				if(connectedShape=="") return true;
+				var downwardConnectedTinyBoard = $("#"+targetDivID).find('div[shape="'+connectedShape+'"]');
+				var matches_downwardConnectedTinyBoard = downwardConnectedTinyBoard.attr('matchindex').split(",");
+				if(commonElementsFromArrays(matches_downwardConnectedTinyBoard,listOfSelectedMatches).length>0) {
+					drawGraphLine(canvas,$(tinyboard),downwardConnectedTinyBoard,direction,"#bbb");
+				}
+			});
+		}
+	});
+}
+function drawGraphLine(canvas,sA,sB,direction,color) {
+	var ctx = $(canvas)[0].getContext("2d");
+	var offsetA = sA.offset();
+	var offsetB = sB.offset();
+	var gap = 15; // how strong bezierCurve tends to go straight
+	if(direction=="horizontal")  {
+		var startPoint = {'x':sA.offset().left+sA.width()-$(canvas).offset().left, 'y':sA.offset().top+sA.height()/2-$(canvas).offset().top};
+		var endPoint = {'x':sB.offset().left-$(canvas).offset().left, 'y':sB.offset().top+sB.height()/2-$(canvas).offset().top};
+		var ctrA = {'x':startPoint.x+gap,'y':startPoint.y};
+		var ctrB = {'x':endPoint.x-gap, 'y':endPoint.y};
+	} else {
+		var startPoint = {'x':sA.offset().left+sA.width()/2-$(canvas).offset().left, 'y':sA.offset().top+sA.height()-$(canvas).offset().top};
+		var endPoint = {'x':sB.offset().left+sB.width()/2-$(canvas).offset().left, 'y':sB.offset().top-$(canvas).offset().top};
+		var ctrA = {'x':startPoint.x,'y':startPoint.y+gap};
+		var ctrB = {'x':endPoint.x, 'y':endPoint.y-gap};
+	}
+	ctx.beginPath();
+	ctx.moveTo(startPoint.x,startPoint.y);
+	ctx.bezierCurveTo(ctrA.x,ctrA.y,ctrB.x,ctrB.y,endPoint.x,endPoint.y);
+	if(parseInt($(sA).find(".board_frequency").text()) < parseInt($(sB).find(".board_frequency").text())) {
+		ctx.lineWidth = 1+parseInt($(sA).find(".board_frequency").text())/2;
+	} else {
+		ctx.lineWidth = 1+parseInt($(sB).find(".board_frequency").text())/2;
+	}
+    ctx.strokeStyle =color; // line color
+    ctx.stroke();
+}
+
 function highlightPath(shapeDIV) {
-	$(".tinyboard").css("opacity","0.1");
 	var indexes = $(shapeDIV).attr("matchindex").split(',');
 	indexes.splice(0,1);
 	var currentGraphDiv = $(shapeDIV).parent().parent();
+	$(currentGraphDiv).find(".tinyboard").css("opacity","0.1");
+//	$(currentGraphDiv).find(".board_frequency").css('visibility','hidden');
+	var canvas = currentGraphDiv.find('canvas');
+	var direction = canvas.attr('direction');
+	drawGraphLinesSpecificMatches(currentGraphDiv.attr('id'),canvas,direction,indexes);
 	$.each(indexes, function(iMatchIndex,matchIndex) {
-		$(currentGraphDiv).find('div.tinyboard[matchindex*=",'+matchIndex+',"]').css("opacity","1.0");
+		var tempDIV = $(currentGraphDiv).find('div.tinyboard[matchindex*=",'+matchIndex+',"]');
+		$(tempDIV).css("opacity","1.0");	// select all Div having matchindex of the index and set opacity 1.0
+//		$(tempDIV).find(".board_frequency").css('visibility','show');
 	});
 	
 //	$(shapeDIV).css("opacity","1.0");
 }
-function dehighlightPath(shapeDIV) {
+function dehighlightPath() {
 	$(".tinyboard").css("opacity","1.0");
+//	$(".board_frequency").css('visibility','hidden');
+	$.each([p1,p2], function(iP, firstMovePlayer) {	
+		var currentGraphDiv = $("#matches_"+firstMovePlayer);
+		var canvas = currentGraphDiv.find('canvas');
+		var direction = canvas.attr('direction');
+		drawGraphLinesAll("#"+currentGraphDiv.attr('id'),canvas,direction);
+	});
 //	$(shapeDIV).css("opacity","1.0");	
 }
+
+
 //function drawGraph_vertical(result,selectedMatches,targetDivID) {
 //	var graph = result.graph;
 //	var cM = result.connectivity;
@@ -513,34 +615,34 @@ function dehighlightPath(shapeDIV) {
    
    
    // FUNCTIONS FOR GETTING WINNING CELLS //
-   isFull = function() {
+isFull = function() {
        for (var i = 0; i < 3; i++)
 		for (var j =0; j<3;j++)
 		    if (board[i][j] == 0)
 		        return false;
        return true;
-   }
+}
 checkCol =function(x,board) {
        if (board[x][0] == board[x][1] && (board[x][0] == board[x][2]) && (board[x][0] != 0)) 
-       	return [[x,0],[x,1],[x,2]];
+       	return {'winner':board[x][0],'pattern':[[x,0],[x,1],[x,2]]};
        else return false;
 }
    
    checkRow = function(y,board) {
        if (board[0][y] == board[1][y] && (board[0][y] == board[2][y]) && (board[0][y] != 0))
-       	return [[0,y],[1,y],[2,y]];
+    	   return {'winner':board[0][y],'pattern':[[0,y],[1,y],[2,y]]};
        else return false;
    }
    
    checkDiag1 = function(board)  {
        if (board[0][0] != 0 && board[0][0] == board[1][1] && board[0][0] == board[2][2]) 
-       	return [[0,0],[1,1],[2,2]];
+    	   return {'winner':board[0][0],'pattern':[[0,0],[1,1],[2,2]]};
        else return false;
        
    }
    checkDiag2 = function(board) {
        if (board[2][0] != 0 && board[1][1] == board[2][0] && board[0][2] == board[2][0]) 
-       	return [[2,0],[1,1],[0,2]];
+    	   return {'winner':board[2][0],'pattern':[[2,0],[1,1],[0,2]]};
        else return false;
    }
 function findWinningCells(board) {
@@ -566,14 +668,17 @@ function findWinningCells(board) {
 $(document).ready( function() {
 	memberList = new MemberList();
 	memberList.init("#memberListDIV");
+	currentMode = 'graph_horizontal';
 	if(p1=="Guest") {
 		$("#welcome").append("Welcome, Guest!  You need to <a href='javascript:openSignIn();'>log in</a> to play matches with others.");
 	} else {
+		showUserAI(p1,"userInfo");
 		$("#welcome").append("Welcome, "+p1+"! Select an opponent to play matches.");
-		if(p2!="") {
-			init(p2);
-			runMatch(p1,p2);
-			
+		if(p2!="") {	
+	   		init(p1,p2); 
+	   		runMatch(p1,p2);
 		}
 	}
+	$(".header #header_button_match").addClass("currentMode");
+
 });
