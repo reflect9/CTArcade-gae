@@ -59,7 +59,7 @@ class Lobby(webapp.RequestHandler):
         # Add the task to the default queue.
         taskqueue.add(url='/worker', params={'key': key}, countdown=0)
 
-        self.redirect('/')    
+        self.redirect('/lobby')    
 
 class Init(webapp.RequestHandler):
     def get(self):
