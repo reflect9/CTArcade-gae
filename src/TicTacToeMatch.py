@@ -101,11 +101,12 @@ class TicTacToeMatch:
         return self.board
     def findBestStrategy(self,player):
         if self.isFull():       return {'message':"Tie Game",'locList':None}
+#        print >>sys.stderr, self.strategy[player]
         for st in self.strategy[player]:
             # locals() provide a dictionary of all elements in local scope
             # locals()[functionName] gives a handler to the function
             # thus, below we execute local function whose name is st['code']
-#            print st
+            print >>sys.stderr, "1 "+st
             strategyMethodToCall =  getattr(self, st)
             result = strategyMethodToCall(self.board,player) 
             if result['success']:

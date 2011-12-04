@@ -20,13 +20,13 @@ function checkWinner() {
 	// winning event
 	var winner = game.checkForWinner();
 	if (winner) {
-		$("#status").text(winner + " wins!");
-		$("#status").css('background-color', 'yellow');
+//		$("#status").text(winner + " wins!");
+//		$("#status").css('background-color', 'yellow');
 		if(winner=='p1') cons.appendHTML("<div style='font-size:17px; margin:10px;'>"+game.p1 + " wins!</div>");
 		else cons.appendHTML("<div style='font-size:17px; margin:10px;'>"+game.p2 + " wins!</div>");
 		needReset = true;
 	} else {
-		$("#status").text(game.turn + " to play");
+//		$("#status").text(game.turn + " to play");
 	}
 }	
 // it uses AI's current strategy set 
@@ -53,7 +53,7 @@ function computerMove(response) {
 		code = strategy[i].st;
 		strt = game.publicStrategyDict[code];  
 		name = code;
-		html = html+"<li class='ui-state-default'><div style='margin:10px 0 0 10px; ' id='ai_"+code+"' class='ai_"+ code +" rule_inactive'>"+ name +"</div></li>";
+		html = html+"<li class='ui-state-default'><div style='margin:10px 0 0 10px; ' id='ai_"+code+"' class='ai_"+ code +" rule_inactive rule'>"+ name +"</div></li>";
 	}
 	html = html+"</ul>";
 	cons.appendHTML(html);
@@ -83,11 +83,11 @@ function computerMove(response) {
 	});
 	$("#sortable").disableSelection();
 	if (strategy.message=="Tie Game") {
-		$("#status").text(strategy.message);
+//		$("#status").text(strategy.message);
 		html = "<div style='line-height:2em;'>Tie game! Click 'new game' button to start over.</div>"
 		cons.appendHTML(html);
 	} else if (strategy.message=="no strategy found") {
-		$("#status").text(strategy.message);
+//		$("#status").text(strategy.message);
 		html = "<div style='line-height:2em;'>No strategy seems to match the situation.</div>"
 		cons.appendHTML(html);
 	} else {
@@ -173,8 +173,8 @@ function historyMode(flag) {
 	if(flag=='on') {
 		$(".tile").unbind();
 		$('.tile').css('background-color','#ddd');
-		$('#status').text('History mode')
-						.css('background-color','#0055ff');
+//		$('#status').text('History mode')
+//						.css('background-color','#0055ff');
 	} 
 	if(flag=='off') {
 		$(".tile").unbind();
@@ -182,8 +182,8 @@ function historyMode(flag) {
 			callUserMove($(this).attr('id'));
 		});
 		$('.tile').css('background-color','#fff');
-		$('#status').text(currentTurn + " 's turn")
-						.css('background-color','#fff');
+//		$('#status').text(currentTurn + " 's turn")
+//						.css('background-color','#fff');
 		cons.appendMessage("It's your turn. Click an empty cell to take.");			
 	}
 	
@@ -200,12 +200,12 @@ function changeOrder() {
 }
 function clearBoard() {
 	needReset=false;
-	$("#status").css('color','black');
+//	$("#status").css('color','black');
 	$("#bigButton").hide();
 	historyMode('off');
 	game.restart();  // reset game.board, game.turn 
 	$("#currentStep").text(game.history.length-1);
-	$("#status").css('background-color', 'white');
+//	$("#status").css('background-color', 'white');
 	$("#rule").text("");
 	cons.clear();
 	cons.appendMessage("It's your turn. Click an empty cell for next move.");

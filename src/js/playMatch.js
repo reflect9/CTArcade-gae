@@ -29,7 +29,7 @@ function showUserAI(userID, targetDIV) {
 		    	$.ajax({
 		    		type : "GET",
 		    		url: "/ajaxTrainer",
-		    		async: true,
+		    		async: false,
 		    		data: 	{ 	action: 'changeOrder',
 		    					player: userID,
 		    					game: 'tictactoe',
