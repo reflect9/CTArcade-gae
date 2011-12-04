@@ -2,6 +2,7 @@
 
 <html>
 <head>
+	<title>Trainer - CTArcade</title>
 	<script type="text/javascript" src="js/jquery-1.7.js"></script>
 	<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
 	<script type="text/javascript" src="js/TicTacToeTrainer.js"> </script>
@@ -27,6 +28,7 @@
 	<div class='pageContent'>
 		<div class="wrapper clearfix">
 			<div class="innerHeader">
+             {% if user_id != "Guest" %}
 				<div id='desc' style='margin-bottom:10px;'>
 					<div id='welcome'></div>
 					<div id='userInfo'></div>
@@ -70,6 +72,15 @@
 				</div>
 				<div class='message'>
 				</div>
+                   {% else %}
+				<div id='desc' style='margin-bottom:10px;'>
+					<div id='welcome'>Welcome to the CTArcade Tic Tact Toe Trainer.<br />
+                    In order to use the trainer you must sign in as a registered user using the "Sign In" link.<br />
+                    Registering a user account is quick and easy, just click on the "Create New Account" link.<br />
+				    <hr />
+				</div>
+			</div>
+			{% endif %}
 			</div> 	<!-- console -->
 			<div style="clear:both;"></div>
 		</div> <!--wrapper clearfix-->

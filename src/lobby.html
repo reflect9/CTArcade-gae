@@ -16,7 +16,7 @@ Updates:
 	   var p1='{{user_id}}';
 	   var currentUser = "{{user_id}}";
 	   function playMatch(p1, p2) {
-	       location.href = self.location.href + "playMatch?p2="+p2;
+	       location.href = "playMatch?p2="+p2;
 	   }
 	   function challenge(opponent) {
 	       if (currentUser=="Guest") {
@@ -43,9 +43,14 @@ Updates:
 		<div class="wrapper clearfix">
 			<div class="innerHeader">
 				<div id='desc' style='margin-bottom:10px;'>
-					<div id='welcome'>Welcome to the lobby!<br />
+					<div id='welcome'>Welcome to the CTArcade lobby!<br />
+                    {% if user_id != "Guest"%}
                     You can review you rank and score against other players using CT Arcade.<br />
                     You can also select a player to challenge from the list below.<br />
+                    {% else %}
+					In order to use the lobby you must sign in as a registered user using the "Sign In" link.<br />
+                    Registering a user account is quick and easy, just click on the "Create New Account" link.<br />
+					{% endif %}
 				    <hr /></div>
 				</div>
 			</div>
