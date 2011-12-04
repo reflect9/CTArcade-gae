@@ -106,8 +106,12 @@ class TicTacToeMatch:
             # locals()[functionName] gives a handler to the function
             # thus, below we execute local function whose name is st['code']
 #            print st
-            strategyMethodToCall =  getattr(self, st)
-            result = strategyMethodToCall(self.board,player) 
+            if (hasattr(self,st)):
+                strategyMethodToCall =  getattr(self, st)
+                result = strategyMethodToCall(self.board,player)
+            else:
+                strategy = [s for s in getPublicStrategy(self.game) if s['name'] == st]
+                result = self.evaluateCreatedStrategy(eval(strategy[0]['boardList']),self.board,player)
             if result['success']:
                 return {'message':st, 'locList':result['loc']}
         return {'message':"no matching strategy found",'locList':None}
@@ -185,7 +189,34 @@ class TicTacToeMatch:
             if board[c2[0]][c1[1]]!=0 and board[c1[0]][c2[1]]==0:
                 return {'success':True, 'loc':[c1]}      
         return {'success':False}
-        
+
+    def evaluateCreatedStrategy(self, ruleBoardList, board, player):
+        result = {'success':True,'loc':[]}
+        pushFlag = False
+        for ruleBoard in ruleBoardList:
+            width = len(ruleBoard)
+            height = len(ruleBoard[0])
+            for i in range(len(board)-width+1):
+                for j in range(len(board[0])-height+1):
+                    for k in range(i,i+width):
+                        for l in range(j,j+height):
+                            tile = ruleBoard[k-i][l-j]
+                            if (tile == Type.P1 and board[k][l] != player):
+                                result['success'] = False
+                            elif (tile == Type.P2 and board[k][l] != self.flip(player)):
+                                result['success'] = False
+                            elif (tile == Type.EMPTY and board[k][l] != Type.EMPTY):
+                                result['success'] = False
+                            elif (tile == Type.SELECTED and board[k][l] == Type.EMPTY):
+                                result['loc'].append([k,l])
+                                pushFlag = True
+                    if pushFlag and not result['success']:
+                        result['loc'].pop()
+                    pushFlag = False
+                    result['success'] = True
+        if len(result['loc']) == 0:
+            result['success'] = False
+        return result
         
         
         
