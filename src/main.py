@@ -292,7 +292,7 @@ class CounterWorker(webapp.RequestHandler):
         #log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
         #log.put()
         print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
-        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=200)
+        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=180)
     def get(self): # should run at most 1/s
         #log = TournamentLog(message = "Tournament Start")
         print >>sys.stderr, "Tournament Start"
@@ -305,7 +305,7 @@ class CounterWorker(webapp.RequestHandler):
         #log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
         #log.put()
         print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
-        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=200)
+        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=180)
 		
         
 class RoundWorker(webapp.RequestHandler):
@@ -349,7 +349,7 @@ class RoundWorker(webapp.RequestHandler):
                 #log.put()
             # Determine if another round is necessary or if winner can be declared
             print >>sys.stderr, "Exiting"    
-            taskqueue.add(url='/score', params={'tournament_entries': json.dumps(round_winners), 'by': by}, countdown=200)
+            taskqueue.add(url='/score', params={'tournament_entries': json.dumps(round_winners), 'by': by}, countdown=180)
 
         except:
             self.response.clear()
@@ -380,7 +380,7 @@ class ScoreWorker(webapp.RequestHandler):
             if self.request.get('by') != "None":
                 next_round.append(self.request.get('by'))
             if len(next_round) >= 2:     
-                taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=200)
+                taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=180)
 def main():
     application = webapp.WSGIApplication([('/', Intro),
                                           ('/init', Init),
@@ -395,8 +395,8 @@ def main():
                                           ('/reviewMatch',ReviewMatch), 
                                           ('/worker', CounterWorker), 
                                           ('/round', RoundWorker),
-                                          ('/score', ScoreWorker),								  ('/lobby', Lobby),
-  
+                                          ('/score', ScoreWorker),
+                                          ('/lobby', Lobby),
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
