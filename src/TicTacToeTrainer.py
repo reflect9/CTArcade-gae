@@ -10,6 +10,13 @@ from random import choice
 from django.utils import simplejson
 from datastore import *
 
+class Type:
+    EMPTY = 0
+    P1 = 1
+    P2 = 2
+    SELECTED = 3
+    IGNORE = 4
+
 class TicTacToeTrainer:
     def __init__(self,user=None,player1=None,player2=None,game='tictactoe',board=None,turn=None):
         self.user = user;
@@ -89,9 +96,14 @@ class TicTacToeTrainer:
             # locals()[functionName] gives a handler to the function
             # thus, below we execute local function whose name is st['code']
 #            print st
-            strategyMethodToCall =  getattr(self, st)
             p1p2 = 'p1' if self.turn==self.p1 else 'p2'
-            result = strategyMethodToCall(self.board,p1p2) 
+            if (hasattr(self, st)):
+                strategyMethodToCall =  getattr(self, st)
+                result = strategyMethodToCall(self.board,p1p2)
+            else:
+                strategy = [s for s in getPublicStrategy(self.game) if s['name'] == st]
+                result = self.evaluateCreatedStrategy(eval(strategy[0]['boardList']),self.board,p1p2)
+                
             resultList.append({'st':st, 'result':result })
         return resultList
 #        return {'message':"no matching strategy found",'locList':None}
@@ -102,13 +114,16 @@ class TicTacToeTrainer:
         print >>sys.stderr, userLoc
         for st in allPublicStrategy:
             print >>sys.stderr, st
-            strategyMethodToCall = getattr(self, st['code'])
-            if st['code'] in self.strategy: st['enabled']=True 
+            if st['name'] in self.strategy: st['enabled']=True # PREVIOUSLY st['code']
             else:  st['enabled']=False
 #            print >>sys.stderr, self.board
             p1p2 = 'p1' if self.turn==self.p1 else 'p2'
             print >>sys.stderr, "board : " + json.dumps(self.board) + p1p2
-            result = strategyMethodToCall(self.board,p1p2)
+            if (st['code'] != ''):
+                strategyMethodToCall = getattr(self, st['code'])
+                result = strategyMethodToCall(self.board,p1p2)
+            else:
+                result = self.evaluateCreatedStrategy(eval(st['boardList']), self.board, p1p2)
             if result['success'] and result['loc']!=None:
                 for loc in result['loc']:
                     if int(userLoc[0])==loc[0] and int(userLoc[1])==loc[1]:
@@ -195,19 +210,43 @@ class TicTacToeTrainer:
                 return {'success':True, 'loc':[c1]}      
         return {'success':False}
 
+    def evaluateCreatedStrategy(self, ruleBoardList, board, player):
+        result = {'success':True,'loc':[]}
+        pushFlag = False
+        for ruleBoard in ruleBoardList:
+            width = len(ruleBoard)
+            height = len(ruleBoard[0])
+            for i in range(len(board)-width+1):
+                for j in range(len(board[0])-height+1):
+                    for k in range(i,i+width):
+                        for l in range(j,j+height):
+                            tile = ruleBoard[k-i][l-j]
+                            if (tile == Type.P1 and board[k][l] != player):
+                                result['success'] = False
+                            elif (tile == Type.P2 and board[k][l] != self.flip(player)):
+                                result['success'] = False
+                            elif (tile == Type.EMPTY and board[k][l] != Type.EMPTY):
+                                result['success'] = False
+                            elif (tile == Type.SELECTED and board[k][l] == Type.EMPTY):
+                                result['loc'].append([k,l])
+                                pushFlag = True
+                    if pushFlag and not result['success']:
+                        result['loc'].pop()
+                    pushFlag = False
+                    result['success'] = True
+        if len(result['loc']) == 0:
+            result['success'] = False
+        return result
+        
     def makeNewStrategy(self, ruleBoard, name, desc, translationInvariant,
                         flipping, rowPermutation, columnPermutation, rotation):
-        class Type:
-            EMPTY = 0
-            P1 = 1
-            P2 = 2
-            SELECTED = 3
-            IGNORE = 4
         def addRule(container, toBeAdded):
             if toBeAdded not in container:
                 container.append(toBeAdded)
         def flip(ruleBoard, horizontally, vertically):
-            flipped = list(ruleBoard)
+            flipped = []
+            for i in range(len(ruleBoard)):
+                flipped.append([0]*len(ruleBoard[0]))
             for i in range(len(ruleBoard)):
                 for j in range(len(ruleBoard[0])):
                     xIndex = i
@@ -219,12 +258,10 @@ class TicTacToeTrainer:
                     flipped[xIndex][yIndex] = ruleBoard[i][j]
             return flipped
         def rotate(ruleBoard):
-            # rotated will start as the transpose of ruleBoard
-            rotated = [];
+            # rotated will start with transposed dimensions
+            rotated = []
             for i in range(len(ruleBoard[0])):
-                rotated.append([])
-                for j in range(len(ruleBoard)):
-                    rotated[i].append(0)
+                rotated.append([0]*len(ruleBoard))
             # now define the values appropriately
             for i in range(len(ruleBoard)):
                 for j in range(len(ruleBoard[0])):
@@ -233,14 +270,21 @@ class TicTacToeTrainer:
                     rotated[xIndex][yIndex] = ruleBoard[i][j]
             return rotated
         def colPermute(ruleBoard,offset):
-            permuted = list(ruleBoard)
+            permuted = []
+            for i in range(len(ruleBoard)):
+                permuted.append([0]*len(ruleBoard[0]))
+            print permuted
+            print ruleBoard
             for i in range(len(ruleBoard)):
                 for j in range(len(ruleBoard[0])):
                     xIndex = (i + offset) % len(ruleBoard)
                     permuted[xIndex][j] = ruleBoard[i][j]
+                    print (i,",",j,": ",permuted)
             return permuted
         def rowPermute(ruleBoard,offset):
-            permuted = list(ruleBoard)
+            permuted = []
+            for i in range(len(ruleBoard)):
+                permuted.append([0]*len(ruleBoard[0]))
             for i in range(len(ruleBoard)):
                 for j in range(len(ruleBoard[0])):
                     yIndex = (i + offset) % len(ruleBoard[0])
@@ -269,6 +313,7 @@ class TicTacToeTrainer:
             return newBoard
 
         # Here is the start of the actual processing function
+        
         if translationInvariant:
             ruleBoard = minimize(ruleBoard)
 
@@ -277,9 +322,13 @@ class TicTacToeTrainer:
 
         if flipping:
             for i in range(len(boardList)):
+                print boardList
                 addRule(boardList,flip(boardList[i],True,False))
+                print boardList
                 addRule(boardList,flip(boardList[i],False,True))
+                print boardList
                 addRule(boardList,flip(boardList[i],True,True))
+                print boardList
 
         if rowPermutation:
             for i in range(len(boardList)):
@@ -291,6 +340,8 @@ class TicTacToeTrainer:
                 for j in range(len(boardList[i])):
                     addRule(boardList,colPermute(boardList[i],j))
 
+        print boardList
+
         if rotation:
             for i in range(len(boardList)):
                 rotated = rotate(boardList[i])
@@ -298,34 +349,5 @@ class TicTacToeTrainer:
                 addRule(boardList,flip(boardList[i],True,True))
                 addRule(boardList,flip(rotated,True,True))
 
-        # define the function that will eventually process this rule
-        def newRule(board, player):
-            result = {'success':True,'loc':[]}
-            pushFlag = False
-            for ruleBoard in boardList:
-                width = len(ruleBoard)
-                height = len(ruleBoard[0])
-                for i in range(len(board)-width):
-                    for j in range(len(board[0])-height):
-                        for k in range(i,i+width):
-                            for l in range(j,j+height):
-                                tile = ruleBoard[k-i][l-j]
-                                if (tile == Type.P1 and board[k][l] != player):
-                                    result['success'] = False
-                                elif (tile == Type.P2 and board[k][l] != self.flip(player)):
-                                    result['success'] = False
-                                elif (tile == Type.EMPTY and board[k][l] != Type.EMPTY):
-                                    result['success'] = False
-                                elif (tile == Type.SELECTED and board[k][l] == Type.EMPTY):
-                                    result['loc'].append([k,l])
-                                    pushFlag = True
-                        if pushFlag and not result['success']:
-                            result['loc'].pop()
-                        pushFlag = False
-                        result['success'] = True
-            if len(result['loc']) == 0:
-                result['success'] = False
-            return result
-
-        # add the function to the trainer class
-        setattr(self, name, newRule)
+        print boardList.__repr__()
+        Strategy(name=name,code='',key_name=name,description=desc,game='tictactoe',boardList=boardList.__repr__()).put()

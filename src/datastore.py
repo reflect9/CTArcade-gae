@@ -32,7 +32,7 @@ class Strategy(db.Model):
     description = db.StringProperty() # tooltip
     game = db.StringProperty()
     public = db.BooleanProperty(default=True)  # built-in heuristic rules are public
-
+    boardList = db.StringProperty(default="") # this will only be set for created rules
 
 
 
@@ -105,8 +105,7 @@ def initSampleData():
     
     User(id='tak',password='tak',email='tak@umd.edu',score=0,key_name='tak').put()
     User(id='ben',password='ben',email='ben@umd.edu',score=0,key_name='ben').put()
-    User(id='aaa',password='aaa',email='aaa@umd.edu',score=0,key_name='aaa').put()
-    
+    User(id='aaa',password='aaa',email='aaa@umd.edu',score=0,key_name='aaa').put()    
       
     AI(user='tak',game='tictactoe',key_name='tak_tictactoe',data='{"data":["takeWin","takeBlockWin","takeAnySide","takeRandom"]}').put()
     AI(user='ben',game='tictactoe',key_name='ben_tictactoe',data='{"data":["takeWin","takeBlockWin","takeAnyCorner","takeCenter","takeRandom"]}').put()

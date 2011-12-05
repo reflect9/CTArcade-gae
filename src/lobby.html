@@ -16,7 +16,7 @@ Updates:
 	   var p1='{{user_id}}';
 	   var currentUser = "{{user_id}}";
 	   function playMatch(p1, p2) {
-	       location.href = self.location.href + "playMatch?p2="+p2;
+	       location.href = "playMatch?p2="+p2;
 	   }
 	   function challenge(opponent) {
 	       if (currentUser=="Guest") {
@@ -25,12 +25,27 @@ Updates:
 	       }
 	       playMatch(currentUser,opponent);
 	   }
-	   $(document).ready(function() {
-	      $(".header #header_button_lobby").addClass("currentMode");
-	   });
-	   
+	   function getTime(zone, success) {
+		var url = 'http://json-time.appspot.com/time.json?tz=' + zone,
+			ud = 'json' + (+new Date());
+
+		window[ud]= function(o){
+			success && success(o);
+		};
+		document.getElementsByTagName('head')[0].appendChild((function(){
+			var s = document.createElement('script');
+			s.type = 'text/javascript';
+			s.src = url + '&callback=' + ud;
+			return s;
+			})());
+		}
+		$(document).ready(function() {
+			$(".header #header_button_lobby").addClass("currentMode");
+		});
 	</script>
-	
+
+    
+
 </head>
 <body>	
 <!-- header -->
@@ -43,9 +58,14 @@ Updates:
 		<div class="wrapper clearfix">
 			<div class="innerHeader">
 				<div id='desc' style='margin-bottom:10px;'>
-					<div id='welcome'>Welcome to the lobby!<br />
+					<div id='welcome'>Welcome to the CTArcade lobby!<br />
+                    {% if user_id != "Guest"%}
                     You can review you rank and score against other players using CT Arcade.<br />
                     You can also select a player to challenge from the list below.<br />
+                    {% else %}
+					In order to use the lobby you must sign in as a registered user using the "Sign In" link.<br />
+                    Registering a user account is quick and easy, just click on the "Create New Account" link.<br />
+					{% endif %}
 				    <hr /></div>
 				</div>
 			</div>
@@ -86,9 +106,13 @@ Updates:
                 </div>
          	<div style="width:100%;clear:both;">
                 <hr />
+	
+
+<div id="javascript_countdown_time"></div>
+                
                 <p align="left" id="accessTrainer" style="padding-top:8px; cursor:pointer;">
-                {% if user_id != "Guest"%}
-                	<strong>Administration:</strong><br /><form action="/" method="post">
+                {% if user_id == "mattm401" or user_id == "tak" %}
+                	<strong>Administration:</strong><br /><form action="/lobby" method="post">
                 	<input type="submit" value="Run Server Tournament" />
                 	<input type="hidden" name="key" id="key" value="Test"/>
                 	</form>
@@ -100,6 +124,88 @@ Updates:
 		</div> <!--wrapper clearfix-->
 	</div>	<!--pageContent-->
 </div>		<!-- end of container-->
-</div
-></body>
+</div>
+<script type="application/javascript">
+var javascript_countdown = function () {
+	var time_left = 10; //number of seconds for countdown
+	var output_element_id = 'javascript_countdown_time';
+	var keep_counting = 1;
+	var target_hour = 0;
+ 
+	function countdown() {
+		if(time_left < 2) {
+			keep_counting = 0;
+		}
+ 
+		time_left = time_left - 1;
+	}
+ 
+	function add_leading_zero(n) {
+		if(n.toString().length < 2) {
+			return '0' + n;
+		} else {
+			return n;
+		}
+	}
+ 
+	function format_output() {
+		var hours, minutes, seconds, currentTime, target;
+		if (time_left > 0) {
+			seconds = time_left % 60;
+			minutes = Math.floor(time_left / 60) % 60;
+			hours = Math.floor(time_left / 3600);
+			seconds = add_leading_zero( seconds );
+			minutes = add_leading_zero( minutes );
+			hours = add_leading_zero( hours );	
+		} else {
+			target = target_hour + 24;
+			currentTime = new Date();
+			hours = add_leading_zero( target - currentTime.getHours() );
+			minutes = add_leading_zero( 59 -  currentTime.getMinutes() );
+			seconds = add_leading_zero( 59 - currentTime.getSeconds() );
+			
+		}
+ 
+		return '<br /><p align=\"center\"><strong>Time until next tournament: ' + hours + ':' + minutes + ':' + seconds + '</strong></p>';
+	}
+ 
+	function show_time_left() {
+		document.getElementById(output_element_id).innerHTML = format_output();//time_left;
+	}
+  
+	return {
+		count: function () {
+			countdown();
+			show_time_left();
+		},
+		timer: function () {
+			javascript_countdown.count();
+				setTimeout("javascript_countdown.timer();", 1000);
+		},
+
+		setTimeLeft: function (t) {
+			time_left = t;
+			if(keep_counting == 0) {
+				javascript_countdown.timer();
+			}
+		},
+		init: function (t, h, element_id) {
+			time_left = t;
+			target_hour = h;
+			output_element_id = element_id;
+			javascript_countdown.timer();
+		}
+	};
+}();
+ 
+getTime('EST', function(time){
+	var hours = time['hour'];
+	var minutes = time['minute'];
+	var seconds = time['second'];
+	var target_hour = 17;
+	var target = target_hour * 60 * 60;
+	javascript_countdown.init((target - (hours * 60 * 60  + minutes * 60  + seconds)), target_hour - 1, 'javascript_countdown_time');
+});
+</script>
+</body>
 </html>

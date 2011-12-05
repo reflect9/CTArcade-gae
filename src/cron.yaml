@@ -1,4 +1,4 @@
 cron:
 - description: Run Tournaments
   url: /worker
-  schedule: every 4 hours synchronized
+  schedule: every 1 hours from 22:00 to 22:00
