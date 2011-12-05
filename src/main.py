@@ -17,6 +17,7 @@ from google.appengine.api import taskqueue
 import urllib2
 from google.appengine.api import urlfetch
 
+
 class Intro(webapp.RequestHandler):
     def get(self):
         session = sessions.Session()
@@ -43,11 +44,15 @@ class Lobby(webapp.RequestHandler):
                 
         users = User.all()
         users.order('-score')
+		
+        champ = TournamentWinners.all()
+        champRet = champ.order('-timestamp')[0]
         
         template_values = {
             'users': users,
             'logged' : logged,
             'user_id': loggedID,
+            'champ' : champRet,
         }  # map of variables to be handed to html template
 
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')
@@ -365,6 +370,7 @@ class ScoreWorker(webapp.RequestHandler):
             updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",tournament_winner).get()
             updateUser.score += 10
             updateUser.put()
+            updateUserStatus = TournamentWinners(winner = tournament_winner).put()
         else:	     
             while len(score_entries) > 0:    
                 score_entry = score_entries.pop()

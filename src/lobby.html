@@ -75,7 +75,11 @@ Updates:
             <p><strong>Players</strong><br /><br />
             	{% for user in users %}
                   {% if user.id %}
-                    {{ user.id }}<br />
+                  	{% if user.id == champ.winner %}
+                     	{{ user.id }} &diams; <br />
+                   	{% else %}     
+                    	{{ user.id }}<br />
+					{% endif %}
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
@@ -127,7 +131,7 @@ Updates:
 </div>
 <script type="application/javascript">
 var javascript_countdown = function () {
-	var time_left = 10; //number of seconds for countdown
+	var time_left = 0; //number of seconds for countdown
 	var output_element_id = 'javascript_countdown_time';
 	var keep_counting = 1;
 	var target_hour = 0;

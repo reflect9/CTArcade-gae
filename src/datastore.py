@@ -2,8 +2,9 @@ from google.appengine.ext import db
 from django.utils import simplejson as json
 import sys, datetime, time
 
-class TournamentLog(db.Model):
-    message = db.StringProperty()
+class TournamentWinners(db.Model):
+    timestamp = db.DateTimeProperty(auto_now_add=True)
+    winner = db.StringProperty()
 
 class Game(db.Model):
     title = db.StringProperty()
