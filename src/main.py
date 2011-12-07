@@ -47,12 +47,15 @@ class Lobby(webapp.RequestHandler):
 		
         champ = TournamentWinners.all()
         champRet = champ.order('-timestamp')[0]
-        
+		
+        dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime) else None
+       
         template_values = {
             'users': users,
             'logged' : logged,
             'user_id': loggedID,
             'champ' : champRet,
+			'server_time': json.dumps(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), default=dthandler),
         }  # map of variables to be handed to html template
 
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')
