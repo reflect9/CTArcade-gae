@@ -15,10 +15,7 @@ Updates:
 	<script type="text/javascript">
 	   var p1='{{user_id}}';
 	   var currentUser = "{{user_id}}";
-	   var preformatServerTime = "{{server_time}}";
-	   var formatServerTime = preformatServerTime.replace("&quot;", "").replace("&quot;", "").replace("T", " ");
-
-	  // var returnedTimer = false;
+	   var returnedTimer = false;
 	   function playMatch(p1, p2) {
 	       location.href = "playMatch?p2="+p2;
 	   }
@@ -29,7 +26,7 @@ Updates:
 	       }
 	       playMatch(currentUser,opponent);
 	   }
-	 /*  function returnEmpty() {
+	   function returnEmpty() {
 		   if (returnedTimer == false){
 			var currentTime = new Date();
 			var hours = currentTime.getHours();
@@ -55,7 +52,7 @@ Updates:
 			s.src = url + '&callback=' + ud;
 			return s;
 			})());
-		}*/
+		}
 		$(document).ready(function() {
 			$(".header #header_button_lobby").addClass("currentMode");
 		});
@@ -220,15 +217,14 @@ var javascript_countdown = function () {
 }();
 
 
-/*getTime('EST', function(time){*/
-	var time = new Date(formatServerTime);
-	var hours = time.getHours();
-	var minutes = time.getMinutes();
-	var seconds = time.getSeconds();
+getTime('EST', function(time){
+	var hours = time['hour'];
+	var minutes = time['minute'];
+	var seconds = time['second'];
 	var target_hour = 17;
 	var target = target_hour * 60 * 60;
 	javascript_countdown.init((target - (hours * 60 * 60  + minutes * 60  + seconds)), target_hour - 1, 'javascript_countdown_time');
-//});
+});
 </script>
 </body>
 </html>
