@@ -17,6 +17,7 @@ from appengine_utilities import sessions
 from google.appengine.api import taskqueue
 import urllib2
 
+
 class Intro(webapp.RequestHandler):
     def get(self):
         session = sessions.Session()
@@ -43,11 +44,18 @@ class Lobby(webapp.RequestHandler):
                 
         users = User.all()
         users.order('-score')
-        
+		
+        champ = TournamentWinners.all()
+        champRet = champ.order('-timestamp')[0]
+		
+        dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime) else None
+       
         template_values = {
             'users': users,
             'logged' : logged,
             'user_id': loggedID,
+            'champ' : champRet,
+			'server_time': json.dumps(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), default=dthandler),
         }  # map of variables to be handed to html template
 
         path = os.path.join(os.path.dirname(__file__), 'lobby.html')
@@ -278,7 +286,7 @@ class CounterWorker(webapp.RequestHandler):
         #log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
         #log.put()
         print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
-        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=200)
+        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=180)
     def get(self): # should run at most 1/s
         #log = TournamentLog(message = "Tournament Start")
         print >>sys.stderr, "Tournament Start"
@@ -291,7 +299,7 @@ class CounterWorker(webapp.RequestHandler):
         #log = TournamentLog(message = str(("Loaded:", len(tournament_entries))))
         #log.put()
         print >>sys.stderr, str(("Loaded:", len(tournament_entries)))
-        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=200)
+        taskqueue.add(url='/round', params={'tournament_entries': json.dumps(tournament_entries)}, countdown=180)
 		
         
 class RoundWorker(webapp.RequestHandler):
@@ -335,7 +343,7 @@ class RoundWorker(webapp.RequestHandler):
                 #log.put()
             # Determine if another round is necessary or if winner can be declared
             print >>sys.stderr, "Exiting"    
-            taskqueue.add(url='/score', params={'tournament_entries': json.dumps(round_winners), 'by': by}, countdown=200)
+            taskqueue.add(url='/score', params={'tournament_entries': json.dumps(round_winners), 'by': by}, countdown=180)
 
         except:
             self.response.clear()
@@ -356,6 +364,7 @@ class ScoreWorker(webapp.RequestHandler):
             updateUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",tournament_winner).get()
             updateUser.score += 10
             updateUser.put()
+            updateUserStatus = TournamentWinners(winner = tournament_winner).put()
         else:	     
             while len(score_entries) > 0:    
                 score_entry = score_entries.pop()
@@ -365,7 +374,7 @@ class ScoreWorker(webapp.RequestHandler):
             if self.request.get('by') != "None":
                 next_round.append(self.request.get('by'))
             if len(next_round) >= 2:     
-                taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=200)
+                taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=180)
 def main():
     application = webapp.WSGIApplication([('/', Intro),
                                           ('/init', Init),

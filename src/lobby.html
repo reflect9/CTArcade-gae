@@ -15,6 +15,7 @@ Updates:
 	<script type="text/javascript">
 	   var p1='{{user_id}}';
 	   var currentUser = "{{user_id}}";
+	   var returnedTimer = false;
 	   function playMatch(p1, p2) {
 	       location.href = "playMatch?p2="+p2;
 	   }
@@ -25,12 +26,25 @@ Updates:
 	       }
 	       playMatch(currentUser,opponent);
 	   }
+	   function returnEmpty() {
+		   if (returnedTimer == false){
+			var currentTime = new Date();
+			var hours = currentTime.getHours();
+			var minutes = currentTime.getMinutes();
+			var seconds = currentTime.getSeconds();
+			var target_hour = 17;
+			var target = target_hour * 60 * 60;
+			javascript_countdown.init((target - (hours * 60 * 60  + minutes * 60  + seconds)), target_hour - 1, 'javascript_countdown_time');
+		   }
+	   }
 	   function getTime(zone, success) {
+		setTimeout(returnEmpty, 4000);
 		var url = 'http://json-time.appspot.com/time.json?tz=' + zone,
 			ud = 'json' + (+new Date());
 
 		window[ud]= function(o){
 			success && success(o);
+			returnedTimer = true;
 		};
 		document.getElementsByTagName('head')[0].appendChild((function(){
 			var s = document.createElement('script');
@@ -75,7 +89,11 @@ Updates:
             <p><strong>Players</strong><br /><br />
             	{% for user in users %}
                   {% if user.id %}
-                    {{ user.id }}<br />
+                  	{% if user.id == champ.winner %}
+                     	{{ user.id }} &diams; <br />
+                   	{% else %}     
+                    	{{ user.id }}<br />
+					{% endif %}
                   {% else %}
             		<!--- Do Nothing --->
                   {% endif %}
@@ -127,7 +145,7 @@ Updates:
 </div>
 <script type="application/javascript">
 var javascript_countdown = function () {
-	var time_left = 10; //number of seconds for countdown
+	var time_left = 0; //number of seconds for countdown
 	var output_element_id = 'javascript_countdown_time';
 	var keep_counting = 1;
 	var target_hour = 0;
@@ -197,7 +215,8 @@ var javascript_countdown = function () {
 		}
 	};
 }();
- 
+
+
 getTime('EST', function(time){
 	var hours = time['hour'];
 	var minutes = time['minute'];
