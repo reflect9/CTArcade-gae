@@ -16,21 +16,6 @@ oct13 2011, by Tak
 
 
 function TicTacToeTrainer() {		
-	
-
-
-//  NOW ALL THE RULES ARE STORED ON THE SERVER
-//	this.strategySet = [
-//						{'name':"Win",'code':"takeWin",'tooltip':'Take a cell completing three of my stones in a row/column/diagonal','enabled':true},
-//						{'name':"Block Win",'code':"takeBlockWin",'tooltip':"Take a cell of the opponent's winning position", 'enabled':false},
-//						{'name':"Take Center",'code':"takeCenter",'tooltip':"Take the center cell",'enabled':false},
-//						{'name':"Take Any Corner",'code':"takeAnyCorner",'tooltip':"Take any corner",'enabled':false},
-//						{'name':"Take Any Side",'code':"takeAnySide",'tooltip':"Take any non-corner cells on the side.",'enabled':false},
-//						{'name':"Random Move",'code':"takeRandom",'tooltip':"Take any empty cell.",'enabled':true},
-//						{'name':"Take OppositeCorner",'code':"takeOppositeCorner",'tooltip':"Take a corner cell if its opposite corner is occupied by another player",'enabled':false}
-//					];
-
-
 	/* BASIC FUNCTIONS */
     this.createEmptyBoard = function (col, row) {
         var b = new Array();
@@ -43,12 +28,10 @@ function TicTacToeTrainer() {
         }
         return b;
     }
-    
-	this.flip = function(player) {
+	this.flipTurn = function(player) {
 		if (player==this.p1) return this.p2
 		else return this.p1
 	}
-	
 	this.cloneBoard = function(b) {
 		var nb = this.createEmptyBoard(this.width,this.height);
 		for(var i=0;i<this.width;i++) {
@@ -58,9 +41,8 @@ function TicTacToeTrainer() {
 		}
 		return nb;
 	}
-	
     this.restart = function() {
-        this.firstTurn = this.flip(this.firstTurn);
+        this.firstTurn = this.flipTurn(this.firstTurn);
     	this.turn = this.firstTurn;
         this.board = this.createEmptyBoard(this.width, this.height);
         this.history = [];
@@ -70,7 +52,6 @@ function TicTacToeTrainer() {
         });
         this.started=false;
     }
-
 //  AS THE SERVER HAS ALL THE RULE OF THE USER, trainer doesn't update all the strategies at once,
 //	this.updateRule = function() {
 //		// 
@@ -87,21 +68,18 @@ function TicTacToeTrainer() {
 // 			}	
 // 		);
 // 	}
- 
- 	this.resumeAt = function(step) {
+ 	this.resumeFromHistoryMode = function(step) {
  		if (step>=this.history.length-1) {
  			alert('history out of bound');	
  		} else {
  			resumePoint = this.history[step];
  			this.board = resumePoint['board'];
- 			this.turn = this.flip(resumePoint['turn']); // turn of each history is the one who made the previous move. 
+ 			this.turn = this.flipTurn(resumePoint['turn']); // turn of each history is the one who made the previous move. 
  			this.history = this.history.slice(0,step); // cut history after the resume point
  		}
  	}
-	
  	// move function applies to both user and AI's move - it updates board data and history
     this.move = function(i, j, t) {
-    
         if (this.turn != t) {
         	console.log("player turn doesn't match!" + t + "!=" + this.turn);	
         	return;
@@ -112,17 +90,16 @@ function TicTacToeTrainer() {
         }
        	if (this.started==false)   this.started = true;
         if (this.p1==this.turn) {
-        	this.board[i][j]='p1';
+        	this.board[i][j]=this.p1;
         } else {
-        	this.board[i][j]='p2';
+        	this.board[i][j]=this.p2;
         }
         this.history.push({'board':this.cloneBoard(this.board), 'loc':[i,j], 'turn':t});
-        this.turn = this.flip(this.turn);
+        this.turn = this.flipTurn(this.turn);
         return this.board[i][j];
     }
 
     // FUNCTIONS FOR CHECKING CURRENT BOARD STATE //
-    
     this.isFull = function() {
         for (var i = 0; i < 3; i++)
 			for (var j =0; j<3;j++)
@@ -135,26 +112,21 @@ function TicTacToeTrainer() {
         	return this.board[x][0];
         else return false;
     }
-    
     this.checkRow = function(y) {
         if (this.board[0][y] == this.board[1][y] && (this.board[0][y] == this.board[2][y]) && (this.board[0][y] != 0))
         	return this.board[0][y];
         else return false;
     }
-    
     this.checkDiag1 = function()  {
         if (this.board[0][0] != 0 && this.board[0][0] == this.board[1][1] && this.board[0][0] == this.board[2][2]) 
         	return this.board[0][0];
-        else return false;
-        
+        else return false; 
     }
-    
     this.checkDiag2 = function() {
         if (this.board[2][0] != 0 && this.board[1][1] == this.board[2][0] && this.board[0][2] == this.board[2][0]) 
         	return this.board[2][0];
         else return false;
     }
-    
     this.checkForWinner = function() {
         /* Check the top row */
         var result = false;
@@ -174,9 +146,6 @@ function TicTacToeTrainer() {
             return result;
         return false;
     }
-    
-    
-    
 //	this.analyzeMove = function(brd,player,userMoveLoc) {
 //		// to check which strategies are matching with given brd,turn,loc
 // 		// query the server.  The response is a list of strategies.
@@ -223,7 +192,7 @@ function TicTacToeTrainer() {
     		}
     	});
     }
-    this.getPublicStrategyDict = function(callBack) {
+    this.getPublicStrategyDict = function(callBack) {	// list of all possible public rules
     	$.ajax({
     		type : "GET",
     		url: '/ajaxTrainer',
@@ -275,27 +244,13 @@ function TicTacToeTrainer() {
  	 					loc: JSON.stringify(userMoveLoc)
  	 				},
  	 		success: function(response) {
-// 	 				alert(response);
  	 				callBack(response);	
- 	 		
-//					cons.clear();
-//					cons.appendMessage("Is your last move based on one of these rules?")
-//					$(matchingRules).each( function(i,rule) {
-//						alreadyKnown = game.checkStrategyEnabled(rule['code']);
-//						$('<div></div>',{
-//							id : 'mR_'+rule['code'],
-//							style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
-//						})	.text(rule['name'])
-//							.click(function() { enableStrategy(rule['code']);})
-//							.appendTo($(cons.target));
-//					});
-//					cons.appendButton("CONTINUE","$(this).hide(); computerMove()");
  	 		}
 		});
 	}  
 	
 	// it just tells server to add a rule(by code) to user's AI's strategy
-    this.enableStrategy = function(userName,code) {
+    this.enableStrategy = function(userName,key) {
     	$.ajax({
     		type : "GET",
     		url: "/ajaxTrainer",
@@ -304,16 +259,14 @@ function TicTacToeTrainer() {
     		data: 	{ 	action: 'enableStrategy',
     					player: userName,
     					game: this.gameTitle,
-    					strategyToEnable : code
+    					strategyToEnable : key
     				},
     		success: function(response) {
 //    					alert(response);
     					if (response=='True') {
-//    						alert(code);
-//    						alert($(cons.target).find("#mR_"+code).html());
-    						$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#955;'> I learned this new rule!</span>");
+    						$(cons.target).find("#mR_"+key).append("<span style='font-size:12px; color:#955;'> I learned this new rule!</span>");
     					} else if(response=='False') {
-    						$(cons.target).find("#mR_"+code).append("<span style='font-size:12px; color:#595;'> Thanks! But I knew it already.</span>");
+    						$(cons.target).find("#mR_"+key).append("<span style='font-size:12px; color:#595;'> Thanks! But I knew it already.</span>");
     					}
     				}
     	
@@ -331,23 +284,20 @@ function TicTacToeTrainer() {
     					game: this.gameTitle,
     					newStrategy : JSON.stringify(nameList)
     				},
-//    		success: function(response) {
-//    					alert(response);
-//    					return JSON.parse(response);
-//    				}
     	});
     }
-	
-    this.assignStrategy = function(data) {
-//    	alert(data);
+    // callback functions for ajax calls
+    this.setStrategy = function(data) {
     	this.strategy = JSON.parse(data);
-//    	alert(this.strategy);
+    	this.strategyKeyList = [];
+    	for (i in this.strategy)
+    		this.strategyKeyList.push(this.strategy[i].key);
+
     }
-    this.assignStrategyDict = function(data) {
-//    	alert(data);
+    this.setPublicStrategyDict = function(data) {
     	this.publicStrategyDict = JSON.parse(data);
     }
-	
+    //
 	this.makeNewStrategy = function(board, turn, ruleBoard, name, desc,
 									translationInvariant, flipping, rowPermutation,
 									columnPermutation,rotation){
@@ -363,7 +313,7 @@ function TicTacToeTrainer() {
  	 					game: this.gameTitle,
  	 					board: JSON.stringify(board),
 						ruleBoard : JSON.stringify(ruleBoard),
-						name : name,
+						title : name,
 						desc : desc,
 						translationInvariant : translationInvariant,
 						flipping : flipping,
@@ -373,30 +323,29 @@ function TicTacToeTrainer() {
 					}
 		});
 	}
-    
-    
-	this.init = function(user) {
-		this.user = user;
-		this.firstTurn = user;
+	this.init = function(p1,p2) {
+		this.user = p1;
+		this.firstTurn = p1;
 		this.gameTitle = 'tictactoe';
-		this.p1 = user;
-		this.p2 = user + "'s AI";
+		this.p1 = p1;
+		this.p2 = p2;
 		this.width=3; 
 		this.height=3;  
 		var started; 	// true when playing game is on
 		
 		this.publicStrategyDict = {};  // list of code -> other information of all the public codes for the game
-		this.strategy = [];  // list of strategy codes that this user's AI knows
+		this.strategy = [];  // list of rules that this user's AI knows
+		this.strategyKeyList = [];  // list of keys only
 		this.history = [];	// pop in/out current board state for undo/redo moves
 	
 		this.turn = this.p1;
 		this.started = true;    
 		this.board = this.createEmptyBoard(this.width, this.height);	
-//		alert(this);
-//		alert(this.flip(this.turn));
 		this.history.push({'board':this.cloneBoard(this.board), 'loc':undefined, 'turn':undefined});
-        this.getStrategy(this.user, $.proxy(this.assignStrategy,this)); // $.proxy(function,scope) : will force the function to run within the scope 
-        this.getPublicStrategyDict($.proxy(this.assignStrategyDict,this));
+        this.getStrategy(this.user, $.proxy(this.setStrategy,this)); // $.proxy(function,scope) : will force the function to run within the scope 
+        this.getPublicStrategyDict($.proxy(this.setPublicStrategyDict,this));
 	}
-    
-}
+
+
+	
+} // end of TicTacToeTrainer

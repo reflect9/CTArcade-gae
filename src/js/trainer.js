@@ -10,7 +10,10 @@ function updateBoard(board) {  // update current board presentation
 		for(var y=0;y<game.height;y++) {
 			$("#t"+x+""+y).removeClass('tile_p1');
 			$("#t"+x+""+y).removeClass('tile_p2');
-			$("#t"+x+""+y).addClass('tile_'+board[x][y]);
+			if(board[x][y]==game.p1)
+				$("#t"+x+""+y).addClass('tile_p1');
+			else if(board[x][y]==game.p2)
+				$("#t"+x+""+y).addClass('tile_p2');
 		}
 	}
 }
@@ -22,7 +25,7 @@ function checkWinner() {
 	if (winner) {
 //		$("#status").text(winner + " wins!");
 //		$("#status").css('background-color', 'yellow');
-		if(winner=='p1') cons.appendHTML("<div style='font-size:17px; margin:10px;'>"+game.p1 + " wins!</div>");
+		if(winner==game.p1) cons.appendHTML("<div style='font-size:17px; margin:10px;'>"+game.p1 + " wins!</div>");
 		else cons.appendHTML("<div style='font-size:17px; margin:10px;'>"+game.p2 + " wins!</div>");
 		needReset = true;
 	} else {
@@ -40,40 +43,32 @@ function computerMove(response) {
 		$(this).attr('id','');	// when there's an existing list of rules already, delete their id to prevent conflicts with new list.
 	});
 	var html = "<div>For my last move I tried all my strategies,</div><ul id='sortable'>";
-	var strategy = JSON.parse(response);
-	var nextMove;
-	for(i in strategy) {
-		result = strategy[i].result;
-		if (result.success) {
-			nextMove=strategy[i];	// nextMove : the top-priority successful rule which will be executed. 
-			break;
-		}
-	}
-	for(i in strategy) {
-		code = strategy[i].st;
-		strt = game.publicStrategyDict[code];  
-		name = code;
-		html = html+"<li class='ui-state-default'><div style='margin:10px 0 0 10px; ' id='ai_"+code+"' class='ai_"+ code +" rule_inactive rule'>"+ name +"</div></li>";
+	var responseDict = JSON.parse(response);
+	game.strategy = responseDict.userRules;
+	var bestRuleFound = responseDict.rule;
+	showUserAI(game.strategy,"userInfo");
+	for(i in game.strategy) {
+		html = html+"<li class='ui-state-default'><div style='margin:10px 0 0 10px; ' id='ai_"+game.strategy[i].key+"' class='ai_"+ game.strategy[i].key +" rule_inactive rule'>"+ game.strategy[i].title +"</div></li>";
 	}
 	html = html+"</ul>";
 	cons.appendHTML(html);
-	for(i in strategy) {
-		stCode = strategy[i].st;
-		if (nextMove!=undefined && nextMove.st==strategy[i].st) {	// for the best strategy, color it in red
-			console.log("found it!"+stCode);
+	for(i in game.strategy) {
+		stKey = game.strategy[i].key;
+		if (bestRuleFound!=undefined && bestRuleFound.key==stKey) {	// for the best strategy, color it in red
+			console.log("found it!"+game.strategy[i].title);
 			var currentMove = cons.getLast(); 
-			$(".ai_"+stCode).removeClass('rule_inactive');
-			$(".ai_"+stCode).removeClass('rule_unapplicable');
-			$(".ai_"+stCode).addClass('rule_selected');
-			$(".ai_"+stCode).append("<span style='color:gray; font-size:13px;'> was the first applicable rule.</span>");
+			$(".ai_"+stKey).removeClass('rule_inactive');
+			$(".ai_"+stKey).removeClass('rule_unapplicable');
+			$(".ai_"+stKey).addClass('rule_selected');
+			$(".ai_"+stKey).append("<span style='color:gray; font-size:13px;'> was the first applicable rule.</span>");
 			break;
 		} else {   // for non-feasible (but top-priority) strategies
 			var currentMove = cons.getLast(); 
-			console.log("cannot find it!"+ stCode);  
-			$(".ai_"+stCode).removeClass('rule_inactive');
-			$(".ai_"+stCode).addClass('rule_unapplicable');
-			$(".ai_"+stCode).removeClass('rule_selected');
-			$(".ai_"+stCode).append("<span style='color:gray; font-size:13px;'> was not applicable.</span>");
+			console.log("cannot find it!"+ game.strategy[i].title);  
+			$(".ai_"+stKey).removeClass('rule_inactive');
+			$(".ai_"+stKey).addClass('rule_unapplicable');
+			$(".ai_"+stKey).removeClass('rule_selected');
+			$(".ai_"+stKey).append("<span style='color:gray; font-size:13px;'> was not applicable.</span>");
 		}
 	}
 	$("#sortable").sortable({
@@ -82,20 +77,20 @@ function computerMove(response) {
 		}
 	});
 	$("#sortable").disableSelection();
-	if (strategy.message=="Tie Game") {
+	if (responseDict.message=="Tie Game") {
 //		$("#status").text(strategy.message);
 		html = "<div style='line-height:2em;'>Tie game! Click 'new game' button to start over.</div>"
 		cons.appendHTML(html);
-	} else if (strategy.message=="no strategy found") {
+	} else if (responseDict.message=="no strategy found") {
 //		$("#status").text(strategy.message);
 		html = "<div style='line-height:2em;'>No strategy seems to match the situation.</div>"
 		cons.appendHTML(html);
 	} else {
-		$("#rule").text(strategy.message);
+		$("#rule").text(responseDict.message);
 		html = "<div style='line-height:1.2em;margin-top:10px;'>Your turn now. Click an empty cell to continue.</div>"
 		cons.appendHTML(html);
 		// now it selects one from all the moves of the best strategy
-		selectedLoc = nextMove.result.loc[Math.floor(Math.random()*nextMove.result.loc.length)]; // randomly select one location from list
+		selectedLoc = responseDict.locList[Math.floor(Math.random()*responseDict.locList.length)]; // randomly select one location from list
 		game.move(selectedLoc[0], selectedLoc[1], game.turn); // update board ds with current game.turn and return new value of the cell
 		$("#currentStep").text(game.history.length-1);
 		updateBoard(game.board);
@@ -139,11 +134,11 @@ function history(direction) {
 function teachAI(board,turn,loc) {   // this teaching method is being used in history mode only. 
 	var x = loc[1];
 	var y = loc[2];
-	flippedTurn = (turn == 'p1') ? 'p2' : 'p1';
+	flippedTurn = (turn == game.p1) ? game.p2 : game.p1;
 	game.findMatchingStrategy(board,flippedTurn,[x,y],showTeachingStrategy);
 }
 function resumeGame(currentStep) {	// history mode -> play mode
-	game.resumeAt(currentStep);
+	game.resumeFromHistoryMode(currentStep);
 	historyMode('off');
 	$(".tile").click( function() {
 		callUserMove($(this).attr('id'));
@@ -161,13 +156,13 @@ function showTeachingStrategy(response) {   // teaching method in history mode
 			.click(function() { game.enableStrategy(game.user,rule['code']);})
 			.appendTo($(cons.target));
 	});
-	$('<div></div>',{
-		id : 'mR_createYourOwn',
-		class : 'mR',
-		style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
-	})	.text("Create Your Own")
-		.click(function() {startGuidedCreationInterface(tempBoard['board']);})
-		.appendTo($(cons.target));
+//	$('<div></div>',{
+//		id : 'mR_createYourOwn',
+//		class : 'mR',
+//		style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
+//	})	.text("Create Your Own")
+//		.click(function() {startGuidedCreationInterface(tempBoard['board']);})
+//		.appendTo($(cons.target));
 }
 function historyMode(flag) {
 	if(flag=='on') {
@@ -220,46 +215,45 @@ function clearBoard() {
 	}
 	
 }	
-function showUserAI(userID, targetDIV) {
+function showUserAI(userAI,targetDIV) {
 	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
 	else var t = targetDIV;
-	$.get('ajaxCall',{action:'getUserAI', userID:userID}, function(data){
-		var res= JSON.parse(data);  var userAI = res.result;
-		//  show the player's strategy
-		$(t).append("<h2 style='float:left;'>"+userID+"'s AI</h2><div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
-		var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
-		$.each(userAI, function(i,strategy) {
-			$(aiDIV).find("#p1_ai").append("<li class='ai_item'>"+strategy+"</li>");
-		});
-		$("#p1_ai").sortable({	// update user's strategy after changing order. 
-			update : function(event, ui) {
-				var codeList = [];
-				$("#p1_ai li").each(function(i,e) {
-					var code = $(e).text();
-					codeList.push(code);
-				});
-		    	$.ajax({
-		    		type : "GET",
-		    		url: "/ajaxTrainer",
-		    		async: true,
-		    		data: 	{ 	action: 'changeOrder',
-		    					player: userID,
-		    					game: 'tictactoe',
-		    					newStrategy : JSON.stringify(codeList)
-		    				},
-		    		success: function(response) {
-		    			// run what after updating rule? 
-		    		}
-		    	});
-			}
-		});
-		$("#p1_ai").disableSelection();
-		$("#instruction_reorder").hide();
-		$("#p1_ai").mouseover(function() { $("#instruction_reorder").show(); });
-		$("#p1_ai").mouseout(function() { $("#instruction_reorder").hide(); });
-		$(t).append("<div id='createRuleButton' class='btn green clearfix' style='float:right;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Create New Rule</div>")
-		$(t).append("<div style='clear:both;'></div>");
+	$(t).empty();
+	//  show the player's strategy
+	$(t).append("<h2 style='float:left;'>"+p1+"'s AI</h2><div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
+	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+	$.each(userAI, function(i,rule) {
+		$(aiDIV).find("#p1_ai").append("<li class='ai_item' key='"+rule.key+"'>"+rule.title+"</li>");
 	});
+	$("#p1_ai").sortable({	// update user's strategy after changing order. 
+		update : function(event, ui) {
+			var keyList = [];
+			$("#p1_ai li").each(function(i,e) {
+				var key = $(e).attr('key');
+				keyList.push(key);
+			});
+	    	$.ajax({
+	    		type : "GET",
+	    		url: "/ajaxTrainer",
+	    		async: true,
+	    		data: 	{ 	action: 'changeOrder',
+	    					player: game.p1,
+	    					game: 'tictactoe',
+	    					newStrategy : JSON.stringify(keyList)
+	    				},
+	    		success: function(response) {
+	    			// run what after updating rule? 
+	    		}
+	    	});
+		}
+	});
+	$("#p1_ai").disableSelection();
+	$("#instruction_reorder").hide();
+	$("#p1_ai").mouseover(function() { $("#instruction_reorder").show(); });
+	$("#p1_ai").mouseout(function() { $("#instruction_reorder").hide(); });
+	$(t).append("<div id='createRuleButton' class='btn green clearfix' style='float:right;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Create New Rule</div>")
+	$(t).append("<div style='clear:both;'></div>");
+
 }
 function callUserMove(dd) {
 	if (needReset) {	// when baord is full or game already ended, needReset is true
@@ -278,22 +272,23 @@ function showMatchingStrategy(response) {
 	cons.appendMessage("Is your last move based on one of these rules?")
 	$(matchingRules).each( function(i,rule) {
 		var r = $('<div></div>',{
-			id : 'mR_'+rule['code'],
+			id : 'mR_'+rule['key'],
+			key : rule['key'],
 			class : 'mR',
 			style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
-		})	.text(rule['name'])
-			.click(function() { game.enableStrategy(game.user,rule['code']);
+		})	.text(rule['title'])
+			.click(function() { game.enableStrategy(game.user,rule['key']);
 								$(".mR").unbind().css('cursor','default').css('color','#aaa');
 			}).appendTo($(cons.target));
-		if ($.inArray(rule['code'],game.strategy)==-1) {$(r).append("<span style='font-size:13px;' title='your AI does not know this rule.'> <b>[?]</b></span>");} else {$(r).append("<span style='font-size:13px;' title='your AI knows this rule.'> <b>[!]</b></span>");}
+		if ($.inArray(rule['key'],game.strategyKeyList)==-1) {$(r).append("<span style='font-size:13px;' title='your AI does not know this rule.' class='icon_question'>&nbsp;</span>");} else {$(r).append("<span style='font-size:13px;' title='your AI knows this rule.' class='icon_checkSmall'>&nbsp;</span>");}
 	});
-	var c = $('<div></div>',{
-		id : 'mR_createYourOwn',
-		class : 'mR',
-		style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
-	})	.text("Create Your Own")
-		.click(function() {startCreationInterface(game.cloneBoard(game.board));})
-		.appendTo($(cons.target));
+//	var c = $('<div></div>',{
+//		id : 'mR_createYourOwn',
+//		class : 'mR',
+//		style : 'margin: 7px 5px 7px 25px; font-size:1.3em; cursor:pointer;'
+//	})	.text("Create Your Own")
+//		.click(function() {startCreationInterface(game.cloneBoard(game.board));})
+//		.appendTo($(cons.target));
 	cons.appendButton("CONTINUE","$(this).hide(); game.findBestStrategy(game.board,game.turn,computerMove);");
 }
 
@@ -310,9 +305,9 @@ function userMove(x,y) {
 $(document).ready(function () {
 	$(".header #header_button_trainer").addClass("currentMode");
 	$.ajaxSetup({ cache: false });
-	showUserAI(p1, "userInfo");
 	game = new TicTacToeTrainer();
-	game.init(p1);
+	game.init(p1,p2);
+	showUserAI(game.strategy,"userInfo");	// using user's rule JSON object, show user's AI in userInfo div
 	cons = new Console();
 	cons.init("#console > .message"); // initialize console object
 	currentTurn = game.turn;

@@ -8,14 +8,14 @@ from google.appengine.ext.webapp import util
 from datastore import *
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
-from django.utils import simplejson as json
+import json
 import pprint, os, sys, re
-from TicTacToeMatch import TicTacToeMatch
-from TicTacToeTrainer import TicTacToeTrainer
+#from TicTacToeMatch import TicTacToeMatch
+#from TicTacToeTrainer import TicTacToeTrainer
+import TicTacToe
 from appengine_utilities import sessions
 from google.appengine.api import taskqueue
 import urllib2
-from google.appengine.api import urlfetch
 
 class Intro(webapp.RequestHandler):
     def get(self):
@@ -191,21 +191,22 @@ class AjaxCall(webapp.RequestHandler):
             user_AI = getUserStrategy(self.request.get('userID'),'tictactoe')
             self.response.out.write('{"result":'+json.dumps(user_AI)+'}')
         if action== 'runMatch':
-            matches = []
-            p1 = self.request.get('p1')
-            p2 = self.request.get('p2')
-            firstTurn = p1
-            for i in range(0,30):
-                if i<15:    firstTurn = p1
-                else:       firstTurn = p2
-                match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=firstTurn)
-                matches.append(match.run())
-            p1_AI = getUserStrategy(self.request.get('p1'),'tictactoe')
-            p2_AI = getUserStrategy(self.request.get('p2'),'tictactoe') 
-            result = {}
-            result['players'] = {"p1":p1, "p2":p2}
-            result['AI'] = {p1:p1_AI, p2:p2_AI}
-            result['matches'] = matches 
+            result = TicTacToe.runMatches(self.request.get('p1'), self.request.get('p2'), 30)
+#            matches = []
+#            p1 = self.request.get('p1')
+#            p2 = self.request.get('p2')
+#            firstTurn = p1
+#            for i in range(0,30):
+#                if i<15:    firstTurn = p1
+#                else:       firstTurn = p2
+#                match = TicTacToeMatch(p1=self.request.get('p1'),p2=self.request.get('p2'),game='tictactoe',turn=firstTurn)
+#                matches.append(match.run())
+#            p1_AI = getUserStrategy(self.request.get('p1'),'tictactoe')
+#            p2_AI = getUserStrategy(self.request.get('p2'),'tictactoe') 
+#            result = {}
+#            result['players'] = {"p1":p1, "p2":p2}
+#            result['AI'] = {p1:p1_AI, p2:p2_AI}
+#            result['matches'] = matches 
             self.response.out.write('{"result":'+json.dumps(result)+'}')
 
 
@@ -213,48 +214,45 @@ class AjaxTrainer(webapp.RequestHandler):
     def get(self):
         action  = self.request.get('action')
         if action == 'getStrategy':
-            self.response.out.write(json.dumps(getUserStrategy(self.request.get('player'),self.request.get('game'))))
+            self.response.out.write(json.dumps(getUserRuleDict(self.request.get('player'),self.request.get('game'))))
         elif action == 'getPublicStrategyDict':
-            dict = getPublicStrategyDict(self.request.get('game'))
+            dict = getBuiltInRuleDict(self.request.get('game'))
             self.response.out.write(json.dumps(dict))
         elif action == 'findBestStrategy':
-            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
-            result = trainer.findBestStrategy()
+            result = TicTacToe.findBestStrategy(json.loads(self.request.get('board')), self.request.get('turn'))
             self.response.out.write(json.dumps(result)) 
         elif action == 'findMatchingStrategy':
-            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
-            result = trainer.findMatchingStrategy(json.loads(self.request.get('loc')))
+            result = TicTacToe.findMatchingStrategy(json.loads(self.request.get('board')), self.request.get('turn'), self.request.get('loc'))  
             self.response.out.write(json.dumps(result))
         elif action == 'enableStrategy':
-            # append an existing strategy to the user's AI data 
-            codeList = getUserStrategy(self.request.get('player'),self.request.get('game'))
-            if self.request.get('strategyToEnable') not in codeList:
-                codeList.append(self.request.get('strategyToEnable'))
-                setUserStrategy(self.request.get('player'),self.request.get('game'),codeList)
-                self.response.out.write('True')
-            else:
-                self.response.out.write('False')
+            # append a builtIn strategy to the user's AI data 
+            result = TicTacToe.activateBuiltInRule(self.request.get('player'), self.request.get('strategyToEnable'))
+            self.response.out.write(str(result))
         elif action == 'makeNewStrategy':
-            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
+#            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
             # parse the list
             ruleBoard = eval(self.request.get('ruleBoard'))
-            trainer.makeNewStrategy(ruleBoard, self.request.get('name'), self.request.get('desc'), self.request.get('translationInvariant'), self.request.get('flipping'), self.request.get('rowPermutation'), self.request.get('columnPermutation'), self.request.get('rotation'))
+            addedRule = TicTacToe.addCustomRule(ruleBoard, self.request.get('title'), self.request.get('desc'), self.request.get('user'), self.request.get('translationInvariant'), self.request.get('flipping'), self.request.get('rowPermutation'), self.request.get('columnPermutation'), self.request.get('rotation'))
             # have a fail response if the name is already in use
             #   self.response.out.write('failure') -- name already taken
             #   return
             # Otherwise, go ahead and enable the strategy
-            codeList = getUserStrategy(self.request.get('user'),self.request.get('game'))
-            print codeList
-            codeList.append(self.request.get('name'))
-            setUserStrategy(self.request.get('user'),self.request.get('game'),codeList)
-            self.response.out.write('success')
+            userAI = getAI(self.request.get('user'),'tictactoe')
+#            ruleList = getUserRule(self.request.get('user'),self.request.get('game'))
+#            print codeList
+#            ruleList.append(self.request.get('name'))
+            result = userAI.addRule(addedRule)
+#            setUserStrategy(self.request.get('user'),self.request.get('game'),codeList)
+            self.response.out.write(result) # True or False
         elif action == 'changeOrder':
             # change the user's AI's data which is JSON string of an array that contains 
             # codes of strategies
             user_id = self.request.get('player')
             game_title = self.request.get('game')
-            data = json.loads(self.request.get('newStrategy'))
-            setUserStrategy(user_id,game_title,data)
+            keyStringList = json.loads(self.request.get('newStrategy'))
+            userAI = getAI(user_id,game_title)
+            self.response.out.write(userAI.updateByKeyStringList(keyStringList))
+#            setUserStrategy(user_id,game_title,data)
 #            self.response.out.write('updated Rule is '+getUserStrategy(user_id,game_title))
         elif action == 'a':
             self.response.out.write("hi")
@@ -268,12 +266,6 @@ class AjaxTrainer(webapp.RequestHandler):
             self.response.out.write("unrecognized action: "+action)
             # ignore this
             pass                               
-                                          
-
-class ReviewMatch(webapp.RequestHandler):
-    def get(self):
-        self.response.out.write('Hello world!')
-
 class CounterWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
         #log = TournamentLog(message = "Tournament Start")
@@ -322,7 +314,7 @@ class RoundWorker(webapp.RequestHandler):
                 print >>sys.stderr,"Pop"
                 player2 = round_entries.pop()
                 print >>sys.stderr,"Pop"
-                match = TicTacToeMatch(player1,player2,game='tictactoe',turn=player1)
+                match = TicTacToe.runMatch(player1,player2,player1)
                 result = match.run()
                 print >>sys.stderr, "Match"
                 while result["winner"] == "Tie Game":
@@ -386,10 +378,10 @@ def main():
                                           ('/trainer',Trainer),
                                           ('/ajaxCall',AjaxCall),
                                           ('/ajaxTrainer',AjaxTrainer),
-                                          ('/reviewMatch',ReviewMatch), 
                                           ('/worker', CounterWorker), 
                                           ('/round', RoundWorker),
-                                          ('/score', ScoreWorker),								  ('/lobby', Lobby),
+                                          ('/score', ScoreWorker),								  
+                                          ('/lobby', Lobby),
   
                                           ],
                                          debug=True)

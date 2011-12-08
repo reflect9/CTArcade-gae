@@ -350,4 +350,4 @@ class TicTacToeTrainer:
                 addRule(boardList,flip(rotated,True,True))
 
         print boardList.__repr__()
-        Strategy(name=name,code='',key_name=name,description=desc,game='tictactoe',boardList=boardList.__repr__()).put()
+        Strategy(name=name,code='',key_name=name,code=name,description=desc,game='tictactoe',type='board definition',definition=boardList.__repr__()).put()

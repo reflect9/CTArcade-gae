@@ -113,7 +113,7 @@ class TicTacToeMatch:
             # locals() provide a dictionary of all elements in local scope
             # locals()[functionName] gives a handler to the function
             # thus, below we execute local function whose name is st['code']
-            print >>sys.stderr, "1 "+st
+#            print >>sys.stderr, "1 "+st
             if (hasattr(self,st)):
                 strategyMethodToCall =  getattr(self, st)
                 result = strategyMethodToCall(self.board,player)

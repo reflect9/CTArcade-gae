@@ -306,7 +306,7 @@ function findCluster(matches) {
 }
 // graph (from left to right). Each column represents round. In a column, similar matches are clustered. Edges between two clusters in adjacent columns are strategy used. 
 function showMatchesAsGraph(matchList, direction) {
-	currentMode = "graph";
+	currentMode = "graph_"+direction;
 	$("#matches").empty();
 //	var graph_p1 = [];  var graph_p2 = [];	// graph_p1 is a set of matches initiated by p1's move first
 	$.each([p1,p2], function(iP, firstMovePlayer) {	//

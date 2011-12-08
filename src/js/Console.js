@@ -65,10 +65,9 @@ function Console() {
 	
 	this.init = function(t) {   // t must be ID of div
 		this.target = $(t);
-		html = "<img src='css/image/icon_computer_40.png'> Welcome to CTArcade! <br> We are in TicTacToe trainer mode.";
-		html += "<br><br>I am an AI (Artificial Intelligence), but I don't know much about TicTacToe."; 
-		html += " I know a rule of Winning - three stones in a row makes me win. ";
-		html += "But if there's no applicable rule, I'll make a random move.";
+		html = "<img src='css/image/icon_computer_40.png'> Welcome to Trainer mode of TicTacToe game.";
+		html += "<br><br>I am your AI (Artificial Intelligence), and I'll play against other people's AI. "; 
+		html += "To play TicTacToe, you need to teach me rules for winning."; 
 		html += "<br><br> Here's how you can help me learn.";
 		html += "<br> I'll ask which rule was used for each of your moves. By picking a rule, you can teach the rule to me.";
 		html += "<br><br> I'll show how I made each move as well. You can teach me which rule is more important by changing the priority of each rule."
