@@ -323,11 +323,10 @@ class RoundWorker(webapp.RequestHandler):
                 print >>sys.stderr,"Pop"
                 player2 = round_entries.pop()
                 print >>sys.stderr,"Pop"
-                match = TicTacToe.runMatch(player1,player2,player1)
-                result = match.run()
+                result = TicTacToe.runMatch(player1,player2,player1)
                 print >>sys.stderr, "Match"
                 while result["winner"] == "Tie Game":
-                    result = match.run()
+                    result = TicTacToe.runMatch(player1,player2,player1)
                     print >>sys.stderr, "Tie"
                 round_winners.append(str(result["winner"]))
                 #Message = "%s%s" % ("Round Winner: ", str(result["winner"]))
