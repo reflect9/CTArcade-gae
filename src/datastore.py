@@ -38,6 +38,13 @@ class AI(db.Model):
             self.data.append(newRuleKey)
             self.put()
             return True
+    def removeRule(self,ruleKeyToRemove):
+        if ruleKeyToRemove not in self.data:
+            return False
+        else:
+            self.data.remove(ruleKeyToRemove)
+            self.put()
+            return True
     def updateByKeyStringList(self,keyStringList):
         newData = []
         for keyString in keyStringList:
@@ -150,22 +157,23 @@ def initSampleData():
     Rule(title='Take Opposite Corner',definition='takeOppositeCorner',description='Take a corner cell if its opposite corner is occupied by another player',author='built-in',rule_type='built-in',game='tictactoe').put()
     
     deleteAll('User')
-    User(id='tak',password='tak',email='tak@umd.edu',score=0,key_name='tak').put()
-    User(id='ben',password='ben',email='ben@umd.edu',score=0,key_name='ben').put()
-    User(id='matthew',password='matthew',email='matthew@umd.edu',score=0,key_name='matthew').put()    
+    User(id='easyNPC',password='easyNPC',email='easyNPC@umd.edu',score=0,key_name='easyNPC').put()
+    User(id='moderateNPC',password='moderateNPC',email='moderateNPC@umd.edu',score=0,key_name='moderateNPC').put()
+    User(id='hardNPC',password='hardNPC',email='hardNPC@umd.edu',score=0,key_name='hardNPC').put()    
 
     deleteAll('AI')
-    AI(user='tak',game='tictactoe',key_name='tak_tictactoe').put()
-    AI(user='ben',game='tictactoe',key_name='ben_tictactoe').put()
-    AI(user='matthew',game='tictactoe',key_name='matthew_tictactoe').put()
-    TicTacToe.activateBuiltInRuleByTitle('tak', 'Win')
-    TicTacToe.activateBuiltInRuleByTitle('tak', 'Block Win')
-    TicTacToe.activateBuiltInRuleByTitle('tak', 'Take Random')
-    TicTacToe.activateBuiltInRuleByTitle('ben', 'Win')
-    TicTacToe.activateBuiltInRuleByTitle('ben', 'Block Win')
-    TicTacToe.activateBuiltInRuleByTitle('ben', 'Take Any Side')
-    TicTacToe.activateBuiltInRuleByTitle('ben', 'Take Random')
-    TicTacToe.activateBuiltInRuleByTitle('matthew', 'Win')
-    TicTacToe.activateBuiltInRuleByTitle('matthew', 'Block Win')
-    TicTacToe.activateBuiltInRuleByTitle('matthew', 'Take Any Corner')
-    TicTacToe.activateBuiltInRuleByTitle('matthew', 'Take Random')
+    AI(user='easyNPC',game='tictactoe',key_name='easyNPC_tictactoe').put()
+    AI(user='moderateNPC',game='tictactoe',key_name='moderateNPC_tictactoe').put()
+    AI(user='hardNPC',game='tictactoe',key_name='hardNPC_tictactoe').put()
+    TicTacToe.activateBuiltInRuleByTitle('easyNPC', 'Win')
+    TicTacToe.activateBuiltInRuleByTitle('easyNPC', 'Take Random')
+    TicTacToe.activateBuiltInRuleByTitle('moderateNPC', 'Win')
+    TicTacToe.activateBuiltInRuleByTitle('moderateNPC', 'Block Win')
+    TicTacToe.activateBuiltInRuleByTitle('moderateNPC', 'Take Any Corner')
+    TicTacToe.activateBuiltInRuleByTitle('moderateNPC', 'Take Random')
+    TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Win')
+    TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Block Win')
+    TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Take Center')
+    TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Take Any Corner')
+    TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Take Any Side')
+    TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Take Random')

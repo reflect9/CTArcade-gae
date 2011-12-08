@@ -81,7 +81,7 @@ class SignUp(webapp.RequestHandler):
         # create User object defined in datastore.py
         # assign usr id and password and save it
         # send back success message
-        namePattern = re.compile(r"[a-zA-Z][a-zA-Z0-9]{3,16}$")
+        namePattern = re.compile(r"[a-zA-Z][a-zA-Z0-9]{2,16}$")
         name = self.request.get('name')
         if namePattern.match(name)==None:
             self.response.out.write("User name(3~16 characters) should contain only alphabets and numbers(not for the first character).")
@@ -97,13 +97,11 @@ class SignUp(webapp.RequestHandler):
                     score = 0)            
         result = user.put()                
         if result:
-            ai_rec = AI(key_name=name+"_tictactoe",
+            AI(key_name=name+"_tictactoe",
                         user = name,
-                        game = "tictactoe",
-                        data =     "{\"data\":[\"takeRandom\"]}")
-            result_2 = ai_rec.put()
-            self.response.out.write("You may now login.")
-                        
+                        game = "tictactoe").put()
+            TicTacToe.activateBuiltInRuleByTitle(name, 'Take Random')
+            self.response.out.write("You may now login.")         
         #http://ctarcade.appspot.com/signUp?name=ben&email=ben@umd.edu&password=ben
 
 class LogIn(webapp.RequestHandler):
@@ -234,6 +232,10 @@ class AjaxTrainer(webapp.RequestHandler):
         elif action == 'enableStrategy':
             # append a builtIn strategy to the user's AI data 
             result = TicTacToe.activateBuiltInRule(self.request.get('player'), self.request.get('strategyToEnable'))
+            self.response.out.write(str(result))
+        elif action == 'deleteRule':
+            # append a builtIn strategy to the user's AI data 
+            result = TicTacToe.deleteRule(self.request.get('player'), self.request.get('strategyToDelete'))
             self.response.out.write(str(result))
         elif action == 'makeNewStrategy':
 #            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')

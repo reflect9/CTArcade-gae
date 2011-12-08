@@ -251,7 +251,24 @@ function showUserAI(userAI,targetDIV) {
 	$("#instruction_reorder").hide();
 	$("#p1_ai").mouseover(function() { $("#instruction_reorder").show(); });
 	$("#p1_ai").mouseout(function() { $("#instruction_reorder").hide(); });
+	$("li.ai_item").click(function() {
+		var detailDIV = $(t).find('.ai_detail');
+		detailDIV.empty();
+		var keyValue = $(this).attr('key');
+		for(i in game.strategy) {
+			if(game.strategy[i].key == keyValue) {
+				detailDIV.append("<span style='font-weight:bold;'> "+game.strategy[i].title+"</span>");
+				detailDIV.append("<span> "+game.strategy[i].description+"</span>");
+				var deleteButton = $("<div class='btn' style='clear:both;'> REMOVE THIS RULE </div>").click(function() { game.deleteRule(game.p1,keyValue); });
+				detailDIV.append(deleteButton);
+				break;
+			}
+		}
+//		alert(keyValue);
+		
+	});
 	$(t).append("<div id='createRuleButton' class='btn green clearfix' style='float:right;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Create New Rule</div>")
+	$(t).append("<div class='ai_detail' style='clear:both; float:left;'> </div>")
 	$(t).append("<div style='clear:both;'></div>");
 
 }
@@ -305,6 +322,7 @@ function userMove(x,y) {
 $(document).ready(function () {
 	$(".header #header_button_trainer").addClass("currentMode");
 	$.ajaxSetup({ cache: false });
+	if (p1=='guest') return;
 	game = new TicTacToeTrainer();
 	game.init(p1,p2);
 	showUserAI(game.strategy,"userInfo");	// using user's rule JSON object, show user's AI in userInfo div

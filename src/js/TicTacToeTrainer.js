@@ -272,7 +272,27 @@ function TicTacToeTrainer() {
     	
     	});
     }
-    
+    this.deleteRule = function(userName,key) {
+    	$.ajax({
+    		type : "GET",
+    		url: "/ajaxTrainer",
+    		async: true,
+    		cache: false,
+    		data: 	{ 	action: 'deleteRule',
+    					player: userName,
+    					game: this.gameTitle,
+    					strategyToDelete : key
+    				},
+    		success: function(response) {
+//    					alert(response);
+    					if (response=='True') {
+    						alert("rule deleted.");
+    					} else if(response=='False') {
+    						alert("rule couldn't be deleted.");
+    					}
+    				}
+    	});
+    }
     
     this.changeOrder = function(nameList) {
     	$.ajax({

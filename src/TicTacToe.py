@@ -55,14 +55,14 @@ def addCustomRule(ruleBoard, title, desc, author, translationInvariant,
                 permuted[xIndex][j] = ruleBoard[i][j]
                 print (i,",",j,": ",permuted)
         return permuted
-    def rowPermute(ruleBoard,offset):
+    def rowPermute(ruleBoard,rowOffset):
         permuted = []
-        for i in range(len(ruleBoard)):
+        for iCol in range(len(ruleBoard)):
             permuted.append([0]*len(ruleBoard[0]))
-        for i in range(len(ruleBoard)):
-            for j in range(len(ruleBoard[0])):
-                yIndex = (i + offset) % len(ruleBoard[0])
-                permuted[i][yIndex] = ruleBoard[i][j]
+        for iCol in range(len(ruleBoard)):
+            for iRow in range(len(ruleBoard[0])):
+                permutedRowIndex = (iRow + rowOffset) % len(ruleBoard[0])
+                permuted[iCol][permutedRowIndex] = ruleBoard[iCol][iRow]
         return permuted
     def minimize(ruleBoard):
         hMin = len(ruleBoard)
@@ -130,6 +130,10 @@ def activateBuiltInRuleByTitle(userID,ruleTitle):
     ai = datastore.getAI(userID,'tictactoe')
     ruleKey = rule.key()
     return ai.addRule(ruleKey)
+
+def deleteRule(userID,ruleKeyString):
+    ai = datastore.getAI(userID,'tictactoe')
+    return ai.removeRule(db.Key(ruleKeyString))
 
 ''' MATCH FUNCTIONS'''
 # run a single match and return result
@@ -353,6 +357,7 @@ def takeOppositeCorner(board,player):
     return {'success':False}
 def evaluateCreatedStrategy(ruleBoardList, board, player):
     result = {'success':True,'loc':[]}
+    opponent = "op"
     for row in board:
         for cell in row:
             if cell!=0 and cell!=player:
