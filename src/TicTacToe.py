@@ -5,9 +5,9 @@ Created on Dec 6, 2011
 '''
 
 from google.appengine.ext import db
-import sys, copy, json
+import sys, copy
+from django.utils import simplejson as json
 from random import choice
-from django.utils import simplejson
 import datastore
 
 ''' TRAINER FUNCTIONS '''

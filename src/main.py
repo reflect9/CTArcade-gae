@@ -8,7 +8,7 @@ from google.appengine.ext.webapp import util
 from datastore import *
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
-import json
+from django.utils import simplejson as json
 import pprint, os, sys, re
 #from TicTacToeMatch import TicTacToeMatch
 #from TicTacToeTrainer import TicTacToeTrainer
@@ -196,7 +196,7 @@ class AjaxCall(webapp.RequestHandler):
         if action == 'getStrategy':
             self.response.out.write(json.dumps(getUserRuleDict(self.request.get('player'),self.request.get('game'))))
         if action== 'runMatch':
-            result = TicTacToe.runMatches(self.request.get('p1'), self.request.get('p2'), 30)
+            result = TicTacToe.runMatches(self.request.get('p1'), self.request.get('p2'), 10)
 #            matches = []
 #            p1 = self.request.get('p1')
 #            p2 = self.request.get('p2')

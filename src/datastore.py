@@ -136,11 +136,14 @@ def setUserStrategy(user_id,game_title,codeList):
  
 def deleteAll(table):
     while True:
-        result = db.GqlQuery("SELECT * FROM "+table).fetch(1000)
-        if len(result)==0:
+        try:
+            result = db.GqlQuery("SELECT * FROM "+table).fetch(1000)
+            if len(result)==0:
+                return
+            for r in result:
+                r.delete()
+        except:
             return
-        for r in result:
-            r.delete()
 
 ''' when empty db is created, run this function to populate basic data set  '''    
 def initSampleData():
@@ -177,3 +180,5 @@ def initSampleData():
     TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Take Any Corner')
     TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Take Any Side')
     TicTacToe.activateBuiltInRuleByTitle('hardNPC', 'Take Random')
+    
+    TournamentWinners(winner='None').put()
