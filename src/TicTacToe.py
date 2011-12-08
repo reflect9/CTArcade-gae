@@ -147,7 +147,7 @@ def runMatch(p1,p2,startTurn):
         return board
     while True:
         opponent = p2 if turn==p1 else p1
-        nextMove = findBestStrategy(board,turn,opponent)
+        nextMove = findBestStrategy(board,turn)
         if nextMove['message']=="Tie Game":
             history.append({'board':copy.deepcopy(board),'loc':None,'turn':turn,'message':nextMove['message']})
             result = "Tie Game"
@@ -173,8 +173,8 @@ def runMatches(p1,p2,numberOfMatches):
         else:       firstTurn = p2
         match = runMatch(p1,p2,firstTurn)
         matches.append(match)
-    p1_AI = datastore.getUserRule(p1, 'tictactoe')
-    p2_AI = datastore.getUserRule(p2, 'tictactoe')
+    p1_AI = datastore.getUserRuleDict(p1, 'tictactoe')
+    p2_AI = datastore.getUserRuleDict(p2, 'tictactoe')
     result = {}
     result['players'] = {"p1":p1, "p2":p2}
     result['AI'] = {p1:p1_AI, p2:p2_AI}
@@ -198,9 +198,10 @@ def findBestStrategy(board,turn):
 
 def findMatchingStrategy(board, player, userLoc):
     matchingStrategy = [];
+    userID = player.replace("_AI","")
     builtInRules = datastore.getBuiltInRule('tictactoe')
     userLoc = json.loads(userLoc)
-    userRules = datastore.getAI(player,'tictactoe').data
+    userRules = datastore.getAI(userID,'tictactoe').data
     for rule in builtInRules:
         if rule['key'] in userRules:
             rule['enabled']=True # PREVIOUSLY st['code']
@@ -216,7 +217,8 @@ def findMatchingStrategy(board, player, userLoc):
                 if int(userLoc[0])==loc[0] and int(userLoc[1])==loc[1]:
                     matchingStrategy.append(rule)
                 else:
-                    print >>sys.stderr, str(userLoc) + "__" + str(loc)
+                    pass
+#                    print >>sys.stderr, str(userLoc) + "__" + str(loc)
     return matchingStrategy
 
 ''' BASIC FUNCTIONS FOR CHECKING BOARD STATUS '''

@@ -187,9 +187,8 @@ class AjaxCall(webapp.RequestHandler):
             for user in users:
                 result.append([user.id,user.score])
             self.response.out.write('{"data":'+json.dumps(result)+'}')
-        if action== 'getUserAI':
-            user_AI = getUserStrategy(self.request.get('userID'),'tictactoe')
-            self.response.out.write('{"result":'+json.dumps(user_AI)+'}')
+        if action == 'getStrategy':
+            self.response.out.write(json.dumps(getUserRuleDict(self.request.get('player'),self.request.get('game'))))
         if action== 'runMatch':
             result = TicTacToe.runMatches(self.request.get('p1'), self.request.get('p2'), 30)
 #            matches = []

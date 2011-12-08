@@ -8,45 +8,89 @@ var currentRound = 0;
 var selectedShape = "";
 
 
-function showUserAI(userID, targetDIV) {
+function showUserAI(userID,targetDIV) {
 	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
 	else var t = targetDIV;
-	$.get('ajaxCall',{action:'getUserAI', userID:userID}, function(data){
-		var res= JSON.parse(data);  var userAI = res.result;
-		//  show the player's strategy
-		$(t).append("<h2 style='float:left;'>"+userID+"'s AI</h2><div id='button_ai_edit' style='float:left; margin:2px 0px 0px 10px; cursor:pointer;'><span class='icon_edit'>&nbsp;</span><span style='float:left; margin:4px 0px 0px 2px; font-weight:bold;'>Edit</span></span>");
-		var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
-		$.each(userAI, function(i,strategy) {
-			$(aiDIV).find("#p1_ai").append("<li class='ai_item'>"+strategy+"</li>");
+	$(t).empty();
+	//  show the player's strategy
+	$(t).append("<h2 style='float:left;'>"+p1+"'s AI</h2><div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
+	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+	$.get('ajaxCall',{action:'getStrategy', player:p1, game:'tictactoe'}, function(data){
+		userAI = JSON.parse(data);
+		$.each(userAI, function(i,rule) {
+			$(aiDIV).find("#p1_ai").append("<li class='ai_item' key='"+rule.key+"'>"+rule.title+"</li>");
 		});
-		$("#p1_ai").sortable({
+		$("#p1_ai").sortable({	// update user's strategy after changing order. 
 			update : function(event, ui) {
-				var codeList = [];
+				var keyList = [];
 				$("#p1_ai li").each(function(i,e) {
-					var code = $(e).text();
-					codeList.push(code);
+					var key = $(e).attr('key');
+					keyList.push(key);
 				});
 		    	$.ajax({
 		    		type : "GET",
 		    		url: "/ajaxTrainer",
-		    		async: false,
+		    		async: true,
 		    		data: 	{ 	action: 'changeOrder',
-		    					player: userID,
+		    					player: p1,
 		    					game: 'tictactoe',
-		    					newStrategy : JSON.stringify(codeList)
+		    					newStrategy : JSON.stringify(keyList)
 		    				},
 		    		success: function(response) {
-		    			init(p2);
-		    			runMatch(p1,p2);
+		    			// run what after updating rule? 
 		    		}
 		    	});
 			}
 		});
 		$("#p1_ai").disableSelection();
-		$("#button_ai_edit").click(function() {
-		});
+		$("#instruction_reorder").hide();
+		$("#p1_ai").mouseover(function() { $("#instruction_reorder").show(); });
+		$("#p1_ai").mouseout(function() { $("#instruction_reorder").hide(); });
+//		$(t).append("<div id='createRuleButton' class='btn green clearfix' style='float:right;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Create New Rule</div>")
+		$(t).append("<div style='clear:both;'></div>");
 	});
 }
+
+//
+//function showUserAI(userID, targetDIV) {
+//	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
+//	else var t = targetDIV;
+//	$.get('ajaxCall',{action:'getUserAI', userID:userID}, function(data){
+//		var res= JSON.parse(data);  var userAI = res.result;
+//		//  show the player's strategy
+//		$(t).append("<h2 style='float:left;'>"+userID+"'s AI</h2><div id='button_ai_edit' style='float:left; margin:2px 0px 0px 10px; cursor:pointer;'><span class='icon_edit'>&nbsp;</span><span style='float:left; margin:4px 0px 0px 2px; font-weight:bold;'>Edit</span></span>");
+//		var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+//		$.each(userAI, function(i,strategy) {
+//			$(aiDIV).find("#p1_ai").append("<li class='ai_item'>"+strategy+"</li>");
+//		});
+//		$("#p1_ai").sortable({
+//			update : function(event, ui) {
+//				var codeList = [];
+//				$("#p1_ai li").each(function(i,e) {
+//					var code = $(e).text();
+//					codeList.push(code);
+//				});
+//		    	$.ajax({
+//		    		type : "GET",
+//		    		url: "/ajaxTrainer",
+//		    		async: false,
+//		    		data: 	{ 	action: 'changeOrder',
+//		    					player: userID,
+//		    					game: 'tictactoe',
+//		    					newStrategy : JSON.stringify(codeList)
+//		    				},
+//		    		success: function(response) {
+//		    			init(p2);
+//		    			runMatch(p1,p2);
+//		    		}
+//		    	});
+//			}
+//		});
+//		$("#p1_ai").disableSelection();
+//		$("#button_ai_edit").click(function() {
+//		});
+//	});
+//}
 function init(pl1,pl2) {
 	currentRound = 0;
 	if(pl1=="Guest") {
