@@ -15,18 +15,21 @@
 }
 
 .create_ignore{
+    background-image: url(image/icon_question.png);
+    background-repeat: no-repeat;
+    background-position: center;
 	border: solid 2px black;
 }
 
 .create_p1{
-	background-image: url(image/icon_human_40.png);
+	background-image: url(image/icon_o.png);
 	background-repeat: no-repeat;
 	background-position: center;
 	border: solid 2px black;
 }
 
 .create_p2{
-	background-image: url(image/icon_computer_40.png);
+	background-image: url(image/icon_x.png);
 	background-repeat: no-repeat;
 	background-position: center;
 	border: solid 2px black;
@@ -41,8 +44,10 @@
 }
 
 .create_selected{
-	background-color: #FFFFFF;
-	border: solid 2px red;
+    background-image: url(image/icon_o_red.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: solid 2px black;
 }
 
 #overlayConsole > .message {

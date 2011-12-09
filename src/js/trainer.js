@@ -220,7 +220,7 @@ function showUserAI(userAI,targetDIV) {
 	else var t = targetDIV;
 	$(t).empty();
 	//  show the player's strategy
-	$(t).append("<h2 style='float:left;'>"+p1+"'s AI</h2><div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
+	$(t).append("<h2 style='float:left; margin-bottom:5px;'>"+p1+"'s AI</h2><div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
 	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
 	$.each(userAI, function(i,rule) {
 		$(aiDIV).find("#p1_ai").append("<li class='ai_item' key='"+rule.key+"'>"+rule.title+"</li>");
@@ -257,9 +257,16 @@ function showUserAI(userAI,targetDIV) {
 		var keyValue = $(this).attr('key');
 		for(i in game.strategy) {
 			if(game.strategy[i].key == keyValue) {
-				detailDIV.append("<span style='font-weight:bold;'> "+game.strategy[i].title+"</span>");
-				detailDIV.append("<span> "+game.strategy[i].description+"</span>");
-				var deleteButton = $("<div class='btn' style='clear:both;'> REMOVE THIS RULE </div>").click(function() { game.deleteRule(game.p1,keyValue); });
+				detailDIV.append("<div><span style='font-weight:bold;'> "+game.strategy[i].title+"</span><span> "+game.strategy[i].description+"</span></div>");
+				if(game.strategy[i].rule_type=="board definition") {
+					var defDiv = $("<div id='ai_detail_definition'></div>");
+					var defList = eval(game.strategy[i].definition);
+					$.each(defList, function(iB, brd) {
+						$(defDiv).append(createRuleBoard(brd));
+					});
+				}
+				detailDIV.append(defDiv);
+				var deleteButton = $("<div class='btn' style='clear:both; margin-left:15px; '> REMOVE THIS RULE </div>").click(function() { game.deleteRule(game.p1,keyValue); });
 				detailDIV.append(deleteButton);
 				break;
 			}
@@ -272,6 +279,26 @@ function showUserAI(userAI,targetDIV) {
 	$(t).append("<div style='clear:both;'></div>");
 
 }
+function createRuleBoard(board) {
+	var ruleBoard = $("<div style='border:1px solid #555; margin:3px; float:left;'></div>");
+	var tileSize = 15;
+//	class CellType:
+//	    EMPTY = 0
+//	    P1 = 1
+//	    P2 = 2
+//	    SELECTED = 3
+//	    IGNORE = 4
+	tileCharacter = ['','O','X',"<span style='color:red'>O</span>","<span style='color:#999'>?</span>"];
+	$.each(board, function(iCol,col) {
+		var colDiv = $("<div class='clearfix;' style='float:left; width:"+tileSize+"px;'></div>");
+		$.each(col, function(iRow,tile) {
+			$(colDiv).append("<div style='border:1px solid #eee; font-size:10px; width:"+(tileSize-2)+"px; height:"+(tileSize-2)+"px;'>"+tileCharacter[parseInt(tile)]+"</div>");
+		});
+		$(ruleBoard).append(colDiv);
+	});
+	return ruleBoard;
+}
+
 function callUserMove(dd) {
 	if (needReset) {	// when baord is full or game already ended, needReset is true
 		return;

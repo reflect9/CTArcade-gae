@@ -5,28 +5,28 @@ var TYPE = {
 	EMPTY : {value: 0, css: "create_empty", ignorecss: "consider", description:
 		"This tile needs to be empty to apply the rule"},
 	P1 : {value: 1, css: "create_p1", ignorecss: "consider", description:
-		"This tile needs to have P1 in it to apply the rule"},
+		"Player already occupied this tile."},
 	P2 : {value: 2, css: "create_p2", ignorecss: "consider", description:
-		"This tile needs to have P2 in it to apply the rule"},
+		"Opponent already occupited this tile."},
 	SELECTED : {value: 3, css: "create_selected", ignorecss: "consider", description:
-		"This is where the current player could go next"},
+		"This is where the player could go next"},
 	IGNORE : {value: 4, css: "create_ignore", ignorecss: "ignore", description:
-		"These tiles are ignored by the rule"}
+		"Rule doesn't care what is on this tile."}
 };
 
 changeType = function(index1, index2){
-	if (overlayBoard[index1][index2] == TYPE.IGNORE)
+	if (overlayBoard[index1][index2] == TYPE.EMPTY)
 		overlayBoard[index1][index2] = TYPE.P1;
 	else if (overlayBoard[index1][index2] == TYPE.P1)
 		overlayBoard[index1][index2] = TYPE.P2;
 	else if (overlayBoard[index1][index2] == TYPE.P2)
-		overlayBoard[index1][index2] = TYPE.EMPTY;
-	else if (overlayBoard[index1][index2] == TYPE.EMPTY)
 		overlayBoard[index1][index2] = TYPE.SELECTED;
-	/*else if (overlayBoard[index1][index2] == TYPE.THERE)
-		overlayBoard[index1][index2] = TYPE.SELECTED;*/
 	else if (overlayBoard[index1][index2] == TYPE.SELECTED)
 		overlayBoard[index1][index2] = TYPE.IGNORE;
+	/*else if (overlayBoard[index1][index2] == TYPE.THERE)
+		overlayBoard[index1][index2] = TYPE.SELECTED;*/
+	else if (overlayBoard[index1][index2] == TYPE.IGNORE)
+		overlayBoard[index1][index2] = TYPE.EMPTY;
 }
 
 startCreationInterface = function(board) {
@@ -112,17 +112,17 @@ startCreationInterface = function(board) {
 				</div>\
 				<div id='description_"+type+"' class='instruction' \
 					style='float: left; padding: 10px;'>"
-					+type+": "+TYPE[type].description+"\
+					+TYPE[type].description+"\
 				</div>\
 			</div>"
 	}
 	html = html + "</div>";
 	overlayConsole.appendHTML(html);
-	for (type in TYPE){
-		var handle = $("#container_"+type);
-		var width = handle.width()-74-2*parseInt(handle.css("padding-left"));
-		$("#description_"+type).css("width",width);
-	}
+//	for (type in TYPE){
+//		var handle = $("#container_"+type);
+//		var width = handle.width()-74-2*parseInt(handle.css("padding-left"));
+//		$("#description_"+type).css("width",width);
+//	}
 	
 	// add a continue and quit button to the console
 	overlayConsole.appendButton("CONTINUE","checkRule()");

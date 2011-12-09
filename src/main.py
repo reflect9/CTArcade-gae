@@ -196,7 +196,7 @@ class AjaxCall(webapp.RequestHandler):
         if action == 'getStrategy':
             self.response.out.write(json.dumps(getUserRuleDict(self.request.get('player'),self.request.get('game'))))
         if action== 'runMatch':
-            result = TicTacToe.runMatches(self.request.get('p1'), self.request.get('p2'), 10)
+            result = TicTacToe.runMatches(self.request.get('p1'), self.request.get('p2'), 20)
 #            matches = []
 #            p1 = self.request.get('p1')
 #            p2 = self.request.get('p2')
@@ -323,10 +323,12 @@ class RoundWorker(webapp.RequestHandler):
                 print >>sys.stderr,"Pop"
                 player2 = round_entries.pop()
                 print >>sys.stderr,"Pop"
-                result = TicTacToe.runMatch(player1,player2,player1)
+                p1_AI = getUserRuleDict(player1, 'tictactoe')
+                p2_AI = getUserRuleDict(player2, 'tictactoe')
+                result = TicTacToe.runMatch(player1,player2,player1,p1_AI,p2_AI)
                 print >>sys.stderr, "Match"
                 while result["winner"] == "Tie Game":
-                    result = TicTacToe.runMatch(player1,player2,player1)
+                    result = TicTacToe.runMatch(player1,player2,player1,p1_AI,p2_AI)
                     print >>sys.stderr, "Tie"
                 round_winners.append(str(result["winner"]))
                 #Message = "%s%s" % ("Round Winner: ", str(result["winner"]))

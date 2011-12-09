@@ -169,6 +169,7 @@ def initSampleData():
     AI(user='moderateNPC',game='tictactoe',key_name='moderateNPC_tictactoe').put()
     AI(user='hardNPC',game='tictactoe',key_name='hardNPC_tictactoe').put()
     TicTacToe.activateBuiltInRuleByTitle('easyNPC', 'Win')
+    TicTacToe.activateBuiltInRuleByTitle('easyNPC', 'Take Any Corner')
     TicTacToe.activateBuiltInRuleByTitle('easyNPC', 'Take Random')
     TicTacToe.activateBuiltInRuleByTitle('moderateNPC', 'Win')
     TicTacToe.activateBuiltInRuleByTitle('moderateNPC', 'Block Win')

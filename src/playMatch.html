@@ -23,15 +23,15 @@
 	<div class='container'>
 		<div class='pageContent'>
 			<div class="wrapper clearfix">
-				<div class="innerHeader">
-					<div id='desc' style='margin-bottom:10px;'>
-						<div id='welcome'></div>
+				<div class="innerHeader" style='min-height:180px;'>
+					<div id='memberListDIV' style='float:left; width:150px; height:150px; overflow-y:scroll; overflow-x:hidden;'></div>
+					<div id='desc' style='float:left; margin:10px;'>
 						<div id='userInfo'></div>
 						<div id='summary'></div>
 					</div>
-					<div id='memberListDIV' style='position:absolute; right:10px; top:10px; width:100px; z-index:10'></div>
+					
 				</div>
-				<div>  
+				<div id='viewSelection'>  
 				   <input type="button" onclick="showMatchesAsList(matches)" value="List view"/>
 				   <input type="button" onclick="showMatchesAsAnimation(matches)" value="Stepwise animation"/>
 				   <input type="button" onclick="showMatchesAsGroups(matches)" value="Grouped by winner"/>

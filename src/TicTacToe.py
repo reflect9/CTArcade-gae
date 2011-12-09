@@ -83,11 +83,27 @@ def addCustomRule(ruleBoard, title, desc, author, translationInvariant,
         for i in range(hMin,hMin+width):
             newBoard.append([])
             for j in range(vMin,vMin+height):
-                newBoard[i].append(ruleBoard[i][j])
+                newBoard[len(newBoard)-1].append(ruleBoard[i][j])
         return newBoard
+    def translation(minifiedBoard):
+        dimension = 3
+        width_minified = len(minifiedBoard)
+        height_minified = len(minifiedBoard[0])
+        width_pointer = dimension-width_minified+1
+        height_pointer = dimension-height_minified+1
+        resultBoards = []
+        for iColPointer in range(0,width_pointer):
+            for iRowPointer in range(0,height_pointer):
+                # now create board and append to resultBoards
+                newBoard = [[CellType.IGNORE for i in range(dimension)] for j in range(dimension)]
+                for iColMinified in range(width_minified):
+                    for iRowMinified in range(height_minified):
+                        newBoard[iColPointer+iColMinified][iRowPointer+iRowMinified]=minifiedBoard[iColMinified][iRowMinified]
+                resultBoards.append(newBoard)
+        return resultBoards
     # Here is the start of the actual processing function
     if translationInvariant:
-        ruleBoard = minimize(ruleBoard)
+        ruleBoard = translation(minimize(ruleBoard))
     boardList = []
     boardList.append(ruleBoard)
     if flipping:
@@ -137,10 +153,10 @@ def deleteRule(userID,ruleKeyString):
 
 ''' MATCH FUNCTIONS'''
 # run a single match and return result
-def runMatch(p1,p2,startTurn):
+def runMatch(p1,p2,startTurn,p1_AI,p2_AI):
     strategy = {};  history=[]; counter = 0; result = ""
-    strategy[p1] = datastore.getUserRule(p1,'tictactoe')  
-    strategy[p2] = datastore.getUserRule(p2,'tictactoe')  
+    strategy[p1] = p1_AI  
+    strategy[p2] = p2_AI  
     turn = startTurn
     board = [[0 for i in range(3)] for j in range(3)]
     def makeMove(board,x,y,turn):
@@ -150,8 +166,9 @@ def runMatch(p1,p2,startTurn):
         board[x][y]=turn
         return board
     while True:
+#        print >>sys.stderr, counter
         opponent = p2 if turn==p1 else p1
-        nextMove = findBestStrategy(board,turn)
+        nextMove = findBestStrategyFromRuleDict(board,turn,strategy[turn])
         if nextMove['message']=="Tie Game":
             history.append({'board':copy.deepcopy(board),'loc':None,'turn':turn,'message':nextMove['message']})
             result = "Tie Game"
@@ -172,13 +189,13 @@ def runMatch(p1,p2,startTurn):
 def runMatches(p1,p2,numberOfMatches):
     matches = []
     firstTurn = p1
+    p1_AI = datastore.getUserRuleDict(p1, 'tictactoe')
+    p2_AI = datastore.getUserRuleDict(p2, 'tictactoe')
     for i in range(0,numberOfMatches):
         if i<(numberOfMatches/2):    firstTurn = p1
         else:       firstTurn = p2
-        match = runMatch(p1,p2,firstTurn)
+        match = runMatch(p1,p2,firstTurn,p1_AI,p2_AI)
         matches.append(match)
-    p1_AI = datastore.getUserRuleDict(p1, 'tictactoe')
-    p2_AI = datastore.getUserRuleDict(p2, 'tictactoe')
     result = {}
     result['players'] = {"p1":p1, "p2":p2}
     result['AI'] = {p1:p1_AI, p2:p2_AI}
@@ -186,6 +203,17 @@ def runMatches(p1,p2,numberOfMatches):
     return result
 
 ''' GENERAL UTILITY FUNCTIONS '''
+def findBestStrategyFromRuleDict(board,turn,rules):  
+    if isFull(board):       return {'message':"Tie Game",'locList':None}
+    userID = turn.replace("_AI","")
+    for rule in rules:
+        if (rule['rule_type']=="built-in"):
+            result = eval(rule['definition'])(board,turn)
+        elif (rule['rule_type']=="board definition"):
+            result = evaluateCreatedStrategy(rule['definition'],board,turn)
+        if result['success']:
+            return {'message':rule['title'],'rule':rule,'userRules':rules,'locList':result['loc']}
+    return {'message':"no matching strategy found",'userRules':rules,'locList':None}
 def findBestStrategy(board,turn):  
     if isFull(board):       return {'message':"Tie Game",'locList':None}
     # retrieve player's rules from DB here

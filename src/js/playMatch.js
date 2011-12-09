@@ -102,6 +102,7 @@ function init(pl1,pl2) {
  
 // request server to run match and get response
 function runMatch(pl1,pl2) {
+	$("#viewSelection").show();
 	$("#welcome").empty();
 	if(pl1=="Guest") {
 		return;
@@ -374,7 +375,7 @@ function showMatchesAsGraph(matchList, direction) {
 		}
 		var layoutResult = sugiyama(graph);
 		var divID =  "matches_"+firstMovePlayer;
-		$("#matches").append("<div id='"+divID+"' class='clearfix' style='clear:both; position:relative; width:100%;'></div>");
+		$("#matches").append("<div id='"+divID+"' class='clearfix' style='clear:both; position:relative; width:100%; margin-left:40px;'></div>");
 		drawGraph(layoutResult,selectedMatches,"#"+divID,direction);
 	});
 //	$(".matchGraphColumn_bg").click(function() { alert("asdfdfd"); deselectBoard();});
@@ -393,7 +394,7 @@ function drawGraph(layoutResult,selectedMatches,targetDivID, direction) {
 		}
 	if(direction=="horizontal") {
 		var gap = max_pos-min_pos;
-		var interval = 45;
+		var interval = 50;
 		var totalHeight = (gap+2)*interval;
 		var vertical_offset = (-1*min_pos*interval) + (interval/2);	
 		var columnDivClass = "matchGraphColumn";
@@ -714,13 +715,16 @@ $(document).ready( function() {
 	memberList.init("#memberListDIV");
 	currentMode = 'graph_horizontal';
 	if(p1=="Guest") {
-		$("#welcome").append("Welcome, Guest!  You need to <a href='javascript:openSignIn();'>log in</a> to play matches with others.");
+		$("#userInfo").append("Welcome, Guest!  You need to <a href='javascript:openSignIn();'>log in</a> to play matches with others.");
 	} else {
 		showUserAI(p1,"userInfo");
-		$("#welcome").append("Welcome, "+p1+"! Select an opponent to play matches.");
+//		$("#welcome").append("Welcome, "+p1+"! Select an opponent to play matches.");
 		if(p2!="") {	
 	   		init(p1,p2); 
 	   		runMatch(p1,p2);
+		} else {
+			$("#summary").append("<h2 style='margin-top:20px;'>Select an opponent to play 20 matches.</h2>");
+			$("#viewSelection").hide();
 		}
 	}
 	$(".header #header_button_match").addClass("currentMode");
