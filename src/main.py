@@ -306,7 +306,7 @@ class CounterWorker(webapp.RequestHandler):
         
 class RoundWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
-       # try:
+        try:
        	    tie_counter = 0;
        	    Message = "%s%s" % ("Round Start: ", self.request.get('tournament_entries'))
             print >>sys.stderr, Message
@@ -353,10 +353,10 @@ class RoundWorker(webapp.RequestHandler):
             print >>sys.stderr, "Exiting"    
             taskqueue.add(url='/score', params={'tournament_entries': json.dumps(round_winners), 'by': by}, countdown=180)
 
-       # except:
-        #    self.response.clear()
-         #   self.response.set_status(500)
-          #  print >>sys.stderr, "Round Interrupted"
+        except:
+            self.response.clear()
+            self.response.set_status(500)
+            print >>sys.stderr, "Round Interrupted"
 
 class ScoreWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
