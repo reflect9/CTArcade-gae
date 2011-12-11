@@ -219,6 +219,7 @@ var javascript_countdown = function () {
 
 getTime('EST', function(time){
 	var hours = time['hour'];
+	if (hours == 12) { hours = 0; }
 	var minutes = time['minute'];
 	var seconds = time['second'];
 	var target_hour = 17;
