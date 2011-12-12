@@ -310,6 +310,7 @@ class CounterWorker(webapp.RequestHandler):
 class RoundWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
         try:
+       	    tie_counter = 0;
        	    Message = "%s%s" % ("Round Start: ", self.request.get('tournament_entries'))
             print >>sys.stderr, Message
             #log = TournamentLog(message = Message)
@@ -328,12 +329,16 @@ class RoundWorker(webapp.RequestHandler):
                 print >>sys.stderr,"Pop"
                 p1_AI = getUserRuleDict(player1, 'tictactoe')
                 p2_AI = getUserRuleDict(player2, 'tictactoe')
+                print >>sys.stderr,"AIs Loaded"
                 result = TicTacToe.runMatch(player1,player2,player1,p1_AI,p2_AI)
-                print >>sys.stderr, "Match"
-                while result["winner"] == "Tie Game":
+                while result["winner"] == "Tie Game" and tie_counter < 20:
                     result = TicTacToe.runMatch(player1,player2,player1,p1_AI,p2_AI)
                     print >>sys.stderr, "Tie"
-                round_winners.append(str(result["winner"]))
+                    tie_counter = tie_counter + 1
+                if result["winner"] == "Tie Game":
+                    round_winners.append(player1)
+                else:	
+                    round_winners.append(str(result["winner"]))
                 #Message = "%s%s" % ("Round Winner: ", str(result["winner"]))
                 print >>sys.stderr, result["winner"]
                 #log = TournamentLog(message = Message)
