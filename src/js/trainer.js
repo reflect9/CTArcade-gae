@@ -216,7 +216,7 @@ function clearBoard() {
 	
 }	
 function showUserAI(userAI,targetDIV) {
-	alert("showUSERAI");
+//	alert("showUSERAI");
 	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
 	else var t = targetDIV;
 	$(t).empty();
@@ -283,7 +283,7 @@ function showUserAI(userAI,targetDIV) {
 }
 function setStrategy(data) {
 	game.strategy = eval(data);
-	alert("setStrategy: "+data);
+//	alert("setStrategy: "+data);
 	game.strategyKeyList = [];
 	for (i in game.strategy)
 		game.strategyKeyList.push(game.strategy[i].key);

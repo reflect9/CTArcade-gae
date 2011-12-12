@@ -13,12 +13,12 @@ function showUserAI(userID,targetDIV) {
 	else var t = targetDIV;
 	$(t).empty();
 	//  show the player's strategy
-	$(t).append("<h2 style='float:left;'>"+p1+"'s AI</h2><div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
-	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+	$(t).append("<h2 style='float:left; color:#eee;'>"+p1+"'s AI</h2>");
+	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; width:100%; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
 	$.get('ajaxCall',{action:'getStrategy', player:p1, game:'tictactoe'}, function(data){
 		userAI = JSON.parse(data);
 		$.each(userAI, function(i,rule) {
-			$(aiDIV).find("#p1_ai").append("<li class='ai_item' key='"+rule.key+"'>"+rule.title+"</li>");
+			$(aiDIV).find("#p1_ai").append("<li class='ai_item' key='"+rule.key+"'>"+rule.title+"<div class='icon_order'></div></li>");
 		});
 		$("#p1_ai").sortable({	// update user's strategy after changing order. 
 			update : function(event, ui) {
@@ -38,6 +38,7 @@ function showUserAI(userID,targetDIV) {
 		    				},
 		    		success: function(response) {
 		    			// run what after updating rule? 
+		    			runMatch(p1,p2);
 		    		}
 		    	});
 			}
@@ -51,46 +52,6 @@ function showUserAI(userID,targetDIV) {
 	});
 }
 
-//
-//function showUserAI(userID, targetDIV) {
-//	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
-//	else var t = targetDIV;
-//	$.get('ajaxCall',{action:'getUserAI', userID:userID}, function(data){
-//		var res= JSON.parse(data);  var userAI = res.result;
-//		//  show the player's strategy
-//		$(t).append("<h2 style='float:left;'>"+userID+"'s AI</h2><div id='button_ai_edit' style='float:left; margin:2px 0px 0px 10px; cursor:pointer;'><span class='icon_edit'>&nbsp;</span><span style='float:left; margin:4px 0px 0px 2px; font-weight:bold;'>Edit</span></span>");
-//		var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
-//		$.each(userAI, function(i,strategy) {
-//			$(aiDIV).find("#p1_ai").append("<li class='ai_item'>"+strategy+"</li>");
-//		});
-//		$("#p1_ai").sortable({
-//			update : function(event, ui) {
-//				var codeList = [];
-//				$("#p1_ai li").each(function(i,e) {
-//					var code = $(e).text();
-//					codeList.push(code);
-//				});
-//		    	$.ajax({
-//		    		type : "GET",
-//		    		url: "/ajaxTrainer",
-//		    		async: false,
-//		    		data: 	{ 	action: 'changeOrder',
-//		    					player: userID,
-//		    					game: 'tictactoe',
-//		    					newStrategy : JSON.stringify(codeList)
-//		    				},
-//		    		success: function(response) {
-//		    			init(p2);
-//		    			runMatch(p1,p2);
-//		    		}
-//		    	});
-//			}
-//		});
-//		$("#p1_ai").disableSelection();
-//		$("#button_ai_edit").click(function() {
-//		});
-//	});
-//}
 function init(pl1,pl2) {
 	currentRound = 0;
 	if(pl1=="Guest") {
@@ -122,7 +83,7 @@ function runMatch(pl1,pl2) {
 			if (match.winner=="Tie Game") tie_games++;
 		});
 		// show description of the match
-		$("#summary").append("<h2 style='margin-top:15px;'>Result of 30 matches</h2>");
+		$("#summary").append("<h2 style='margin-top:5px;'>Result of 30 matches</h2>");
 		var html = 	"<SPAN style='background-color:"+getColor(playerColor[result.players.p1],1)+"; color:white; padding:0px 4px 0px 4px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p1+"</SPAN>"
 				+	"<SPAN style='margin:0 10px 0 10px;'>"+p1_wins+"</SPAN>"
 				+	" : "
@@ -245,7 +206,7 @@ function showMatchesAsList(matchList) {
     $("#matches").empty();
    $(matchList).each( function(i,m) {
        //alert(e.message);
-       var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0; border-top:2px dotted'></div>");
+       var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0; padding-top:10px; border-top:2px dotted'></div>");
        var p1tag = "<span style='background-color:"+getColor(playerColor[p1],0.6)+";border-radius:2px; padding:1px 3px 1px 3px;'>"+p1+"</span>";
        var p2tag = "<span style='background-color:"+getColor(playerColor[p2],0.6)+";border-radius:2px; padding:1px 3px 1px 3px;'>"+p2+"</span>";
        if (m.winner==p1) $(matchDIV).append("<div><span>"+"<div class='icon_star' style=''></div>"+p1tag+" vs. "+p2tag+"</span></div>");
@@ -376,7 +337,7 @@ function showMatchesAsGraph(matchList, direction) {
 		}
 		var layoutResult = sugiyama(graph);
 		var divID =  "matches_"+firstMovePlayer;
-		$("#matches").append("<div id='"+divID+"' class='clearfix' style='clear:both; position:relative; width:100%; margin-left:40px;'></div>");
+		$("#matches").append("<div id='"+divID+"' class='clearfix' style='clear:both; position:relative; width:auto; margin-left:40px;'></div>");
 		drawGraph(layoutResult,selectedMatches,"#"+divID,direction);
 	});
 //	$(".matchGraphColumn_bg").click(function() { alert("asdfdfd"); deselectBoard();});

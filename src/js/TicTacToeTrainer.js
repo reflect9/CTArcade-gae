@@ -285,7 +285,7 @@ function TicTacToeTrainer() {
     					strategyToDelete : key
     				},
     		success: function(response) {
-    						alert("rule deleted.");
+//    						alert("rule deleted.");
     						setStrategy(response);
     						showUserAI(game.strategy,"userInfo");
     				}
@@ -310,7 +310,7 @@ function TicTacToeTrainer() {
     // callback functions for ajax calls
     this.setStrategy = function(data) {
     	this.strategy = JSON.parse(data);
-    	alert("setSTrategy");
+//    	alert("setSTrategy");
     	this.strategyKeyList = [];
     	for (i in this.strategy)
     		this.strategyKeyList.push(this.strategy[i].key);
@@ -344,7 +344,7 @@ function TicTacToeTrainer() {
 						rotation : rotation				
 					},
     		success: function(response) {
-    					alert(response);
+//    					alert(response);
 						setStrategy(response);
 						showUserAI(game.strategy,"userInfo");
 			}
