@@ -47,7 +47,7 @@ class Lobby(webapp.RequestHandler):
 		
         champ = TournamentWinners.gql("ORDER BY timestamp DESC").fetch(100)
         if len(champ)>0:
-            champRet = champ.order('-timestamp')[0]
+            champRet = champ[0]
         else:
             champRet = None
         dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime) else None
