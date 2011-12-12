@@ -45,9 +45,11 @@ class Lobby(webapp.RequestHandler):
         users = User.all()
         users.order('-score')
 		
-        champ = TournamentWinners.all()
-        champRet = champ.order('-timestamp')[0]
-		
+        champ = TournamentWinners.gql("ORDER BY timestamp DESC").fetch(100)
+        if len(champ)>0:
+            champRet = champ.order('-timestamp')[0]
+        else:
+            champRet = None
         dthandler = lambda obj: obj.isoformat() if isinstance(obj, datetime.datetime) else None
        
         template_values = {
@@ -236,7 +238,7 @@ class AjaxTrainer(webapp.RequestHandler):
         elif action == 'deleteRule':
             # append a builtIn strategy to the user's AI data 
             result = TicTacToe.deleteRule(self.request.get('player'), self.request.get('strategyToDelete'))
-            self.response.out.write(str(result))
+            self.response.out.write(json.dumps(result))
         elif action == 'makeNewStrategy':
 #            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
             # parse the list
@@ -252,7 +254,8 @@ class AjaxTrainer(webapp.RequestHandler):
 #            ruleList.append(self.request.get('name'))
             result = userAI.addRule(addedRule)
 #            setUserStrategy(self.request.get('user'),self.request.get('game'),codeList)
-            self.response.out.write(result) # True or False
+            print >>sys.stderr, json.dumps(result)
+            self.response.out.write(json.dumps(result)) # True or False
         elif action == 'changeOrder':
             # change the user's AI's data which is JSON string of an array that contains 
             # codes of strategies

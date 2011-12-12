@@ -167,25 +167,25 @@ function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
 	if (showStrategy) $(miniBoard).append("<div id='strategy' style='font-size:12px; font-family:Helvetica; '>"+"</div>");
 	else  $(miniBoard).append("<div id='strategy' style='font-size:12px; font-family:Helvetica'></div>");
 	var boardDiv = $("<div></div>");
-		$(board).each( function(ir,r) {
-			//alert(r);
-			var row = $("<div></div>");
-			$(r).each( function(ic,c) {
-			    var col = $("<div class='review_cell "+ir+"_"+ic+"'><p>"+movesInOrder[ir][ic]+"</p></div>");
-				col.css({'width':miniBoard.width()/4,'height':miniBoard.width()/4});
-			    if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
-					if (c==p1) $(col).css("background-color",color.paleGreen);  
-                   else if (c==p2) $(col).css("background-color",color.violetPink);
-				} else {
-                   if (c==p1) $(col).css("background-color",getColor("paleGreen",0.3));  
-                   else if (c==p2) $(col).css("background-color",getColor("violetPink",0.3));
-				}		
-				if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
-				$(row).append(col);
-			});
-			$(row).append("<div style='clear:both'></div>");
-			$(boardDiv).append(row);
+	$(board).each( function(ir,r) {
+		//alert(r);
+		var row = $("<div></div>");
+		$(r).each( function(ic,c) {
+		    var col = $("<div class='review_cell "+ir+"_"+ic+"'><p>"+movesInOrder[ir][ic]+"</p></div>");
+			col.css({'width':16,'height':16});
+		    if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
+				if (c==p1) $(col).css("background-color",color.paleGreen);  
+               else if (c==p2) $(col).css("background-color",color.violetPink);
+			} else {
+               if (c==p1) $(col).css("background-color",getColor("paleGreen",0.3));  
+               else if (c==p2) $(col).css("background-color",getColor("violetPink",0.3));
+			}		
+			if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
+			$(row).append(col);
 		});
+		$(row).append("<div style='clear:both'></div>");
+		$(boardDiv).append(row);
+	});
 	var winnerAndPattern = findWinningCells(board);
 	if (winnerAndPattern!=false) {
 //		$(miniBoard).css('border','2px solid '+getColor(playerColor[winnerAndPattern.winner],1));
@@ -202,35 +202,36 @@ function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
 // tiny board are used in graph layouts
 function createTinyBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy) {
 	var miniBoard = $("<div class='tinyboard'></div>"); 
-	var cellSize = Math.floor((miniBoard.width()-10)/3);
+	var cellSize = 10;
 	var boardDiv = $("<div style='position:absolute; margin:2px 0 0 2px;'></div>");
-		$(board).each( function(ir,r) {
-			//alert(r);
-			var row = $("<div></div>");
-			$(r).each( function(ic,c) {
-			    var col = $("<div class='review_cell "+ir+"_"+ic+"'>&nbsp;</div>");
-				col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee'});
-			    if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
-					if (c==p1) $(col).css("background-color",color.paleGreen).css("border","1px solid white");  
-                   else if (c==p2) $(col).css("background-color",color.violetPink).css("border","1px solid white");
-				} else {
-                   if (c==p1) $(col).css("background-color",getColor("paleGreen",0.25));  
-                   else if (c==p2) $(col).css("background-color",getColor("violetPink",0.25));
-				}		
-				if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
-				$(row).append(col);
-			});
-			$(row).append("<div style='clear:both'></div>");
-			$(boardDiv).append(row);
+	for (ir in board) {
+		var r= board[ir];
+		var row = $("<div></div>");
+		for (ic in r) {
+			var c = r[ic];
+			var col = $("<div class='review_cell "+ir+"_"+ic+"'>&nbsp;</div>");
+			col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee'});
+		    if (loc!=undefined && loc[0]==ir && loc[1]==ic) { // if it's the latest move
+				if (c==p1) $(col).css("background-color",color.paleGreen).css("border","1px solid white");  
+               else if (c==p2) $(col).css("background-color",color.violetPink).css("border","1px solid white");
+			} else {
+               if (c==p1) $(col).css("background-color",getColor("paleGreen",0.25));  
+               else if (c==p2) $(col).css("background-color",getColor("violetPink",0.25));
+			}		
+			if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
+			$(row).append(col);
+		}
+		$(row).append("<div style='clear:both'></div>");
+		$(boardDiv).append(row);
+	}
+	var winnerAndPattern = findWinningCells(board);
+	if (winnerAndPattern!=false) {
+		$(miniBoard).attr('winner',winnerAndPattern.winner);
+		$(miniBoard).css('border','1px solid '+getColor(playerColor[winnerAndPattern.winner],1));
+		$(winnerAndPattern.pattern).each(function(i,wloc) {
+			$(boardDiv).find("."+wloc[0]+"_"+wloc[1]).css('border','1px solid black');
 		});
-		var winnerAndPattern = findWinningCells(board);
-		if (winnerAndPattern!=false) {
-			$(miniBoard).attr('winner',winnerAndPattern.winner);
-			$(miniBoard).css('border','1px solid '+getColor(playerColor[winnerAndPattern.winner],1));
-			$(winnerAndPattern.pattern).each(function(i,wloc) {
-				$(boardDiv).find("."+wloc[0]+"_"+wloc[1]).css('border','1px solid black');
-			});
-	   }		
+	}		
 	$(boardDiv).append("<div style='clear:both'></div>");
 	$(miniBoard).append(boardDiv);
 	$(miniBoard).append("<div style='clear:both;'></div>");

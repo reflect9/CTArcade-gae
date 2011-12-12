@@ -25,60 +25,52 @@
 
 <!-- container : main stuff -->
 <div class='container'>
-	<div class='pageContent'>
+	<div class='pageContent' style='background-color:rgba(0,0,0,0);'>
 		<div class="wrapper clearfix">
-			<div class="innerHeader">
-             {% if user_id != "Guest" %}
-				<div id='desc' style='margin-bottom:10px;'>
+			<div class="ruleListPanel">
+				<div id='desc' style=''>
 					<div id='welcome'></div>
 					<div id='userInfo'></div>
 				</div>
 				<div id='memberListDIV' style='position:absolute; right:10px; top:10px; width:100px;'></div>
 			</div>
-			<div id="container_board" style="float:left; margin:10px 20px 10px 30px; border:0px solid">	
-				<div id="board" style="position:relative; margin-top:10px;">
-					<div id="t00" class="tile"></div>
-					<div id="t10" class="tile"></div>
-					<div id="t20" class="tile"> </div>
-					<div id="t01" class="tile"> </div>
-					<div id="t11" class="tile"> </div>
-					<div id="t21" class="tile"> </div>
-					<div id="t02" class="tile"> </div>
-					<div id="t12" class="tile"> </div>
-					<div id="t22" class="tile"> </div>		
-				</div>
-				<div id="pane_control">
-					<div>
-						<div style="float:left; margin-right:10px;"><input type="button" value="New Game" onclick="clearBoard();"></div>
-						<div id="historyControl" style="float:right;">
-							<span id="prev" onclick="history('prev');" style="cursor:pointer">
-								<
-							</span> 
-							[<span id='currentStep'>0</span>]
-							<span id="next" onclick="history('next');" style="cursor:pointer">
-								>
-							</span>
-						</div>
-						<div style="clear:both;"></div>
+			<div class="trainerPanel clearfix">
+				<div id="container_board" style="float:left; margin:10px 20px 10px 30px; border:0px solid">	
+					<div id="board" style="position:relative; margin-top:10px;">
+						<div id="t00" class="tile"></div>
+						<div id="t10" class="tile"></div>
+						<div id="t20" class="tile"> </div>
+						<div id="t01" class="tile"> </div>
+						<div id="t11" class="tile"> </div>
+						<div id="t21" class="tile"> </div>
+						<div id="t02" class="tile"> </div>
+						<div id="t12" class="tile"> </div>
+						<div id="t22" class="tile"> </div>		
 					</div>
-				</div>
-			</div> <!-- container_board -->
-			<div id="console" class='console_panel' style="float:left;">
-				<div style="text-align:left; width:100%;">
-				</div>
-				<div class='message'>
-				</div>
-                   {% else %}
-				<div id='desc' style='margin-bottom:10px;'>
-					<div id='welcome'>Welcome to the CTArcade Tic Tact Toe Trainer.<br />
-                    In order to use the trainer you must sign in as a registered user using the "Sign In" link.<br />
-                    Registering a user account is quick and easy, just click on the "Create New Account" link.<br />
-				    <hr />
-				</div>
-			</div>
-			{% endif %}
-			</div> 	<!-- console -->
-			<div style="clear:both;"></div>
+					<div id="pane_control">
+						<div>
+							<div style="float:left; margin-right:10px;"><input type="button" value="New Game" onclick="clearBoard();"></div>
+							<div id="historyControl" style="float:right;">
+								<span id="prev" onclick="history('prev');" style="cursor:pointer">
+									<
+								</span> 
+								[<span id='currentStep'>0</span>]
+								<span id="next" onclick="history('next');" style="cursor:pointer">
+									>
+								</span>
+							</div>
+							<div style="clear:both;"></div>
+						</div>
+					</div>
+				</div> 
+				<div id="console" class='console_panel' style="float:left;">
+					<div style="text-align:left; width:100%;"></div>
+					<div class='message'></div>
+					<div id='desc' style='margin-bottom:10px;'>
+						<div id='welcome'></div>
+					</div>
+				</div>	<!-- console -->
+			</div>	<!-- trainerPanel end -->
 		</div> <!--wrapper clearfix-->
 	</div>	<!--pageContent-->
 </div>		<!-- end of container-->

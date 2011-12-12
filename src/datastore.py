@@ -32,26 +32,34 @@ class AI(db.Model):
             rules.append(Rule.get(ruleKey))
         return rules
     def addRule(self,newRuleKey):
-        if newRuleKey in self.data:
-            return False
-        else:
+        if newRuleKey not in self.data:
             self.data.append(newRuleKey)
             self.put()
-            return True
+        result=[]
+        for rule in self.getRules():
+            temp = to_dict(rule)
+            result.append(temp)
+        return result
     def removeRule(self,ruleKeyToRemove):
-        if ruleKeyToRemove not in self.data:
-            return False
-        else:
+        if ruleKeyToRemove in self.data:
             self.data.remove(ruleKeyToRemove)
             self.put()
-            return True
+        result=[]
+        for rule in self.getRules():
+            temp = to_dict(rule)
+            result.append(temp)
+        return result
     def updateByKeyStringList(self,keyStringList):
         newData = []
         for keyString in keyStringList:
             newData.append(db.Key(keyString))
         self.data = newData
         self.put()
-        return self.getRules()
+        result=[]
+        for rule in self.getRules():
+            temp = to_dict(rule)
+            result.append(temp)
+        return result
 
 class Rule(db.Model):
     ''' individual rule '''
@@ -145,12 +153,16 @@ def deleteAll(table):
         except:
             return
 
+def clearAll():
+    deleteAll('Game')
+    deleteAll('Rule')
+    deleteAll('User')
+    deleteAll('AI')
+    
 ''' when empty db is created, run this function to populate basic data set  '''    
 def initSampleData():
-    deleteAll('Game')
+    clearAll()
     Game(title='tictactoe',key_name='tictactoe').put()
-
-    deleteAll('Rule')
     Rule(title='Win',definition='takeWin',description='Take a cell completing three of my stones in a row/column/diagonal',author='built-in',rule_type='built-in',game='tictactoe').put()
     Rule(title='Block Win',definition='takeBlockWin',description='Take a cell of the opponent winning position',author='built-in',rule_type='built-in',game='tictactoe').put()
     Rule(title='Take Center',definition='takeCenter',description='Take the center cell',author='built-in',rule_type='built-in',game='tictactoe').put()
@@ -159,12 +171,11 @@ def initSampleData():
     Rule(title='Take Random',definition='takeRandom',description='Take any empty cell.',author='built-in',rule_type='built-in',game='tictactoe').put()
     Rule(title='Take Opposite Corner',definition='takeOppositeCorner',description='Take a corner cell if its opposite corner is occupied by another player',author='built-in',rule_type='built-in',game='tictactoe').put()
     
-    deleteAll('User')
+
     User(id='easyNPC',password='easyNPC',email='easyNPC@umd.edu',score=0,key_name='easyNPC').put()
     User(id='moderateNPC',password='moderateNPC',email='moderateNPC@umd.edu',score=0,key_name='moderateNPC').put()
     User(id='hardNPC',password='hardNPC',email='hardNPC@umd.edu',score=0,key_name='hardNPC').put()    
 
-    deleteAll('AI')
     AI(user='easyNPC',game='tictactoe',key_name='easyNPC_tictactoe').put()
     AI(user='moderateNPC',game='tictactoe',key_name='moderateNPC_tictactoe').put()
     AI(user='hardNPC',game='tictactoe',key_name='hardNPC_tictactoe').put()

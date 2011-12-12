@@ -5,8 +5,8 @@
 
 body { 
 	height:100%;
-	background-color: #ccc;
-	padding-top: 50px !important;
+	background-color: #222;
+	padding-top: 45px !important;
 	font: 13px/1.5 Helvetica Neue,Arial,Helvetica,'Liberation Sans',FreeSans,sans-serif
 }
 h3 {
@@ -39,7 +39,7 @@ p {
     cursor: pointer;
     display: inline-block;
     font-size: 13px;
-    line-height: normal;
+/*     line-height: normal; */
     padding: 5px 14px 6px;
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 }
@@ -66,15 +66,15 @@ p {
     position: fixed;
     top: 0;
     height:35px;
-    color:#ddd;
+    color:#fff;
     width: 100%;
     z-index: 12;
 }
 .header_bg {
-    background-color: #333;
-    background-image: -moz-linear-gradient(#333333, #111111); 
+    background-color: #CF004F;
+    background-image: -moz-linear-gradient(#CF004F, #9E0233);  
     bottom: 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
     left: 0;
     position: absolute;
     right: 0;
@@ -93,14 +93,14 @@ p {
 }
 
 .header #game_select {
-	margin : 6px 5px 0px 20px;
-    background: none repeat scroll 0 0 #666666;
-    border: 1px solid black;
-    border-radius: 4px 4px 4px 4px;
-    box-shadow: 0 1px 0 #444444;
-    color: #ddd;
+	margin : 8px 5px 0px 20px;
+    background: none repeat scroll 0 0 rgba(255,255,255,0.3);
+    border: 0px solid #eee;
+    border-radius: 4px 4px 4px 4px; 
+    /* box-shadow: 0 1px 0 #444444; */
+    color: #fff;
     font: 13px Arial,sans-serif;
-    padding: 2px 5px 2px 5px;
+    padding: 1px;
     width: 150px;
 }
 .header input[type="text"],
@@ -114,37 +114,53 @@ p {
     height:19px; 
 }
 .header a {
-	color: #aaa;
+	color: #fff;
 	font-size:0.95em;
+	border:1px solid rgba(255,255,255,0);
 	margin : 6px 5px 0px 10px;
+	padding: 1px 3px 1px 3px;
 	overflow:hidden;
 	text-decoration:none;
 }
 .header a:hover {
     color: #fff;
+    border-radius: 5px;
+    background: none repeat scroll 0 0 rgba(255,255,255,0.3);
     font-size:0.95em;
     text-weight:bold;
+    padding: 1px 3px 1px 3px;
     margin : 6px 5px 0px 10px;
     overflow:hidden;
     text-decoration:none;
 }
 .header .currentMode {
-	border-radius: 3px 3px 3px 3px;
+	border-radius: 5px;
 	padding: 3px;
-	color: #ccc;
-	background: none repeat scroll 0 0 #666;
+    text-weight:bold;
+    padding: 1px 3px 1px 3px;
+	color: #fff;
+	background: none repeat scroll 0 0 rgba(255,255,255,0.5);
+}
+.header .currentMode:hover {
+    border-radius: 5px;
+    padding: 3px;
+    text-weight:bold;
+    padding: 1px 3px 1px 3px;
+    color: #333;
+    background: none repeat scroll 0 0 #fff;
 }
 .header .ui_user {
     /*background: none repeat scroll 0 0 #666666;*/
-    border:2px solid #444;
+    /* border:2px solid #444; */
     cursor:pointer;
     display: inline-block;
     height: 22px;
     padding: 0px;
     white-space:nowrap;
-    margin: 4px 0px 0px 0px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
+    margin: 6px 0px 0px 0px;
+/*     -moz-border-radius: 5px; */
+    /* border-radius: 5px; */
+    /* box-shadow: 3px 0px 3px rgba(255, 255, 255, 0.5), -3px 0px 3px rgba(255, 255, 255, 0.5); */
 }
 
 .icon_dropdown {
@@ -196,10 +212,29 @@ p {
     box-shadow:inset 0 -5px 3px #eee;
 }
 
+.ruleListPanel {
+    position:relative;  
+    float:left;
+    background: none repeat scroll 0 0 transparent;
+    /* border-radius: 10px 10px 10px 10px; */
+    margin: -20px 0 -20px -20px;
+    border-radius: 10px 10px 10px 10px;
+    padding: 15px;
+    width:160px;
+    /* -moz-box-shadow:inset 0 -5px 3px #eee;
+    -webkit-box-shadow:inset 0 -5px 3px #eee; */
+    /* box-shadow:inset 0 -5px 3px #eee; */
+}
+.trainerPanel {
+	background: none repeat scroll 0 0 #fff;
+	border-radius: 10px 10px 10px 10px;
+    margin: -20px -20px -20px 180px;
+}
+
 .pageContent {
     background: none repeat scroll 0 0 #FFFFFF;
     border-radius: 10px;
-    box-shadow: 0 1px 3px #A8CFE5;
+/*     box-shadow: 0 1px 3px #A8CFE5; */
 	color: #333;
 	
 }
@@ -229,6 +264,8 @@ div.wrapper {
     width: 12px; height: 12px; 
     margin: 8px 2px 0px 5px;
 }
+
+
 /* trainer */
 div#container_game {
 	width: 400px; 
@@ -272,9 +309,9 @@ li {
 .console_panel {
 	border: 0px silver solid;
 	float:left;
-	width: 420px;	
+	width: 300px;	
 	height: 500px;
-	margin-left: 15px; margin-right:15px;
+	margin-left: 5px; margin-right:10px;
 }
 .tile_p1 {
 	background: url(image/icon_human_40.png) no-repeat center;
@@ -487,15 +524,23 @@ div#title_bar {
 	width:auto;
 }
 .ai_item {
-	background: #555;
+    background: #444;
 	color: #fff;
 	border-radius: 20px; 
 	height:20px;
+	width:88%;
+	overflow: hidden;
     display: inline-block;
-    margin: 0 2px 0 0px;
-    padding: 3px 15px 3px 15px;
+    margin: 3px 0 3px 0;
+    padding: 3px 12px 3px 12px;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
     float:left; 
-    width:auto;
-    
+}
+.icon_order {
+	position: absolute;
+	right:10px; 
+    background: url(image/icon_order.png) no-repeat transparent;
+    display: inline-block; 
+    width: 8px; height: 12px; 
+    margin: 5px -5px 0 0;
 }

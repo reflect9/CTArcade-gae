@@ -216,14 +216,16 @@ function clearBoard() {
 	
 }	
 function showUserAI(userAI,targetDIV) {
+	alert("showUSERAI");
 	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
 	else var t = targetDIV;
 	$(t).empty();
 	//  show the player's strategy
-	$(t).append("<h2 style='float:left; margin-bottom:5px;'>"+p1+"'s AI</h2><div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
-	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
+	$(t).append("<h2 style='float:left; margin:-10px 5px 5px 5px; color:#eee;'>"+p1+"'s AI</h2>");
+//	$(t).append("<div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
+	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left; width:100%;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
 	$.each(userAI, function(i,rule) {
-		$(aiDIV).find("#p1_ai").append("<li class='ai_item' key='"+rule.key+"'>"+rule.title+"</li>");
+		$(aiDIV).find("#p1_ai").append("<li class='ai_item' key='"+rule.key+"'>"+rule.title+"<div class='icon_order'></div></li>");
 	});
 	$("#p1_ai").sortable({	// update user's strategy after changing order. 
 		update : function(event, ui) {
@@ -274,10 +276,17 @@ function showUserAI(userAI,targetDIV) {
 //		alert(keyValue);
 		
 	});
-	$(t).append("<div id='createRuleButton' class='btn green clearfix' style='float:right;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Create New Rule</div>")
+	$(t).append("<div id='createRuleButton' class='ai_item btn green clearfix' style='text-align:center;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Add Custom Rule</div>")
 	$(t).append("<div class='ai_detail' style='clear:both; float:left;'> </div>")
 	$(t).append("<div style='clear:both;'></div>");
 
+}
+function setStrategy(data) {
+	game.strategy = eval(data);
+	alert("setStrategy: "+data);
+	game.strategyKeyList = [];
+	for (i in game.strategy)
+		game.strategyKeyList.push(game.strategy[i].key);
 }
 function createRuleBoard(board) {
 	var ruleBoard = $("<div style='border:1px solid #555; margin:3px; float:left;'></div>");

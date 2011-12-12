@@ -264,6 +264,7 @@ function TicTacToeTrainer() {
     		success: function(response) {
 //    					alert(response);
     					if (response=='True') {
+    						game.setStrategy(response);
     						$(cons.target).find("#mR_"+key).append("<span style='font-size:12px; color:#955;'> I learned this new rule!</span>");
     					} else if(response=='False') {
     						$(cons.target).find("#mR_"+key).append("<span style='font-size:12px; color:#595;'> Thanks! But I knew it already.</span>");
@@ -284,12 +285,9 @@ function TicTacToeTrainer() {
     					strategyToDelete : key
     				},
     		success: function(response) {
-//    					alert(response);
-    					if (response=='True') {
     						alert("rule deleted.");
-    					} else if(response=='False') {
-    						alert("rule couldn't be deleted.");
-    					}
+    						setStrategy(response);
+    						showUserAI(game.strategy,"userInfo");
     				}
     	});
     }
@@ -304,11 +302,15 @@ function TicTacToeTrainer() {
     					game: this.gameTitle,
     					newStrategy : JSON.stringify(nameList)
     				},
+    		success: function(response) {
+//    			alert(response);
+    		}
     	});
     }
     // callback functions for ajax calls
     this.setStrategy = function(data) {
     	this.strategy = JSON.parse(data);
+    	alert("setSTrategy");
     	this.strategyKeyList = [];
     	for (i in this.strategy)
     		this.strategyKeyList.push(this.strategy[i].key);
@@ -340,7 +342,12 @@ function TicTacToeTrainer() {
 						rowPermutation : rowPermutation,
 						columnPermutation : columnPermutation,
 						rotation : rotation				
-					}
+					},
+    		success: function(response) {
+    					alert(response);
+						setStrategy(response);
+						showUserAI(game.strategy,"userInfo");
+			}
 		});
 	}
 	this.init = function(p1,p2) {
