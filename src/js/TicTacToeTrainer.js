@@ -263,6 +263,8 @@ function TicTacToeTrainer() {
     				},
     		success: function(response) {
 //    					alert(response);
+						setStrategy(response);
+						showUserAI(game.strategy,"userInfo");
     					if (response=='True') {
     						game.setStrategy(response);
     						$(cons.target).find("#mR_"+key).append("<span style='font-size:12px; color:#955;'> I learned this new rule!</span>");
@@ -309,6 +311,7 @@ function TicTacToeTrainer() {
     }
     // callback functions for ajax calls
     this.setStrategy = function(data) {
+//    	console.log(data);
     	this.strategy = JSON.parse(data);
 //    	alert("setSTrategy");
     	this.strategyKeyList = [];
@@ -320,33 +323,21 @@ function TicTacToeTrainer() {
     	this.publicStrategyDict = JSON.parse(data);
     }
     //
-	this.makeNewStrategy = function(board, turn, ruleBoard, name, desc,
-									translationInvariant, flipping, rowPermutation,
-									columnPermutation,rotation){
+	this.makeNewStrategy = function(ruleBoardList, title, desc){
 		$.ajax({
-			type : "GET",
+			type : "POST",
 			url : "/ajaxTrainer",
 			async : true,
 			data : 	{	action : 'makeNewStrategy',
+						ruleBoardList : JSON.stringify(ruleBoardList),
 						user: this.user,
-						player1: this.p1,
-						player2: this.p2,
-						turn: turn, 
- 	 					game: this.gameTitle,
- 	 					board: JSON.stringify(board),
-						ruleBoard : JSON.stringify(ruleBoard),
-						title : name,
+ 	 					title : title,
 						desc : desc,
-						translationInvariant : translationInvariant,
-						flipping : flipping,
-						rowPermutation : rowPermutation,
-						columnPermutation : columnPermutation,
-						rotation : rotation				
 					},
     		success: function(response) {
-//    					alert(response);
-						setStrategy(response);
-						showUserAI(game.strategy,"userInfo");
+    			game.getStrategy(game.user, $.proxy(game.setStrategy,game)); // $.proxy(function,scope) : will force the function to run within the scope 
+//						setStrategy(response);
+				showUserAI(game.strategy,"userInfo");
 			}
 		});
 	}

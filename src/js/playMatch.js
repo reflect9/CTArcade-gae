@@ -83,7 +83,7 @@ function runMatch(pl1,pl2) {
 			if (match.winner=="Tie Game") tie_games++;
 		});
 		// show description of the match
-		$("#summary").append("<h2 style='margin-top:5px;'>Result of 30 matches</h2>");
+		$("#summary").append("<h2 style='margin-top:5px;'>Result of matches</h2>");
 		var html = 	"<SPAN style='background-color:"+getColor(playerColor[result.players.p1],1)+"; color:white; padding:0px 4px 0px 4px; -moz-border-radius: 4px; border-radius:4px;'>"+result.players.p1+"</SPAN>"
 				+	"<SPAN style='margin:0 10px 0 10px;'>"+p1_wins+"</SPAN>"
 				+	" : "
@@ -440,7 +440,7 @@ function drawGraphLinesAll(targetDivID,canvas,direction) {
 		$.each(downwardConnectedDivShapes, function(iCD, connectedShape) {
 			if(connectedShape=="") return true;
 			var downwardConnectedTinyBoard = $(targetDivID).find('div[shape="'+connectedShape+'"]');
-			drawGraphLine(canvas,$(tinyboard),downwardConnectedTinyBoard,direction,"#eee");
+			drawGraphLine(canvas,$(tinyboard),downwardConnectedTinyBoard,direction,"#ddd");
 		});
 	});
 //	$.each(connectivityMatrix, function(iR, round) {

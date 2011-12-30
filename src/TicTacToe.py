@@ -11,6 +11,11 @@ from random import choice
 import datastore
 
 ''' TRAINER FUNCTIONS '''
+def addCustomRuleList(ruleBoardList, title, desc, author):
+    print ruleBoardList.__repr__()
+    newRule = datastore.Rule(title=title,code='',description=desc,author=author,game='tictactoe',type='board definition',definition=ruleBoardList.__repr__()).put()
+    return newRule
+
 # for adding user-created custom rule to Rule table
 def addCustomRule(ruleBoard, title, desc, author, translationInvariant,
                     flipping, rowPermutation, columnPermutation, rotation):

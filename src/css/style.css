@@ -6,7 +6,7 @@
 body { 
 	height:100%;
 	background-color: #222;
-	padding-top: 35px !important;
+	padding-top: 45px !important;
 	font: 13px/1.5 Helvetica Neue,Arial,Helvetica,'Liberation Sans',FreeSans,sans-serif
 }
 h3 {
@@ -18,6 +18,30 @@ p {
     line-height: 18px;
     margin: 0 0 15px;
     color: #777777;
+}
+input, textarea {
+	-moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px 3px 3px 3px;
+    color: #808080;
+    display: inline-block;
+    font-size: 13px;
+    padding: 4px;
+}
+
+.txtBtn {
+	cursor: pointer;
+	color: #ddd;
+	text-shadow: 0 -1px 0 #000000;
+    padding: 4px 8px 4px 8px;
+}
+.txtBtn:hover {
+	background-color: #1F8CC2;
+	color:#fff;
+	text-shadow: none;
+	border-radius: 9px;
+	padding: 4px 8px 4px 8px;
 }
 
 .btn {
@@ -56,7 +80,12 @@ p {
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
-
+.btn.large {
+    border-radius: 6px 6px 6px 6px;
+    font-size: 15px;
+    line-height: normal;
+    padding: 9px 14px;
+}
 
 
 /* header and body basics */
@@ -346,7 +375,7 @@ li {
 .rule_unapplicable {
 	color:#B81900;
 	line-height:1.2em;
-	background-image:url(image/icon_x.png);
+	background-image:url(image/icon_unknown.png);
 	background-position:0px -5px;
 	background-repeat: no-repeat;
 	min-height:22px;
@@ -465,6 +494,13 @@ div#title_bar {
 				-moz-opacity: 0.5;       /* mozilla, netscape */
 				opacity: 0.5;           /* fx, safari, opera */
 }
+.grayMat {
+           background-color:#222;
+               filter: alpha(opacity=50); /* internet explorer */
+               -khtml-opacity: 0.5;      /* khtml, old safari */
+               -moz-opacity: 0.5;       /* mozilla, netscape */
+               opacity: 0.5;    
+}
 .panel_floating {
 	background-color:white;
 	border:1px solid #ddd;
@@ -528,6 +564,7 @@ div#title_bar {
 	width:auto;
 }
 .ai_item {
+	position:relative;
     background: #444;
 	color: #fff;
 	border-radius: 20px; 
@@ -542,7 +579,8 @@ div#title_bar {
 }
 .icon_order {
 	position: absolute;
-	right:10px; 
+	right:12px; 
+	top:3px;
     background: url(image/icon_order.png) no-repeat transparent;
     display: inline-block; 
     width: 8px; height: 12px; 

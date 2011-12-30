@@ -3,7 +3,7 @@
 }
 
 .ignore{
-	background-color: transparent;
+	background-color: #aaa;
 }
 
 .consider_demonstrate{
@@ -15,7 +15,7 @@
 }
 
 .create_ignore{
-    background-image: url(image/icon_question.png);
+    /* background-image: url(image/icon_question.png); */
     background-repeat: no-repeat;
     background-position: center;
 	border: solid 2px black;

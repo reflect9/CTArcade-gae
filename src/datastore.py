@@ -67,7 +67,7 @@ class Rule(db.Model):
     description = db.StringProperty() # tooltip
     author = db.StringProperty() # who created the rule : 'built-in' or user name 
     rule_type = db.StringProperty(default="board definition")  # either 'built-in','board definition' or else
-    definition = db.StringProperty(default="") # how the strategy will be executed (either calling built-in python function or use board definition
+    definition = db.TextProperty(default="") # how the strategy will be executed (either calling built-in python function or use board definition
     game = db.StringProperty()
     public = db.BooleanProperty(default=True)  # built-in heuristic rules are public
     created = db.DateTimeProperty(auto_now_add=True)

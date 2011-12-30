@@ -234,38 +234,18 @@ class AjaxTrainer(webapp.RequestHandler):
         elif action == 'enableStrategy':
             # append a builtIn strategy to the user's AI data 
             result = TicTacToe.activateBuiltInRule(self.request.get('player'), self.request.get('strategyToEnable'))
-            self.response.out.write(str(result))
+            self.response.out.write(json.dumps(result))
         elif action == 'deleteRule':
             # append a builtIn strategy to the user's AI data 
             result = TicTacToe.deleteRule(self.request.get('player'), self.request.get('strategyToDelete'))
             self.response.out.write(json.dumps(result))
-        elif action == 'makeNewStrategy':
-#            trainer = TicTacToeTrainer(user=self.request.get('user'),player1=self.request.get('player1'),player2=self.request.get('player2'),board=json.loads(self.request.get('board')),turn=self.request.get('turn'),game='tictactoe')
-            # parse the list
-            ruleBoard = eval(self.request.get('ruleBoard'))
-            addedRule = TicTacToe.addCustomRule(ruleBoard, self.request.get('title'), self.request.get('desc'), self.request.get('user'), self.request.get('translationInvariant'), self.request.get('flipping'), self.request.get('rowPermutation'), self.request.get('columnPermutation'), self.request.get('rotation'))
-            # have a fail response if the name is already in use
-            #   self.response.out.write('failure') -- name already taken
-            #   return
-            # Otherwise, go ahead and enable the strategy
-            userAI = getAI(self.request.get('user'),'tictactoe')
-#            ruleList = getUserRule(self.request.get('user'),self.request.get('game'))
-#            print codeList
-#            ruleList.append(self.request.get('name'))
-            result = userAI.addRule(addedRule)
-#            setUserStrategy(self.request.get('user'),self.request.get('game'),codeList)
-            print >>sys.stderr, json.dumps(result)
-            self.response.out.write(json.dumps(result)) # True or False
+
         elif action == 'changeOrder':
-            # change the user's AI's data which is JSON string of an array that contains 
-            # codes of strategies
             user_id = self.request.get('player')
             game_title = self.request.get('game')
             keyStringList = json.loads(self.request.get('newStrategy'))
             userAI = getAI(user_id,game_title)
             self.response.out.write(userAI.updateByKeyStringList(keyStringList))
-#            setUserStrategy(user_id,game_title,data)
-#            self.response.out.write('updated Rule is '+getUserStrategy(user_id,game_title))
         elif action == 'a':
             self.response.out.write("hi")
             userAI = AI.get_by_key_name('ingrahaj_tictactoe')
@@ -277,7 +257,18 @@ class AjaxTrainer(webapp.RequestHandler):
         else:
             self.response.out.write("unrecognized action: "+action)
             # ignore this
-            pass                               
+            pass        
+    def post(self):
+        action  = self.request.get('action')
+        if action == 'makeNewStrategy':
+            ruleBoardList = eval(self.request.get('ruleBoardList'))
+#            addedRule = TicTacToe.addCustomRule(ruleBoard, self.request.get('title'), self.request.get('desc'), self.request.get('user'), self.request.get('translationInvariant'), self.request.get('flipping'), self.request.get('rowPermutation'), self.request.get('columnPermutation'), self.request.get('rotation'))
+            addedRule = TicTacToe.addCustomRuleList(ruleBoardList, self.request.get('title'), self.request.get('desc'), self.request.get('user'))
+            userAI = getAI(self.request.get('user'),'tictactoe')
+            result = userAI.addRule(addedRule)
+            print >>sys.stderr, json.dumps(result)
+            self.response.out.write(json.dumps(result)) # True or False
+                               
 class CounterWorker(webapp.RequestHandler):
     def post(self): # should run at most 1/s
         #log = TournamentLog(message = "Tournament Start")

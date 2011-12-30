@@ -2,7 +2,18 @@ var game=null; 	// trainer object created from TicTacToeTrainer.js
 var cons=null;	// console object from Console.js
 var needReset = false;   
 var playbackMode = false; // True when user's viewing previous moves, 
-								// user can either resume game there or teach AI what it could've done.
+var TYPE = {
+		0 : {code:'EMPTY',value: 0, css: "create_empty", ignorecss: "consider", description:
+			"<b>Empty tile</b> : the tile should be empty to apply the rule"},
+		1 : {code:'P1',value: 1, css: "create_p1", ignorecss: "consider", description:
+			"<b>Player</b> already occupied this tile."},
+		2 : {code:'P2',value: 2, css: "create_p2", ignorecss: "consider", description:
+			"<b>Opponent</b> already occupited this tile."},
+		3 : {code:'SELECTED',value: 3, css: "create_selected", ignorecss: "consider", description:
+			"<b>Next move</b> where the player will take.<br><span style='color:red;'>required</span>"},
+		4 : {code:'IGNORE',value: 4, css: "create_ignore", ignorecss: "ignore", description:
+			"<b>Ignore</b> : rule doesn't care what is on this tile."}
+};						// user can either resume game there or teach AI what it could've done.
 
 function updateBoard(board) {  // update current board presentation
 	// turnPlayer(game.turn);
@@ -37,6 +48,7 @@ function checkWinner() {
 function computerMove(response) {
 	if(needReset) {
 		cons.appendMessage('Game already finished. Press new game button to start again.');
+		clearBoard();
 		return;
 	}
 	$("#sortable").each( function() {
@@ -254,58 +266,156 @@ function showUserAI(userAI,targetDIV) {
 	$("#p1_ai").mouseover(function() { $("#instruction_reorder").show(); });
 	$("#p1_ai").mouseout(function() { $("#instruction_reorder").hide(); });
 	$("li.ai_item").click(function() {
-		var detailDIV = $(t).find('.ai_detail');
-		detailDIV.empty();
-		var keyValue = $(this).attr('key');
-		for(i in game.strategy) {
-			if(game.strategy[i].key == keyValue) {
-				detailDIV.append("<div><span style='font-weight:bold;'> "+game.strategy[i].title+"</span><span> "+game.strategy[i].description+"</span></div>");
-				if(game.strategy[i].rule_type=="board definition") {
-					var defDiv = $("<div id='ai_detail_definition'></div>");
-					var defList = eval(game.strategy[i].definition);
-					$.each(defList, function(iB, brd) {
-						$(defDiv).append(createRuleBoard(brd));
-					});
-				}
-				detailDIV.append(defDiv);
-				var deleteButton = $("<div class='btn' style='clear:both; margin-left:15px; '> REMOVE THIS RULE </div>").click(function() { game.deleteRule(game.p1,keyValue); });
-				detailDIV.append(deleteButton);
-				break;
-			}
+		if($('.floatingPanel').length>0) {
+			if($('.floatingPanel').attr('key')==$(this).attr('key')) {
+				$('.floatingPanel').hide("slide", { direction: "left" }, 300, function() {$(this).remove();});	
+				return;
+			} else $('.floatingPanel').remove();	
 		}
-//		alert(keyValue);
+		
+		var detailDIV = $("<div></div>",{
+			id:	'ruleDetail',
+			class: 'floatingPanel',
+			key: $(this).attr('key'),
+			style: 'position:absolute;\
+					display:hidden;\
+					z-index:1;\
+					top: 40px;\
+					left: 200px;\
+					width:350px;\
+					min-height:400px;\
+					max-height:450px;\
+					border-radius: 0 10px 10px 0;\
+					padding: 10px;\
+					background-color:#fff;\
+					box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 2px 5px rgba(0, 0, 0, 0.5);\
+				'
+		}).appendTo("#userInfo");
+		detailDIV.show("slide",{direction:"left"},200, function() {
+			var keyValue = $(this).attr('key');
+			for(i in game.strategy) {
+				if(game.strategy[i].key == keyValue) {
+					var ruleTitleAndDescDIV = $("<div></div>",{
+						style: 'color:#ddd; \
+								background-color:#444; \
+								border-radius:0px 10px 0px 0px; \
+								margin:-10px -10px 5px -10px;\
+								padding:8px;\
+							'
+					});
+					$("<div style='font-size:1.2em;font-weight:bold; width:250px;'> "+game.strategy[i].title+"</div>").appendTo(ruleTitleAndDescDIV);
+					$("<div style='font-size:0.9em;'> "+game.strategy[i].description+"</div>").appendTo(ruleTitleAndDescDIV);		
+					$(detailDIV).append(ruleTitleAndDescDIV);
+					if(game.strategy[i].rule_type=="board definition") {
+						var defDiv = $("<div></div>",{
+							id: 'ai_detail_definition',
+							class: 'clearfix',
+							style: 'padding:5px;\
+									height:360px;\
+									overflow-y:scroll;\
+									'
+						}).appendTo(detailDIV);
+						var defList = eval(game.strategy[i].definition);
+						$.each(defList, function(iB, brd) {
+							$(defDiv).append(createRuleBoard(brd));
+						});
+					}
+					var deleteButton = $("<div class='txtBtn' style='position:absolute; top:0px; right:0px; margin:5px;'> Remove this rule </div>").click(function() { game.deleteRule(game.p1,keyValue); });
+					detailDIV.append(deleteButton);
+					break;
+				}
+			}
+		});
+
 		
 	});
-	$(t).append("<div id='createRuleButton' class='ai_item btn green clearfix' style='text-align:center;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Add Custom Rule</div>")
+	$(t).append("<div id='createRuleButton' class='ai_item btn green clearfix' style='text-align:center;' onclick='javascript:addCustomRule();'>Add Custom Rule</div>")
 	$(t).append("<div class='ai_detail' style='clear:both; float:left;'> </div>")
 	$(t).append("<div style='clear:both;'></div>");
 
 }
+function addCustomRule() {
+	$('#container_creation').remove();
+	var pageContentHandle = $(".pageContent");
+	var graymat = $("<div></div>",{
+		style: '	position:absolute;\
+					z-index: 1;\
+					width: '+ pageContentHandle.width() +'px;\
+					height: '+ pageContentHandle.height() +'px;\
+					left: '+pageContentHandle.offset()['left']+'px;\
+					top: '+pageContentHandle.offset()['top']+'px;'
+	}).attr("class","grayMat").appendTo("html");
+	graymat.click(function() {
+		$(".grayMat").fadeOut().remove();
+		$("#container_creation").fadeOut().remove();
+	});
+	var container_creation = $("<div></div>",{	
+				id : 'container_creation',
+				style : '	position: absolute;\
+							left: '+ $("#createRuleButton").offset()['left']+'px;\
+							top: 80px;\
+							margin-left : 50px;\
+							width: 780px;\
+							z-index:2;\
+							padding:15px;\
+							background-color: #fff;\
+							opacity: 1;\
+							border-radius: 10px;\
+							-moz-box-shadow: 0px 0px 5px 5px rgba(0,0,0, 0.5);\
+						    -webkit-box-shadow: 0px 0px 5px 5px rgba(0,0 ,0, 0.5);\
+						    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.5);\
+						'
+			}).attr("id","container_creation").appendTo(pageContentHandle);
+	creation = new Creation();
+	creation.startCreationInterface(container_creation,game.cloneBoard(game.board));
+}
+
 function setStrategy(data) {
 	game.strategy = eval(data);
-//	alert("setStrategy: "+data);
+	console.log("setStrategy: "+data);
 	game.strategyKeyList = [];
 	for (i in game.strategy)
 		game.strategyKeyList.push(game.strategy[i].key);
 }
 function createRuleBoard(board) {
-	var ruleBoard = $("<div style='border:1px solid #555; margin:3px; float:left;'></div>");
-	var tileSize = 15;
-//	class CellType:
-//	    EMPTY = 0
-//	    P1 = 1
-//	    P2 = 2
-//	    SELECTED = 3
-//	    IGNORE = 4
-	tileCharacter = ['','O','X',"<span style='color:red'>O</span>","<span style='color:#999'>?</span>"];
-	$.each(board, function(iCol,col) {
-		var colDiv = $("<div class='clearfix;' style='float:left; width:"+tileSize+"px;'></div>");
-		$.each(col, function(iRow,tile) {
-			$(colDiv).append("<div style='border:1px solid #eee; font-size:10px; width:"+(tileSize-2)+"px; height:"+(tileSize-2)+"px;'>"+tileCharacter[parseInt(tile)]+"</div>");
-		});
-		$(ruleBoard).append(colDiv);
-	});
-	return ruleBoard;
+	var miniBoard = $("<div class='tinyboard' style='float:left;'></div>"); 
+	var cellSize = 10;
+	var boardDiv = $("<div style='position:relative; margin:2px 0 0 2px;'></div>");
+	for (ir in board) {
+		var r= board[ir];
+		var row = $("<div></div>");
+		for (ic in r) {
+//			var tileType = r[ic].value;
+			var col = $("<div class='review_cell "+ir+"_"+ic+"'></div>");
+			col.addClass(TYPE[r[ic]].css).addClass(TYPE[r[ic]].ignorecss);				
+			col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee', 'background-size':'15px 15px'});
+			$(row).append(col);
+		}
+		$(row).append("<div style='clear:both'></div>");
+		$(boardDiv).append(row);
+	}	
+	$(boardDiv).append("<div style='clear:both'></div>");
+	$(miniBoard).append(boardDiv);
+	$(miniBoard).append("<div style='clear:both;'></div>");
+	return miniBoard;
+	
+//	var ruleBoard = $("<div style='border:1px solid #555; margin:3px; float:left;'></div>");
+//	var tileSize = 15;
+////	class CellType:
+////	    EMPTY = 0
+////	    P1 = 1
+////	    P2 = 2
+////	    SELECTED = 3
+////	    IGNORE = 4
+//	tileCharacter = ['',"<span style='color:#1F8CC2; text-align:center'>O</span>","<span style='color:#1F8CC2 text-align:center'>X</span>","<span style='color:red text-align:center'>O</span>","<span style='color:#999 text-align:center'>?</span>"];
+//	$.each(board, function(iCol,col) {
+//		var colDiv = $("<div class='clearfix;' style='float:left; width:"+tileSize+"px;'></div>");
+//		$.each(col, function(iRow,tile) {
+//			$(colDiv).append("<div style='border:1px solid #eee; font-size:10px; width:"+(tileSize-2)+"px; height:"+(tileSize-2)+"px;'>"+tileCharacter[parseInt(tile)]+"</div>");
+//		});
+//		$(ruleBoard).append(colDiv);
+//	});
+//	return ruleBoard;
 }
 
 function callUserMove(dd) {
