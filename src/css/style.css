@@ -425,7 +425,7 @@ li {
 #console .paragraph {
 	margin:2px;
 	padding:5px;
-	border:2px solid #ddd;
+/* 	border:2px solid #ddd; */
 	border-radius: 5px;
 }
 

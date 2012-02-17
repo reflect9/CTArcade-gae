@@ -22,17 +22,17 @@ function Console() {
 		});
 	}
 	this.appendHTML = function(html,gotoBottom) {
-		var paragraphs = $(this.target).find('.paragraph');
-		if(!paragraphs.length) {
-			$(this.target).append("<div class='paragraph'>"+html+"</div>");
-		} 
+//		var paragraphs = $(this.target).find('.paragraph');
+//		if(!paragraphs.length) {
+//			$(this.target).append("<div class='paragraph'>"+html+"</div>");
+//		} 
 		// append html at the bottom of the target contents
-		$(this.target).append(newParagraph);
+		$(this.target).append(html);
 		// add click event as well
 		// if (gotoBottom==true) 
 			// t = setTimeout("cons.scrollDown()",1000);
 		// // and scroll down	
-		this.scrollDown();
+//		this.scrollDown();
 	}
 
 	this.appendInstruction = function(message) {

@@ -441,7 +441,8 @@ function callUserMove(dd) {
 function showMatchingStrategy(response) {   
 	matchingRules = JSON.parse(response);
 	cons.clear();
-	cons.appendHTML("Is your last move based on one of these rules?")
+//	alert("aha");
+	cons.appendHTML("<div>Is your last move based on one of these rules?</div>");
 	$(matchingRules).each( function(i,rule) {
 		var r = $('<div></div>',{
 			id : 'mR_'+rule['key'],
