@@ -98,17 +98,18 @@ function runMatch(pl1,pl2) {
 	});
 }
 function showMatches(mode) {
+	$(".tbtn").css('color','#bbb');
+	$("#btn_"+mode).css('color','#1F8CC2');
 	if(mode=='list')
 		showMatchesAsList(matches);
 	else if(mode=='animation')
 		showMatchesAsAnimation(matches);
 	else if(mode=='group')
 		showMatchesAsGroups(matches);
-	else if(mode=='graph_vertical')
-		showMatchesAsGraph(matches,'vertical');
-	else if (mode=='graph_horizontal') 
+	else if (mode=='graph') 
 		showMatchesAsGraph(matches,'horizontal');
 }
+
 function createMiniBoard_singleRound(match,iR) {	// used by graph mode only
 	var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
     var strategyInOrder = [["","",""],["","",""],["","",""]];
@@ -206,7 +207,7 @@ function showMatchesAsList(matchList) {
     $("#matches").empty();
    $(matchList).each( function(i,m) {
        //alert(e.message);
-       var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0; padding-top:10px; border-top:2px dotted'></div>");
+       var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0px; padding-top:10px; border-bottom:0px dotted #aaa'></div>");
        var p1tag = "<span style='background-color:"+getColor(playerColor[p1],0.6)+";border-radius:2px; padding:1px 3px 1px 3px;'>"+p1+"</span>";
        var p2tag = "<span style='background-color:"+getColor(playerColor[p2],0.6)+";border-radius:2px; padding:1px 3px 1px 3px;'>"+p2+"</span>";
        if (m.winner==p1) $(matchDIV).append("<div><span>"+"<div class='icon_star' style=''></div>"+p1tag+" vs. "+p2tag+"</span></div>");
@@ -231,7 +232,7 @@ function showMatchesAsList(matchList) {
 function showMatchesAsAnimation(matchList) {
 	currentMode = "animation";
   $("#matches").empty();
-  $("#matches").append("<div><input type='button' value='<' onclick='prev();'/><input type='button' value='>' onclick='next();'/>"+currentRound+"</div>");
+  $("#matches").append("<div style='margin-top:10px;'><input type='button' class='btn' value='<' onclick='prev();'/><input type='button' class='btn' value='>' onclick='next();'/>&nbsp;"+currentRound+"</div>");
   $(matchList).each( function(i,m) {
       var matchDIV = $("<div id='match_"+i+"' class='match'></div>");
       matchDIV.append("<div style='font-size:11px;'>match "+i+"</div>");
@@ -263,9 +264,9 @@ function next() {
 function showMatchesAsGroups(matchList) {
 	currentMode = "group";
 	$("#matches").empty();
-	$("#matches").append("<div id='winningGames' style='clear:both; margin:10px;'><div>Winning games</div></div>");
-	$("#matches").append("<div id='losingGames' style='clear:both; margin:10px;'><div>Losing games</div></div>");
-	$("#matches").append("<div id='tieGames' style='clear:both; margin:10px;'><div>Tie games</div></div>");
+	$("#matches").append("<div id='winningGames' style='clear:both; margin:0px;'><div>Winning games</div></div>");
+	$("#matches").append("<div id='losingGames' style='clear:both; margin:0px;'><div>Losing games</div></div>");
+	$("#matches").append("<div id='tieGames' style='clear:both; margin:0px;'><div>Tie games</div></div>");
 	$(matchList).each( function(i,m) {
 		var matchDIV = $("<div class='match'></div>");
 		var lastTurn = m.history[m.history.length-1];
@@ -337,7 +338,7 @@ function showMatchesAsGraph(matchList, direction) {
 		}
 		var layoutResult = sugiyama(graph);
 		var divID =  "matches_"+firstMovePlayer;
-		$("#matches").append("<div id='"+divID+"' class='clearfix' style='clear:both; position:relative; width:auto; margin-left:40px;'></div>");
+		$("#matches").append("<div id='"+divID+"' class='clearfix' style='clear:both; position:relative; width:auto; margin-left:1px;'></div>");
 		drawGraph(layoutResult,selectedMatches,"#"+divID,direction);
 	});
 //	$(".matchGraphColumn_bg").click(function() { alert("asdfdfd"); deselectBoard();});
@@ -675,7 +676,7 @@ function findWinningCells(board) {
 $(document).ready( function() {
 	memberList = new MemberList();
 	memberList.init("#memberListDIV");
-	currentMode = 'graph_horizontal';
+	currentMode = 'list';
 	if(p1=="Guest") {
 		$("#userInfo").append("Welcome, Guest!  You need to <a href='javascript:openSignIn();'>log in</a> to play matches with others.");
 	} else {

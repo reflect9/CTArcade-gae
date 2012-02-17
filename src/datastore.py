@@ -33,7 +33,11 @@ class AI(db.Model):
         return rules
     def addRule(self,newRuleKey):
         if newRuleKey not in self.data:
-            self.data.append(newRuleKey)
+            newData= self.data
+            newData.reverse()
+            newData.append(newRuleKey)
+            newData.reverse()
+            self.data =newData
             self.put()
         result=[]
         for rule in self.getRules():

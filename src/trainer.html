@@ -8,7 +8,6 @@
 	<script type="text/javascript" src="js/TicTacToeTrainer.js"> </script>
 	<script type="text/javascript" src="js/Console.js"> </script>
 	<script type="text/javascript" src="js/util.js"> </script>
-	<script type="text/javascript" src="js/bootstrap-twipsy.js"> </script> <!-- twitter style popup help-->
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	<link rel="stylesheet" type="text/css" href="css/Creation.css"/>
 	<script type="text/javascript" src="js/Creation.js"> </script>
@@ -36,7 +35,7 @@
 			</div>
 			<div class="trainerPanel clearfix">
 				<div id="container_board" style="float:left; margin:15px; border:0px solid">	
-					<div id="board" style="position:relative; margin-top:10px;">
+					<div id="board" style="position:relative; margin-top:10px; margin-bottom:10px;">
 						<div id="t00" class="tile"></div>
 						<div id="t10" class="tile"></div>
 						<div id="t20" class="tile"> </div>
@@ -49,22 +48,22 @@
 					</div>
 					<div id="pane_control">
 						<div>
-							<div style="float:left; margin-right:10px;"><input type="button" value="New Game" onclick="clearBoard();"></div>
-							<div id="historyControl" style="float:right;">
-								<span id="prev" onclick="history('prev');" style="cursor:pointer">
-									<
-								</span> 
-								[<span id='currentStep'>0</span>]
-								<span id="next" onclick="history('next');" style="cursor:pointer">
-									>
-								</span>
+							<div id="historyControl" style="float:left;">
+								<div id="prev" class='btn icon_undo' onclick="history('prev');">
+								</div> 
+								<div id="next" class='btn icon_redo' onclick="history('next');">
+								</div>
+								
 							</div>
+							<div id="gameStatusMessage" style="float:left; margin-left:10px; color:#08C; font-size:0.9em; font-weight:bold;"></div>
+							<div style="float:right; margin-right:0px;"><input type="button" class='btn blue' value="New Game" onclick="clearBoard();"></div>
+							
 							<div style="clear:both;"></div>
 						</div>
 					</div>
 				</div> 
 				<div id="console" class='console_panel' style="float:left;">
-					<div style="text-align:left; width:100%;"></div>
+					<div id='turn_info' style="text-align:left; width:100%; margin:5px 10px 5px 10px"></div>
 					<div class='message'></div>
 					<div id='desc' style='margin-bottom:10px;'>
 						<div id='welcome'></div>

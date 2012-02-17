@@ -115,6 +115,7 @@ class LogIn(webapp.RequestHandler):
         if findUser:
             self.sess['loggedInAs'] = findUser.id
             self.response.out.write("You are now logged in as " + self.sess['loggedInAs'])
+            self.redirect('/trainer')
             return
         else:
             self.response.out.write("We could not find your user information,<br />please try again.")    

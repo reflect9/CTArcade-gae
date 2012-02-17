@@ -15,40 +15,56 @@
 }
 
 .create_ignore{
-    /* background-image: url(image/icon_question.png); */
-    background-repeat: no-repeat;
-    background-position: center;
-	border: solid 2px black;
+    background: url(image/create_icons.png) no-repeat scroll -250px -19px;
+    border: none;
 }
 
 .create_p1{
-	background-image: url(image/icon_o.png);
-	background-repeat: no-repeat;
-	background-position: center;
-	border: solid 2px black;
+	background: url(image/create_icons.png) no-repeat scroll -29px -21px;
+	border: none;
 }
 
 .create_p2{
-	background-image: url(image/icon_x.png);
-	background-repeat: no-repeat;
-	background-position: center;
-	border: solid 2px black;
+	background: url(image/create_icons.png) no-repeat scroll -139px -20px;
+	border: none;
 }
 
 .create_empty{
-	border: solid 2px black;
-}
-
-.create_there{
-	border: dashed 2px black;
+	background: none;
 }
 
 .create_selected{
-    background-image: url(image/icon_o_red.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    border: solid 2px black;
+    background: url(image/create_icons.png) no-repeat scroll -29px -130px;
+    border: none;
 }
+
+/* tile type icons for small board */
+.create_ignore_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -17px -15px;
+    border: none;
+}
+
+.create_p1_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -17px -3px;
+    border: none;
+}
+
+.create_p2_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -29px -3px;
+    border: none;
+}
+
+.create_empty_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -5px -15px;
+    border: none;
+}
+
+.create_selected_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -5px -3px;
+    border: none;
+}
+
+
 
 #overlayConsole > .message {
 	margin-top:5px;

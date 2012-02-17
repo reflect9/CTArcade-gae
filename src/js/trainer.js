@@ -47,7 +47,7 @@ function checkWinner() {
 // to find the best move
 function computerMove(response) {
 	if(needReset) {
-		cons.appendMessage('Game already finished. Press new game button to start again.');
+		cons.appendHTML('Game already finished. Press new game button to start again.');
 		clearBoard();
 		return;
 	}
@@ -104,35 +104,35 @@ function computerMove(response) {
 		// now it selects one from all the moves of the best strategy
 		selectedLoc = responseDict.locList[Math.floor(Math.random()*responseDict.locList.length)]; // randomly select one location from list
 		game.move(selectedLoc[0], selectedLoc[1], game.turn); // update board ds with current game.turn and return new value of the cell
-		$("#currentStep").text(game.history.length-1);
+		game.currentStep = game.history.length-1;
 		updateBoard(game.board);
 		checkWinner(); 
 	}
 }
 
 function history(direction) {
-	var currentStep = parseInt($("#currentStep").text());
-	if (direction=='next') currentStep += 1;
-	else currentStep -= 1;
-	if (currentStep>=game.history.length-1) {
-		historyMode('off');
+	if (direction=='next') game.currentStep += 1;
+	else game.currentStep -= 1;
+	if (game.currentStep>=game.history.length-1) {
+		historyMode('off');	
+		cons.clear();
+		cons.appendHTML("It's your turn. Click an empty cell for next move.");
 		tempBoard = game.history[game.history.length-1];
 		updateBoard(tempBoard['board']);
-		currentStep = game.history.length-1;
-		$("#currentStep").text(currentStep);
+		game.currentStep = game.history.length-1;
 		return;
-	} else if(currentStep<=-1) {
-		currentStep=0;
+	} else if(game.currentStep<=-1) {
+		game.currentStep=0;
 		return;
 	} else {
 		historyMode('on');
-		tempBoard = game.history[currentStep];	
+		tempBoard = game.history[game.currentStep];	
 		updateBoard(tempBoard['board']);
-		$("#currentStep").text(currentStep);
+//		$("#currentStep").text(currentStep);
 		cons.clear();
-		cons.appendHTML("<span style='color:#2222ee; font-size:20px;'>History Mode</div>");
+//		cons.appendHTML("<span style='color:#2222ee; font-size:20px;'>History Mode</div>");
 		if (tempBoard['turn']==game.p2) {
-			cons.appendHTML("<div>It was your turn. Do you want to start again from this point?</div><div class='button_round' onclick='resumeGame("+currentStep+");' style='width:200px; text-align:center; background-color:#aaa; font-size:17px; margin:10px auto;'>Resume Game Here</div></div>");
+			cons.appendHTML("<div>It was your turn. Do you want to start again from this point?</div><div class='button_round' onclick='resumeGame("+game.currentStep+");' style='width:200px; text-align:center; background-color:#aaa; font-size:17px; margin:10px auto;'>Resume Game Here</div></div>");
 		} else {
 			cons.appendHTML("<div>It was my turn. You can teach me what I could have done at this point. <br>To do that, click an empty cell and tell me why you think it is important.</div>");
 			$(".tile").click( function() {
@@ -150,7 +150,7 @@ function teachAI(board,turn,loc) {   // this teaching method is being used in hi
 	game.findMatchingStrategy(board,flippedTurn,[x,y],showTeachingStrategy);
 }
 function resumeGame(currentStep) {	// history mode -> play mode
-	game.resumeFromHistoryMode(currentStep);
+	game.resumeFromHistoryMode(game.currentStep);
 	historyMode('off');
 	$(".tile").click( function() {
 		callUserMove($(this).attr('id'));
@@ -179,19 +179,18 @@ function showTeachingStrategy(response) {   // teaching method in history mode
 function historyMode(flag) {
 	if(flag=='on') {
 		$(".tile").unbind();
-		$('.tile').css('background-color','#ddd');
-//		$('#status').text('History mode')
-//						.css('background-color','#0055ff');
+		$('#gameStatusMessage').text("HISTORY MODE");
 	} 
 	if(flag=='off') {
 		$(".tile").unbind();
 		$(".tile").click( function() {
 			callUserMove($(this).attr('id'));
 		});
+		$('#gameStatusMessage').text("");
 		$('.tile').css('background-color','#fff');
 //		$('#status').text(currentTurn + " 's turn")
 //						.css('background-color','#fff');
-		cons.appendMessage("It's your turn. Click an empty cell to take.");			
+		cons.appendHTML("It's your turn. Click an empty cell to take.");			
 	}
 	
 }
@@ -211,11 +210,11 @@ function clearBoard() {
 	$("#bigButton").hide();
 	historyMode('off');
 	game.restart();  // reset game.board, game.turn 
-	$("#currentStep").text(game.history.length-1);
+//	$("#currentStep").text(game.history.length-1);
 //	$("#status").css('background-color', 'white');
 	$("#rule").text("");
 	cons.clear();
-	cons.appendMessage("It's your turn. Click an empty cell for next move.");
+	cons.appendHTML("It's your turn. Click an empty cell for next move.");
 	for (var i = 0; i < 3; i++) {
 		for (var j =0; j<3;j++) {
 			$("#t"+i+""+j).removeClass('tile_p1');
@@ -233,7 +232,7 @@ function showUserAI(userAI,targetDIV) {
 	else var t = targetDIV;
 	$(t).empty();
 	//  show the player's strategy
-	$(t).append("<h2 style='float:left; margin:-10px 5px 5px 5px; color:#eee;'>"+p1+"'s AI</h2>");
+	$(t).append("<h2 style='float:left; margin:-10px 5px 5px 5px; color:#eee;'>"+p1+"'s gamebot</h2>");
 //	$(t).append("<div id='instruction_reorder' style='float:left; margin: 8px 10px 0px 30px;'><span class='icon_downArrow'>&nbsp;</span>Drag rules to Re-order</div>");
 	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; float:left; width:100%;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
 	$.each(userAI, function(i,rule) {
@@ -265,12 +264,15 @@ function showUserAI(userAI,targetDIV) {
 	$("#instruction_reorder").hide();
 	$("#p1_ai").mouseover(function() { $("#instruction_reorder").show(); });
 	$("#p1_ai").mouseout(function() { $("#instruction_reorder").hide(); });
+	
+	// When a rule is clicked, SHOWING DETAIL
 	$("li.ai_item").click(function() {
+		// close all the opened detail windows
 		if($('.floatingPanel').length>0) {
-			if($('.floatingPanel').attr('key')==$(this).attr('key')) {
+			if($('.floatingPanel').attr('key')==$(this).attr('key')) {	// if user clicked the rule of opening one, slide left
 				$('.floatingPanel').hide("slide", { direction: "left" }, 300, function() {$(this).remove();});	
 				return;
-			} else $('.floatingPanel').remove();	
+			} else $('.floatingPanel').remove();	// if another rule is clicked, just remove it
 		}
 		
 		var detailDIV = $("<div></div>",{
@@ -325,6 +327,13 @@ function showUserAI(userAI,targetDIV) {
 					break;
 				}
 			}
+			// add click event of closing all the .floatingPanel to '.trainerPanel'
+			$(".trainerPanel").click(function() {
+				if($('.floatingPanel').length>0) 
+					$('.floatingPanel').hide("slide", { direction: "left" }, 300, function() {$(this).remove();});	
+				$(".trainerPanel").unbind('click');
+			});
+			
 		});
 
 		
@@ -387,8 +396,8 @@ function createRuleBoard(board) {
 		for (ic in r) {
 //			var tileType = r[ic].value;
 			var col = $("<div class='review_cell "+ir+"_"+ic+"'></div>");
-			col.addClass(TYPE[r[ic]].css).addClass(TYPE[r[ic]].ignorecss);				
-			col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee', 'background-size':'15px 15px'});
+			col.addClass(TYPE[r[ic]].css+"_tiny").addClass(TYPE[r[ic]].ignorecss);				
+			col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee'});
 			$(row).append(col);
 		}
 		$(row).append("<div style='clear:both'></div>");
@@ -432,7 +441,7 @@ function callUserMove(dd) {
 function showMatchingStrategy(response) {   
 	matchingRules = JSON.parse(response);
 	cons.clear();
-	cons.appendMessage("Is your last move based on one of these rules?")
+	cons.appendHTML("Is your last move based on one of these rules?")
 	$(matchingRules).each( function(i,rule) {
 		var r = $('<div></div>',{
 			id : 'mR_'+rule['key'],
@@ -458,7 +467,7 @@ function showMatchingStrategy(response) {
 function userMove(x,y) {
 	game.findMatchingStrategy(game.board,game.turn,[x,y],showMatchingStrategy);
 	var val = game.move(x, y, currentTurn);  // update game.board, game.turn and game.history
-	$("#currentStep").text(game.history.length-1);
+	game.currentStep = game.history.length-1;
 	updateBoard(game.board);	// update game.board on #txy.text
 	checkWinner();	// check winning condition. if yes, show the winner, otherwise show next one to play
 			

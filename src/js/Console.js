@@ -22,8 +22,12 @@ function Console() {
 		});
 	}
 	this.appendHTML = function(html,gotoBottom) {
+		var paragraphs = $(this.target).find('.paragraph');
+		if(!paragraphs.length) {
+			$(this.target).append("<div class='paragraph'>"+html+"</div>");
+		} 
 		// append html at the bottom of the target contents
-		$(this.target).append(html);
+		$(this.target).append(newParagraph);
 		// add click event as well
 		// if (gotoBottom==true) 
 			// t = setTimeout("cons.scrollDown()",1000);
@@ -65,16 +69,7 @@ function Console() {
 	
 	this.init = function(t) {   // t must be ID of div
 		this.target = $(t);
-		html = "<img src='css/image/icon_computer_40.png'> Welcome to Trainer mode of TicTacToe game.";
-		html += "<br><br>I am your AI (Artificial Intelligence), and I'll play against other people's AI. "; 
-		html += "To play TicTacToe, you need to teach me rules for winning."; 
-		html += "<br><br> Here's how you can help me learn.";
-		html += "<br> I'll ask which rule was used for each of your moves. By picking a rule, you can teach the rule to me.";
-		html += "<br><br> I'll show how I made each move as well. You can teach me which rule is more important by changing the priority of each rule."
-		html += "<br><br> Let's begin!";
-		this.appendHTML(html);
-		
-		
+
 		// <br>We are now in TicTacToe trainer mode. <br> 
 			// <b>AI: </b>I don't know much about playing TicTacToe. 
 			// Before getting into the tournament, I need your guidance. <br>

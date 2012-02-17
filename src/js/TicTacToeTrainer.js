@@ -44,6 +44,7 @@ function TicTacToeTrainer() {
     this.restart = function() {
         this.firstTurn = this.flipTurn(this.firstTurn);
     	this.turn = this.firstTurn;
+    	this.currentStep = 0;
         this.board = this.createEmptyBoard(this.width, this.height);
         this.history = [];
         this.history.push({'board':this.cloneBoard(this.board), 'loc':undefined, 'turn':undefined});
@@ -349,6 +350,7 @@ function TicTacToeTrainer() {
 		this.p2 = p2;
 		this.width=3; 
 		this.height=3;  
+		this.currentStep = 0;
 		var started; 	// true when playing game is on
 		
 		this.publicStrategyDict = {};  // list of code -> other information of all the public codes for the game

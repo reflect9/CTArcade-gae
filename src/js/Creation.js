@@ -38,64 +38,58 @@ function Creation() {
 	}
 
 	this.startCreationInterface = function(target,board) {	// target: jquery object of container, board: board state
-//		var pageContentHandle = $(".pageContent");
-//		$("<div></div>",{
-//			id : 'overlay',
-//			style : 'width: '+pageContentHandle.width()+'px;\
-//					height: '+pageContentHandle.height()+'px;\
-//					z-index: 1;\
-//					background-color: #444444;\
-//					position: absolute;\
-//					left: '+pageContentHandle.offset()['left']+'px;\
-//					top: '+pageContentHandle.offset()['top']+'px;\
-//					opacity: 0.0;\
-//					filter: alpha(opacity=0.0);'
-//		}).attr("class","pageContent").appendTo("html");
-		
-		// clone, create an overlaid console
-//		var consoleHandle = $("#console");
-//		var left = consoleHandle.offset()['left']-parseInt(consoleHandle.css("margin-left"));
-//		var top = consoleHandle.offset()["top"]-parseInt(consoleHandle.css("margin-top"));
-//		consoleHandle.clone().css({"width":consoleHandle.width(),
-//								 "height":consoleHandle.height(),
-//								 "position":"absolute",
-//								 "left":left,
-//								 "top":top,
-//								 "z-index":2,
-//								 "opacity":1.0,
-//								 "filter":"alpha(opacity=1.0)"})
-//		.attr("id","overlayConsole").appendTo("html");
-//		this.overlayConsole = new Console();
-//		this.overlayConsole.init("#overlayConsole > .message");
-//		this.overlayConsole.clear();
 		target.addClass('creationDIV').addClass('clearfix');
-		$("<h2 style='color:#57A957;'>Step 1. Define basic pattern</h2>").appendTo(target);
-		var boardDIV = $("<div></div>",{
-			id: 'cr_board',
-			style : '	width: 330px;\
-						height: 330px;\
+		var leftDIV = $("<div></div>",{
+			id: 'cr_inst',
+			style : '	width: 350px;\
 						float:left;\
+						margin:0px 10px 0px 10px;\
+					',
+		}).appendTo(target);
+		var rightDIV = $("<div></div>",{
+			id: 'cr_inst',
+			style : '	width: 350px;\
+						float:left;\
+						margin:0px 10px 0px 10px;\
+					',
+		}).appendTo(target);
+		var boardDIVcontainer = $("<div></div>",{
+			style : '	float:left;\
 						margin:0px;\
 					',
-		}).appendTo(target);
-		var instDIV = $("<div></div>",{
-			id: 'cr_inst',
-			style : '	width: 440px;\
-						height: 330px;\
-						float:left;\
-						margin-left:10px;\
+		}).appendTo(leftDIV);
+		$("<h2 style='color:#57A957;'>Step 1. Define basic pattern</h2>").appendTo(boardDIVcontainer);
+		var boardDIV = $("<div></div>",{
+			id: 'cr_board',
+			class: 'board',
+			style : '	float:left;\
+						margin:10px;\
 					',
-		}).appendTo(target);
+		}).appendTo(boardDIVcontainer);
+		var descDIV = $("<div></div>",{
+			style : '	float:left;\
+						width:100%;\
+						margin:0px;\
+					',
+		}).appendTo(leftDIV);
 		var variationDIV = $("<div></div>",{
 			id: 'cr_variation',
 			style : '	clear:both;\
 						width:100%;\
+						margin:0px;\
 						position:relative;\
 						\
 					',
-		}).appendTo(target);
+		}).appendTo(rightDIV);
 		
-		// create the web representation of the game board
+		// STEP0. title and description
+		$("<h2 style='color:#57A957;'>Step 3. Name your rule</h2>").appendTo(descDIV);
+		$("<div style='margin:5px 0 5px 0;'><div style='width:100px; float:left;'>Title</div><input type='text' size='35' id='title' name='title'></div>").appendTo(descDIV);
+		$("<div style='margin:5px 0 5px 0; clear:both;'><div style='width:100px; float:left;'>Description</div><textarea rows='4' id='description' style='width:240px;'name='description'></textarea></div>").appendTo(descDIV);
+		$("<div style='margin:5px 0 5px 0; clear:both;'><div style='float:left;margin-right:15px;'>Allow other users to use your rule</div><input type='checkbox' name='publicCheckBox'></div>").appendTo(descDIV);
+		$("<div style='margin-right:20px;'><a class='btn green large' onclick='creation.createRule();'>CREATE RULE</a></div>").appendTo(descDIV);
+		
+		// STEP1. create the web representation of the game board
 		for (var i=0; i<board.length; i++){
 			for (var j=0; j<board[i].length; j++){
 				//initialize the board type
@@ -124,24 +118,24 @@ function Creation() {
 				
 		
 		// put the descriptions of each creation tile type in the console
-		var html = "<div style='height: 300px;'>"
-		for (type in TYPE){
-			html = html +
-				"<div id='container_"+type+"' style='float:left; margin: 2px;'>\
-				   <div class='"+TYPE[type].ignorecss+"_demonstrate "+TYPE[type].css+"' \
-						style='width: 50px; height: 50px; float: left;'>\
-					</div>\
-					<div id='description_"+type+"' class='instruction' \
-						style='float: left; padding:5px 5px 5px 10px;'>"
-						+TYPE[type].description+"\
-					</div>\
-				</div>"
-		}
-		html = html + "</div>";
-		instDIV.append(html);
+//		var html = "<div style='height: 300px;'>"
+//		for (type in TYPE){
+//			html = html +
+//				"<div id='container_"+type+"' style='float:left; margin: 2px;'>\
+//				   <div class='"+TYPE[type].ignorecss+"_demonstrate "+TYPE[type].css+"' \
+//						style='width: 50px; height: 50px; float: left;'>\
+//					</div>\
+//					<div id='description_"+type+"' class='instruction' \
+//						style='float: left; padding:5px 5px 5px 10px;'>"
+//						+TYPE[type].description+"\
+//					</div>\
+//				</div>"
+//		}
+//		html = html + "</div>";
+//		instDIV.append(html);
 
 		// STEP2. add variation UI
-		$("<h2 style='color:#57A957;'>Step 2. Make variations of your pattern</h2>").appendTo(variationDIV);
+		$("<h2 style='color:#57A957;'>Step 2. Make variations</h2>").appendTo(variationDIV);
 		$.each(variationList,function(i_op,op) {
 			var d = $("<div></div>").attr('id','var_'+i_op).appendTo(variationDIV);
 			d.css('border-bottom','1px solid #ddd');
@@ -149,12 +143,7 @@ function Creation() {
 			d.append("<div class='ex_boards clearfix'></div>");
 		});
 		
-		// STEP3. title and description
-		$("<h2 style='color:#57A957; margin-top:10px;'>Step 3. Name your rule</h2>").appendTo(variationDIV);
-		$("<div style='margin:5px 0 5px 0;'><div style='width:100px; float:left;'>Title</div><input type='text' size='50' id='title' name='title'></div>").appendTo(variationDIV);
-		$("<div style='margin:5px 0 5px 0; clear:both;'><div style='width:100px; float:left;'>Description</div><textarea rows='4' id='description' style='width:415px;'name='description'></textarea></div>").appendTo(variationDIV);
-		$("<div style='margin:5px 0 5px 0; clear:both;'><div style='float:left;margin-right:15px;'>Allow other users to use your rule</div><input type='checkbox' name='publicCheckBox'></div>").appendTo(variationDIV);
-		$("<div style='position:absolute; right:0px; bottom:0px; margin-right:20px;'><a class='btn green large' onclick='creation.createRule();'>CREATE RULE</a></div>").appendTo(variationDIV);
+		
 	} // end of constructor
 
 
@@ -188,8 +177,8 @@ function Creation() {
 			for (ic in r) {
 				var tileType = r[ic].value;
 				var col = $("<div class='review_cell "+ir+"_"+ic+"'></div>");
-				col.addClass(r[ic].css).addClass(r[ic].ignorecss);				
-				col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee', 'background-size':'15px 15px'});
+				col.addClass(r[ic].css+"_tiny").addClass(r[ic].ignorecss);				
+				col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee'});
 				$(row).append(col);
 			}
 			$(row).append("<div style='clear:both'></div>");

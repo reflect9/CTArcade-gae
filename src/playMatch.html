@@ -41,13 +41,13 @@
 				
 				<div class="reviewPanel">
 					<div id='summary' style='margin:5px;'></div>
-					<div id='viewSelection' style='float:left; margin-left:15px;'>  
-					   <input type="button" onclick="showMatchesAsList(matches)" value="List view"/>
-					   <input type="button" onclick="showMatchesAsAnimation(matches)" value="Stepwise animation"/>
-					   <input type="button" onclick="showMatchesAsGroups(matches)" value="Grouped by winner"/>
-					   <input type="button" onclick="showMatchesAsGraph(matches,'horizontal')" value="Game tree graph"/>
+					<div id='viewSelection' style='float:left; margin-left:15px; width:auto; padding-bottom:3px; border-bottom:solid 1px #ddd;'>  
+					   <input type="button" id='btn_list' class='tbtn visMode' onclick="showMatches('list')" value="List view"/>
+					   <input type="button" id='btn_group' class='tbtn visMode' onclick="showMatches('group')" value="Grouped by winner"/>
+					   <input type="button" id='btn_graph' class='tbtn visMode' onclick="showMatches('graph')" value="Game tree graph"/>
+					   <input type="button" id='btn_animation' class='tbtn visMode' onclick="showMatches('animation')" value="Stepwise animation"/>
 					</div>	
-					<div id='matches' style='float:left; min-height:200px; position:relative;'></div>
+					<div id='matches' style='float:left; margin:10px; min-height:200px; position:relative;'></div>
 					<div style='clear:both;'></div>
 				</div>
 				

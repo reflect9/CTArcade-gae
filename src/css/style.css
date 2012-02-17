@@ -20,7 +20,7 @@ p {
     color: #777777;
 }
 input, textarea {
-	-moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+	<!---moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;-->
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
     border: 1px solid #CCCCCC;
     border-radius: 3px 3px 3px 3px;
@@ -29,6 +29,18 @@ input, textarea {
     font-size: 13px;
     padding: 4px;
 }
+/* input[type="button"]{
+    border: 1px solid #CCCCCC;
+    border-radius: 7px;
+    color: #aaa;
+    display: inline-block;
+    font-size: 13px;
+    padding: 4px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+    
+} */
 
 .txtBtn {
 	cursor: pointer;
@@ -80,11 +92,41 @@ input, textarea {
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
+
+.btn.blue {
+    background: none #0088CC;
+    color: #fff;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
 .btn.large {
     border-radius: 6px 6px 6px 6px;
     font-size: 15px;
     line-height: normal;
     padding: 9px 14px;
+}
+
+.tbtn {
+    color: #bbb;
+    background:none;
+    border:0px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 13px;
+    font-weight:bold;
+    padding: 5px 14px 6px;
+}
+.tbtn:hover, .tbtn.hover {
+    color: #222;
+    border:0px;
+    background:none #ddd;
+    border-radius:4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 13px;
+    font-weight:bold;
+    padding: 5px 14px 6px;
 }
 
 
@@ -227,6 +269,22 @@ input, textarea {
     vertical-align:top;
     width: 15px;
 }
+.icon_undo {
+    background: url(image/sprite-icons.png) no-repeat scroll -213px -147px transparent;
+    display: inline-block; 
+    height: 15px;
+    margin: 0px 0px 0px 5px;
+    vertical-align:top;
+    width: 15px;
+}
+.icon_redo {
+    background: url(image/sprite-icons.png) no-repeat scroll -246px -147px transparent;
+    display: inline-block; 
+    height: 15px;
+    margin: 0px 2px 0px 0px;
+    vertical-align:top;
+    width: 15px;
+}
 .container {
 	margin: 0 auto;
     padding: 0 40px;
@@ -304,9 +362,10 @@ div#container_game {
 	width: 400px; 
 	float:left;
 }
-div#board {
+div#board, div.board {
 	width: 330px;
 	height:330px;
+	background: url(image/tictactoe_board.png) no-repeat;
 }
 li { 
 	display: list-item;
@@ -353,16 +412,24 @@ li {
 	background: url(image/icon_computer_40.png) no-repeat center;
 }
 #console > .message {
-	margin-top:5px;
+/* 	margin-top:5px;
 	height:400px;
 	padding:10px;
 	line-height:1.3em;
-/* 	border: 1px solid #ccc;
-	background-color:#eee; */
+	border: 1px solid #ccc;
+	background-color:#eee;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 1em;
+	font-size: 1em; */
 	/* overflow-y:scroll; */
 }
+#console .paragraph {
+	margin:2px;
+	padding:5px;
+	border:2px solid #ddd;
+	border-radius: 5px;
+}
+
+
 .rule {
 	font-size:1.3em;
 }
@@ -401,16 +468,16 @@ li {
 	cursor:pointer;
 }
 .tile {
-	border: 2px solid #e1e1e1;
+ 	/* border: 2px solid #e1e1e1;  */
 	cursor: pointer;
 	float:left;
-	width: 30%;
-	height: 30%;
-	margin: 2px;
+	width: 31%;
+	height: 31%;
+	margin: 4px;
 	line-height:120px;
 	font-size:64px;
 	text-align: center;
-	border-radius: 10px;
+	/* border-radius: 10px; */
 }
 
 div#title_bar {
