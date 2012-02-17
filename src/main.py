@@ -379,7 +379,7 @@ class ScoreWorker(webapp.RequestHandler):
             if len(next_round) >= 2:     
                 taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=180)
 def main():
-    application = webapp.WSGIApplication([('/', Intro),
+    application = webapp.WSGIApplication([('/', Trainer),
                                           ('/init', Init),
                                           ('/signUp',SignUp),
                                           ('/LogIn',LogIn),

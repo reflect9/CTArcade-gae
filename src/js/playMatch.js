@@ -212,6 +212,7 @@ function showMatchesAsList(matchList) {
        var p2tag = "<span style='background-color:"+getColor(playerColor[p2],0.6)+";border-radius:2px; padding:1px 3px 1px 3px;'>"+p2+"</span>";
        if (m.winner==p1) $(matchDIV).append("<div><span>"+"<div class='icon_star' style=''></div>"+p1tag+" vs. "+p2tag+"</span></div>");
        else if(m.winner==p2) $(matchDIV).append("<div><span>"+p1tag+" vs. "+p2tag+"<div class='icon_star' style=''></div>"+"</span></div>");
+       else $(matchDIV).append("<div><span>"+p1tag+" vs. "+p2tag+"</span></div>");
        var movesInOrder = [[0,0,0],[0,0,0],[0,0,0]];
        var strategyInOrder = [["","",""],["","",""],["","",""]];
        $(m.history).each(function(bi,turn) {
