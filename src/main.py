@@ -126,6 +126,18 @@ class LogOut(webapp.RequestHandler):
         self.sess.delete()
         self.redirect(self.request.get("redirect"))
 
+class SignIn(webapp.RequestHandler):
+    def get(self):
+        self.sess = sessions.Session()
+        self.sess.delete()
+        template_values = {
+                           'redirect':self.request.get("redirect")
+        }  
+        path = os.path.join(os.path.dirname(__file__), 'signIn.html')
+        self.response.out.write(template.render(path, template_values))
+        
+#        self.redirect(self.request.get("redirect"))
+
 class UpdateRule(webapp.RequestHandler):
     def get(self):
         ''' This module is only called directly from URL - it's manual updating of rule. '''
@@ -200,6 +212,14 @@ class AjaxCall(webapp.RequestHandler):
             self.response.out.write(json.dumps(getUserRuleDict(self.request.get('player'),self.request.get('game'))))
         if action== 'runMatch':
             result = TicTacToe.runMatches(self.request.get('p1'), self.request.get('p2'), 20)
+            self.response.out.write('{"result":'+json.dumps(result)+'}')
+        if action== 'checkUserName':
+            userName = self.request.get('userName').lower()
+            existingUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",userName).fetch(500)
+            if existingUser:
+                self.response.out.write('Already taken')
+            else:
+                self.response.out.write('Okay')
 #            matches = []
 #            p1 = self.request.get('p1')
 #            p2 = self.request.get('p2')
@@ -215,7 +235,7 @@ class AjaxCall(webapp.RequestHandler):
 #            result['players'] = {"p1":p1, "p2":p2}
 #            result['AI'] = {p1:p1_AI, p2:p2_AI}
 #            result['matches'] = matches 
-            self.response.out.write('{"result":'+json.dumps(result)+'}')
+            
 
 
 class AjaxTrainer(webapp.RequestHandler):
@@ -379,11 +399,13 @@ class ScoreWorker(webapp.RequestHandler):
             if len(next_round) >= 2:     
                 taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=180)
 def main():
-    application = webapp.WSGIApplication([('/', Trainer),
+    application = webapp.WSGIApplication([('/', Intro),
+                                          ('/intro', Intro),
                                           ('/init', Init),
                                           ('/signUp',SignUp),
-                                          ('/LogIn',LogIn),
-                                          ('/logOut',LogOut),
+                                          ('/logIn',LogIn),     # logIn process without uI
+                                          ('/logOut',LogOut),   # logOut process no UI
+                                          ('/signIn',SignIn),   # signIn UI
                                           ('/updateRule', UpdateRule),
                                           ('/playMatch',PlayMatch),
                                           ('/trainer',Trainer),

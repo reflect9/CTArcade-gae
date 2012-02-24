@@ -478,7 +478,10 @@ function userMove(x,y) {
 $(document).ready(function () {
 	$(".header #header_button_trainer").addClass("currentMode");
 	$.ajaxSetup({ cache: false });
-	if (p1=='guest') return;
+	if (p1=='Guest') {
+		self.location="signIn?redirect=trainer";
+		return;
+	}
 	game = new TicTacToeTrainer();
 	game.init(p1,p2);
 	showUserAI(game.strategy,"userInfo");	// using user's rule JSON object, show user's AI in userInfo div

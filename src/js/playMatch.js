@@ -13,7 +13,7 @@ function showUserAI(userID,targetDIV) {
 	else var t = targetDIV;
 	$(t).empty();
 	//  show the player's strategy
-	$(t).append("<h2 style='float:left; color:#eee;'>"+p1+"'s AI</h2>");
+	$(t).append("<h2 style='float:left; color:#eee;'>"+p1+"'s gamebot</h2>");
 	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; width:100%; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
 	$.get('ajaxCall',{action:'getStrategy', player:p1, game:'tictactoe'}, function(data){
 		userAI = JSON.parse(data);

@@ -11,6 +11,9 @@ handlers:
 - url: /css
   static_dir: css
 
+- url: /bootstrap
+  static_dir: bootstrap
+
 - url: /css/image
   static_dir: css/image
 

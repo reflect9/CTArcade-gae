@@ -6,7 +6,7 @@
 body { 
 	height:100%;
 	background-color: #222;
-	padding-top: 45px !important;
+	padding-top: 50px !important;
 	font: 13px/1.5 Helvetica Neue,Arial,Helvetica,'Liberation Sans',FreeSans,sans-serif
 }
 h3 {
@@ -155,10 +155,26 @@ input, textarea {
     top: 0;
     z-index: -1;	
 }
+.header_bg_gray {
+    background-color: #CF004F;
+    /* background-image: -moz-linear-gradient(#CF004F, #9E0233);  */
+    background-image: -moz-linear-gradient(#ddd, #ccc); 
+    background-image: -webkit-linear-gradient(top, #ddd 0%, #ccc 100%);
+    background-image: linear-gradient(top, #ddd 0%, #ccc 100%);
+    bottom: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: -1;    
+}
+
+
 .header_inner {
     margin: 0 auto;
     padding: 0 40px;
-    width: 920px;
+    width: 980px;
 }
 .header .emblem {
 	background: url(image/ctarcade.png) no-repeat center;
@@ -167,7 +183,7 @@ input, textarea {
 }
 
 .header #game_select {
-	margin : 8px 5px 0px 20px;
+	margin : 0px 5px 0px 20px;
     background: none repeat scroll 0 0 rgba(255,255,255,0.3);
     border: 0px solid #eee;
     border-radius: 4px 4px 4px 4px; 
@@ -231,7 +247,7 @@ input, textarea {
     height: 22px;
     padding: 0px;
     white-space:nowrap;
-    margin: 6px 0px 0px 0px;
+    margin: 8px 0px 0px 0px;
 /*     -moz-border-radius: 5px; */
     /* border-radius: 5px; */
     /* box-shadow: 3px 0px 3px rgba(255, 255, 255, 0.5), -3px 0px 3px rgba(255, 255, 255, 0.5); */
@@ -288,7 +304,7 @@ input, textarea {
 .container {
 	margin: 0 auto;
     padding: 0 40px;
-    width: 920px;
+    width: 980px;
 }
 
 .innerHeader {
@@ -493,7 +509,6 @@ div#title_bar {
 	margin-bottom: 15px;
 }
 
-
 /*  review page */
 
 .review_cell {
@@ -653,3 +668,18 @@ div#title_bar {
     width: 8px; height: 12px; 
     margin: 5px -5px 0 0;
 }
+
+.dotted {
+	border: 1px dotted #ddd;
+}
+
+.red {
+	background:none red;
+}
+
+.bot_icon_big {
+	width:33px;
+	height:30px;
+	background: url(image/bot-icons-big.png) no-repeat scroll -63px -66px transparent;
+}
+

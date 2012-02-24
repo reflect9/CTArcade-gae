@@ -9,9 +9,9 @@ Updates:
 <head>
 	<meta name = "viewport" content = "width=device-width">
 	<title>Intro - CTArcade</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css"/>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+<!-- includes -->
+{% include "includes.html" %}
+<!-- end of includes -->
 	<script type="text/javascript">
 	  var p1='{{userID}}';
 	  var currentUser = "{{userID}}";
@@ -19,96 +19,254 @@ Updates:
 	      $(".header #header_button_intro").addClass("currentMode");
 	   });	 
 	</script>
-	<style type="text/css">
-	body.js #tabs{ margin:10px 0px; }
-	#tabs > div{ padding:8px 10px; }
-	body.js #tabs > div{ display:none; }
-	body.js #tabs div.selected{ display:block; }
-	body.js #tabs .expandable_div{ display:none; }
-	body.js .expandable_heading{ cursor:pointer; }
-	</style>
 </head>
 <body>	
 <!-- header -->
 {% include "header.html" %}
 <!-- end of header -->
 
-<!-- container : main stuff -->
 <div class='container'>
-<div class='pageContent'>
+    <div class='pageContent clearfix' style='padding:20px;'>
+	    <!--  new Tictactoe introduction -->
+	    <div class="row">       
+	        <div class="span7" style=''> <!--  LEFT COLUMN -->
+                <div class="row-fluid">
+                    <div class="span12" >
+                        <div class="well" style='height:250px;'>
+                         current best bot will be here to play with guest user
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end of LEFT -->
+            <div class="span5"> <!-- RIGHT COLUMN -->
+	            <h2>Train your bot to play TicTacToe</h2>
+	            <div style='font-size:18px; line-height:2em;'>
+	                Do you like playing TicTacToe?  How about training your own game bot to play for you?   
+	                All you need to do is to start playing with it, then your bot will gradually learn.      
+	            </div>
+            </div>  <!--  end of RIGHT -->
+	    </div> <!--  row -->
+	    <div class="row" style='margin-top:20px;'> <!-- feature row  -->
+	       <div class="span4">
+	           <div class="well" style='height:150px; margin-bottom:10px; border:1px solid #ccc; background:url(css/image/intro_feature_1.png)'> 
+	           </div>
+	           <div>
+	               <h3>Play With Your Bot</h3>
+	               <div>The first step is just playing TicTacToe game with your own bot. Your bot may not be smart at the beginning, but it will learn by asking you questions.</div>
+	           </div>
+	       </div>
+           <div class="span4">
+               <div class="well" style='height:150px; margin-bottom:10px; border:1px solid #ccc;  background:url(css/image/intro_feature_1.png) '> 
+               </div> 
+               <div>
+                   <h3>Let Your Bot Play With Others</h3>
+                   <div>Is your bot ready to challenge other bots? Tournament server runs automatic matches once a day and update the leader board showing which bot is strongest.</div>
+               </div>
+           </div>
+           <div class="span4">
+               <div class="well" style='height:150px; margin-bottom:10px; border:1px solid #ccc;  background:url(css/image/intro_feature_3.png) '> 
+               </div> 
+               <div>
+                   <h3>Review And Re-train</h3>
+                   <div>Did your bot lose matches? Don't worry. It's a good chance to know weakness of your bot and improve its strategy.</div>
+               </div>
+           </div>	    
+	    </div> <!-- end of feature row -->
+	    
+	    
+
+    </div> <!--  end of pageContent -->
+    
+    <!--  stuff done by Matt  -->
+	<!-- <div class='pageContent'>
 		<div class="wrapper clearfix">
-			<div class="innerHeader">
-				<div id='desc' style='margin-bottom:10px;'>
-					<div id='welcome'>Welcome to CTArcade!<br />
-				  <hr /></div>
+			<div style="width: 100%;" align="left" id="tabs">
+				<p>The CTArcade project was initiated by Dr. Ben Bederson.
+						Initial research was performed by the Human Computer Interaction
+						Lab (HCIL) at the University of Maryland. The HCIL worked to
+						develop an activity session that provided challenges for gauging
+						the computational thinking (CT) skills of the group of children
+						through the KidsTeam project initiative. Analyses of this session
+						suggested that a computational thinking tool would be beneficial
+						to teachers and students.</p>
+				<p>The primary motivation behind this project is to develop a
+						framework for computational thinking tools that teach users
+						through a simple interface that enhances existing internalized
+						skills, as opposed to a complex graphical programming tool. Rather
+						than having users program logical rules directly in a bottom up
+						approach, users will "discover" and rank rules to train an
+						"artificial intelligence" (AI). These AI will play for the users
+						on an automated tournament server composed of other similarly
+						trained entities. Playing on the server will result in a rank and
+						tournament score. Users can also challenge individual AI and
+						review the history of the games played during the challenge. These
+						two artifacts are intended to provide motivation for the user to
+						reflect and improve on their AI by learning from past experiences.</p>
+				<p>
+						Below is a list of frequently asked questions about using
+						CTArcade, as well as the project in general. If you have any
+						problems using CTArcade or if you need any additional information,
+						please send an email to: <a href="mailto:ctarcade@gmail.com">ctarcade@gmail.com</a>
+				</p>
+				<h4 class="expandable_heading">What is the CTArcade?</h4>
+				<div class="expandable_div">
+				    <p>The CTArcade is an application framework that will host
+							several games which promote CT skills. The current version of
+							CTArcade is designed to test a simple game (i.e. Tic-Tac-Toe) and
+							the systems that these games will have in common (e.g. trainer
+							mode, challenge matches, automated tournaments, and rankings).
+							This project is about iteratively testing the viability of a
+							system that will help to develop a non-programmer's CT skill
+							through game play while providing motivation for social and
+							competitive interactions.</p>
+				</div>
+				<h4 class="expandable_heading">Is the CTArcade in beta?</h4>
+				<div class="expandable_div">
+					<p>The CTArcade is an application framework that will host
+							several games which promote CT skills. The current version of
+							CTArcade is designed to test a simple game (i.e. Tic-Tac-Toe) and
+							the systems that these games will have in common (e.g. trainer
+							mode, challenge matches, automated tournaments, and rankings).
+							This project is about iteratively testing the viability of a
+							system that will help to develop a non-programmer's CT skill
+							through game play while providing motivation for social and
+							competitive interactions.</p>
+				</div>
+				<h4 class="expandable_heading">What are the requirements to
+						use CTArcade?</h4>
+				<div class="expandable_div">
+					<p>CTArcade has been tested in most browsers, especially:
+							Mozilla Firefox, Internet Explorer, Safari, and Chrome. All
+							browsers need to have JavaScript enabled.</p>
+				</div>
+				<h4 class="expandable_heading">How do I sign up and login?</h4>
+				<div class="expandable_div">
+					<p>
+							In the top right corner of the screen there should be a "Create
+							New Account" link that requires a unique username, password, and
+							email address. The username will be how you are identified in the
+							lobby for challenge matches and in tournaments. Once you have
+							created an account you can use the "Sign In" link. At this time
+							there is no ability to reclaim account information, but you can
+							send an email to: <a href="mailto: ctarcade@gmail.com">ctarcade@gmail.com</a>
+					</p>
+				</div>
+				<h4 class="expandable_heading">How do I train my AI?</h4>
+				<div class="expandable_div">
+					<p>Training your AI is done through the "Trainer" link in the
+							main navigation link; here you will find a game board for the
+							game you have selected from the dropdown. As you begin to play
+							the game with your AI, it will "discover" rules, which you will
+							then be able to prioritize in importance. You can drag the rules
+							above other rules to set priority on the right hand interface;
+							however, this interface may limit your rule options. All of the
+							rules you and your AI have discovered will be presented in the
+							top panel on the screen and these rules can be dragged left or
+							right to prioritize them.</p>
+					<p>In addition to "discoverable" rules, you can also create
+							your own rules by clicking the "New Rule" button. After clicking
+							the button, you will be shown the "New Rule" menu and through
+							multiple-clicks you will draw out the pattern that you wish to
+							teach your AI (e.g. when a player has selected a corner, another
+							player has selected the middle, and the next move for the
+							starting player is the opposite corner along the diagonal) and
+							then in the follow-up dialog you will assign a name, describe it,
+							and then select in what cases the rule can be applied.</p>
+				</div>
+				<h4 class="expandable_heading">What is the lobby?</h4>
+				<div class="expandable_div">
+					<p>The lobby is an area of CTArcade that displays the current
+							user list, your rank, and your score. You can have your AI play
+							another AI by clicking on the "Challenge" link to the right of
+							each entry. The countdown timer at the bottom of the screen
+							represents the time (Hours: Minutes: Seconds) until the next
+							automated server tournament.</p>
+				</div>
+				<h4 class="expandable_heading">How do I challenge the AIs of
+					other users?</h4>
+				<div class="expandable_div">
+					<p>You can have your AI play another AI by clicking on the
+							"Challenge" link to the right of each entry in the lobby, or by
+							selecting the "Match" link from the top navigation and then
+							selecting a user from the panel on the right side of the screen.
+							Any time you select a new user to challenge, the games will be
+							replayed and you will be unable to review your previous results.
+							You can also reprioritize your list of rules by dragging your
+							rules from left to right in the top panel.</p>
+				</div>
+				<h4 class="expandable_heading">How are the results of
+					"Challenges" displayed?</h4>
+				<div class="expandable_div">
+					<p>The first results to be displayed below your list of rules
+							are your "Win to Lose" ratio and the number of tie games.
+							CTArcade has several visualization options, but it defaults to
+							the "Game tree graph(horizontal)" option. Both the horizontal and
+							vertical options display the clustered patterns of games that
+							share similar states. By examining these displays you should be
+							able to determine in what situations your AI is most commonly
+							being defeated and adjust your strategy accordingly. You may need
+							to return to the "Trainer" to "discover" new rules, create custom
+							rules, or reprioritize them.</p>
+					<p>There are also three additional views to those mentioned
+							above. There is a "List view" of every game, a "Stepwise view" of
+							each game move by move, and a "Group by winner" view that shows
+							how each game ended. You should look through each view for
+							information to improve your AI with. These results are only
+							available until you have initiated a new challenge with a new
+							opponent or left the page.</p>
+				</div>
+				<h4 class="expandable_heading">How can I change my strategy in
+					between challenges?</h4>
+				<div class="expandable_div">
+					<p>From the "Match" section, you can also reprioritize your
+						list of rules by dragging your rules from left to right in the
+						top panel. You may need to return to the "Trainer" section to
+						"discover" rules or create custom rules. You can also
+						reprioritize your rules in the "Trainer" section just like the
+						"Match" section.</p>
+				</div>
+				<h4 class="expandable_heading">How are tournaments scheduled
+					and how do they work?</h4>
+				<div class="expandable_div">
+					<p>Tournaments are automatically run every day at 5:00pm EST,
+						or when an administrator decides to run a tournament to initiate
+						a test. Tournaments run for the next 15 – 20 minutes depending
+						on the server load at the time. Tournaments will run in a
+						traditional single elimination bracket structure. A winner of a
+						match receives 1 point and the winner of a tournament receives 10
+						points. A bye is assigned in the event that there are an odd
+						number of entries in a round.</p>
+				</div>
+				<h4 class="expandable_heading">How do I know who won the
+					tournament?</h4>
+				<div class="expandable_div">
+					<p>The winner of the last tournament run on the server will
+						have a diamond symbol next to their name in the lobby.</p>
+				</div>
+				<h4 class="expandable_heading">What is next for CTArcade?</h4>
+				<div class="expandable_div">
+					<p>Over the next few months CTArcade will be iterating several
+						times in order to make it a better education tool. The next
+						immediate stage is an evaluation of the current system, followed
+						by a research and development period. While work is being
+						performed to complete these stages, additionally usability
+						features will be added simultaneously.</p>
+				</div>
+				<h4 class="expandable_heading">What games will be added to
+					CTArcade?</h4>
+				<div class="expandable_div">
+					<p>There are a number of games that are being investigated for
+						inclusion into CTArcade. The most likely next game target is a
+						version of Connect-Four. Other games being looked at are: Pong,
+						an Eco-system game, Othello, and a collaborative drawing game.</p>
 				</div>
 			</div>
-			 <!-- container_board -->
-		<div style="width:100%;" align="left" id="tabs">
-    <p>The CTArcade project was initiated by Dr. Ben Bederson. Initial research was performed by the Human Computer Interaction Lab (HCIL) at the University of Maryland. The HCIL worked to develop an activity session that provided challenges for gauging the computational thinking (CT) skills of the group of children through the KidsTeam project initiative. Analyses of this session suggested that a computational thinking tool would be beneficial to teachers and students.</p>
-	<p>The primary motivation behind this project is to develop a framework for computational thinking tools that teach users through a simple interface that enhances existing internalized skills, as opposed to a complex graphical programming tool. Rather than having users program logical rules directly in a bottom up approach, users will "discover" and rank rules to train an "artificial intelligence" (AI). These AI will play for the users on an automated tournament server composed of other similarly trained entities. Playing on the server will result in a rank and tournament score. Users can also challenge individual AI and review the history of the games played during the challenge. These two artifacts are intended to provide motivation for the user to reflect and improve on their AI by learning from past experiences.</p>
-    <p>Below is a list of frequently asked questions about using CTArcade, as well as the project in general. If you have any problems using CTArcade or if you need any additional information, please send an email to: <a href="mailto:ctarcade@gmail.com">ctarcade@gmail.com</a></p>
-      <h4 class="expandable_heading">What is the CTArcade?</h4>
-      <div class="expandable_div">
-      <p>The CTArcade is an application framework that will host several games which promote CT skills. The current version of CTArcade is designed to test a simple game (i.e. Tic-Tac-Toe) and the systems that these games will have in common (e.g. trainer mode, challenge matches, automated tournaments, and rankings). This project is about iteratively testing the viability of a system that will help to develop a non-programmer's CT skill through game play while providing motivation for social and competitive interactions.</p>
-      </div>
-		<h4 class="expandable_heading">Is the CTArcade in beta?</h4>
-          <div class="expandable_div">
-          <p>The CTArcade is an application framework that will host several games which promote CT skills. The current version of CTArcade is designed to test a simple game (i.e. Tic-Tac-Toe) and the systems that these games will have in common (e.g. trainer mode, challenge matches, automated tournaments, and rankings). This project is about iteratively testing the viability of a system that will help to develop a non-programmer's CT skill through game play while providing motivation for social and competitive interactions.</p>
-          </div>
-       <h4 class="expandable_heading">What are the requirements to use CTArcade?</h4>
-       <div class="expandable_div">
-       <p>CTArcade has been tested in most browsers, especially: Mozilla Firefox, Internet Explorer, Safari, and Chrome. All browsers need to have JavaScript enabled.</p></div>          
-      <h4 class="expandable_heading">How do I sign up and login?</h4>
-     <div class="expandable_div">
-      <p>In the top right corner of the screen there should be a "Create New Account" link that requires a unique username, password, and email address. The username will be how you are identified in the lobby for challenge matches and in tournaments. Once you have created an account you can use the "Sign In" link. At this time there is no ability to reclaim account information, but you can send an email to: <a href="mailto: ctarcade@gmail.com">ctarcade@gmail.com</a></p>
-      </div>
-      <h4 class="expandable_heading">How do I train my AI?</h4>
-      <div class="expandable_div">
-      <p>Training your AI is done through the "Trainer" link in the main navigation link; here you will find a game board for the game you have selected from the dropdown. As you begin to play the game with your AI, it will "discover" rules, which you will then be able to prioritize in importance. You can drag the rules above other rules to set priority on the right hand interface; however, this interface may limit your rule options. All of the rules you and your AI have discovered will be presented in the top panel on the screen and these rules can be dragged left or right to prioritize them.</p>
-      <p>In addition to "discoverable" rules, you can also create your own rules by clicking the "New Rule" button. After clicking the button, you will be shown the "New Rule" menu and through multiple-clicks you will draw out the pattern that you wish to teach your AI (e.g. when a player has selected a corner, another player has selected the middle, and the next move for the starting player is the opposite corner along the diagonal) and then in the follow-up dialog you will assign a name, describe it, and then select in what cases the rule can be applied.</p></div>
-      <h4 class="expandable_heading">What is the lobby?</h4>
-      <div class="expandable_div">
-      <p>The lobby is an area of CTArcade that displays the current user list, your rank, and your score. You can have your AI play another AI by clicking on the "Challenge" link to the right of each entry. The countdown timer at the bottom of the screen represents the time (Hours: Minutes: Seconds) until the next automated server tournament.</p>
-      </div>
-      <h4 class="expandable_heading">How do I challenge the AIs of other users?</h4>
-      <div class="expandable_div">
-      <p>You can have your AI play another AI by clicking on the "Challenge" link to the right of each entry in the lobby, or by selecting the "Match" link from the top navigation and then selecting a user from the panel on the right side of the screen. Any time you select a new user to challenge, the games will be replayed and you will be unable to review your previous results. You can also reprioritize your list of rules by dragging your rules from left to right in the top panel.</p>
-      </div>
-      <h4 class="expandable_heading">How are the results of "Challenges" displayed?</h4>
-      <div class="expandable_div">
-      <p>The first results to be displayed below your list of rules are your "Win to Lose" ratio and the number of tie games. CTArcade has several visualization options, but it defaults to the "Game tree graph(horizontal)" option. Both the horizontal and vertical options display the clustered patterns of games that share similar states. By examining these displays you should be able to determine in what situations your AI is most commonly being defeated and adjust your strategy accordingly. You may need to return to the "Trainer" to "discover" new rules, create custom rules, or reprioritize them.</p>
-      <p>There are also three additional views to those mentioned above. There is a "List view" of every game, a "Stepwise view" of each game move by move, and a "Group by winner" view that shows how each game ended. You should look through each view for information to improve your AI with. These results are only available until you have initiated a new challenge with a new opponent or left the page.</p>
-      </div>
-      <h4 class="expandable_heading">How can I change my strategy in between challenges?</h4>
-      <div class="expandable_div">
-      <p>From the "Match" section, you can also reprioritize your list of rules by dragging your rules from left to right in the top panel. You may need to return to the "Trainer" section to "discover" rules or create custom rules. You can also reprioritize your rules in the "Trainer" section just like the "Match" section.</p>
-      </div>
-      <h4 class="expandable_heading">How are tournaments scheduled and how do they work?</h4>
-      <div class="expandable_div">
-      <p>Tournaments are automatically run every day at 5:00pm EST, or when an administrator decides to run a tournament to initiate a test. Tournaments run for the next 15 – 20 minutes depending on the server load at the time. Tournaments will run in a traditional single elimination bracket structure. A winner of a match receives 1 point and the winner of a tournament receives 10 points. A bye is assigned in the event that there are an odd number of entries in a round.</p>
-      </div>
-		<h4 class="expandable_heading">How do I know who won the tournament?</h4>
-      <div class="expandable_div">
-      <p>The winner of the last tournament run on the server will have a diamond symbol next to their name in the lobby.</p>
-      </div>
-       <h4 class="expandable_heading">What is next for CTArcade?</h4>
-      <div class="expandable_div">
-      <p>Over the next few months CTArcade will be iterating several times in order to make it a better education tool. The next immediate stage is an evaluation of the current system, followed by a research and development period. While work is being performed to complete these stages, additionally usability features will be added simultaneously.</p>
-      </div> 
-      <h4 class="expandable_heading">What games will be added to CTArcade?</h4>
-      <div class="expandable_div">
-      <p>There are a number of games that are being investigated for inclusion into CTArcade. The most likely next game target is a version of Connect-Four. Other games being looked at are: Pong, an Eco-system game, Othello, and a collaborative drawing game.</p>
-      </div> 
+
 		</div>
-     	
-    </div>
-			<div style="clear:both;"></div>
-		</div> <!--wrapper clearfix-->
-	</div>	<!--pageContent-->
+		<div style="clear: both;"></div>
+    </div><!--pageContent-->
 </div>		<!-- end of container-->
-</div
->
+
 <script type="text/javascript">
 	function expandable_divs(){
 		$('#tabs .expandable_heading').append('<span>+</span>');	
