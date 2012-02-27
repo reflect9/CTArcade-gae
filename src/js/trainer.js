@@ -43,9 +43,8 @@ function checkWinner() {
 		if(winner==game.p1) $("#console").append("<div class='alert alert-error' style='margin-top:10px'><b>"+game.p1 + "</b> wins!</div>");
 		else $("#console").append("<div class='alert alert-error' style='margin-top:10px'><b>"+game.p2 + "</b> wins!</div>");
 		needReset = true;
-	} else {
-//		$("#status").text(game.turn + " to play");
-	}
+	} 
+	return winner;
 }	
 
 
@@ -78,19 +77,7 @@ function showMatchingStrategy(response) {
 //		$(this).hide(); 
 //		game.findBestStrategy(game.board,game.turn,computerMove);
 //	}).appendTo($("#console"));
-	
-	// PROGRESS BAR : AI THinking
-	var progressBar = $("<div class='progress progress-info progress-striped active' style='height:5px; margin-bottom:10px;'></div>").appendTo($('#console'));
-	var progress = $("<div class='bar' style='width:1%;'></div>").appendTo(progressBar);
-	var progressLabel = $("<div style='color:#49AFCD;font-size:11px;margin-top:-10px;'>"+botName+" is thinking...</h4>").appendTo($('#console'));
-	$(progress).animate({ 
-		width:'100%'
-	}, 1500, function() {   // when progress bar reach the end,
-		progressBar.hide('slow').remove();
-		progressLabel.hide('slow').remove();
-		$("#continueButton").remove();
-		game.findBestStrategy(game.board,game.turn,computerMove);
-	});
+
 }
 
 // it uses AI's current strategy set 
@@ -534,8 +521,26 @@ function userMove(x,y) {
 	var val = game.move(x, y, currentTurn);  // update game.board, game.turn and game.history
 	game.currentStep = game.history.length-1;
 	updateBoard(game.board);	// update game.board on #txy.text
-	checkWinner();	// check winning condition. if yes, show the winner, otherwise show next one to play
-			
+	var isThereWinner = checkWinner();	// check winning condition. if yes, show the winner, otherwise show next one to play
+	
+	if (isThereWinner!=false) {
+		return;
+	} else if(game.isFull()==true) {
+		$("#console").append("<div class='alert alert-info'>Tie Game</div>");
+	} else {
+		// PROGRESS BAR : AI THinking
+		var progressBar = $("<div class='progress progress-info progress-striped active' style='height:5px; margin-bottom:10px;'></div>").appendTo($('#console'));
+		var progress = $("<div class='bar' style='width:1%;'></div>").appendTo(progressBar);
+		var progressLabel = $("<div style='color:#49AFCD;font-size:11px;margin-top:-10px;'>"+botName+" is thinking...</h4>").appendTo($('#console'));
+		$(progress).animate({ 
+			width:'100%'
+		}, 1500, function() {   // when progress bar reach the end,
+			progressBar.hide('slow').remove();
+			progressLabel.hide('slow').remove();
+			$("#continueButton").remove();
+			game.findBestStrategy(game.board,game.turn,computerMove);
+		});
+	} 
 }
 
 
