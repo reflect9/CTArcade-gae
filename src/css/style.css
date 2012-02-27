@@ -56,7 +56,7 @@ input, textarea {
 	padding: 4px 8px 4px 8px;
 }
 
-.btn {
+/* .btn {
     -moz-border-bottom-colors: none;
     -moz-border-image: none;
     -moz-border-left-colors: none;
@@ -75,23 +75,23 @@ input, textarea {
     cursor: pointer;
     display: inline-block;
     font-size: 13px;
-/*     line-height: normal; */
+    line-height: normal;
     padding: 5px 14px 6px;
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-}
+} */
 .btn.active, .btn:active {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .btn.hover, .btn:hover {
 	}
-.btn.green {
+/* .btn.green {
 	background-color: #57A957;
 	color: #fff;
     background-image: -moz-linear-gradient(center top , #62C462, #57A957);
     background-repeat: repeat-x;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-}
+} */
 
 .btn.blue {
     background: none #0088CC;
@@ -100,12 +100,12 @@ input, textarea {
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.btn.large {
+/* .btn.large {
     border-radius: 6px 6px 6px 6px;
     font-size: 15px;
     line-height: normal;
     padding: 9px 14px;
-}
+} */
 
 .tbtn {
     color: #bbb;
@@ -286,18 +286,18 @@ input, textarea {
     width: 15px;
 }
 .icon_undo {
-    background: url(image/sprite-icons.png) no-repeat scroll -213px -147px transparent;
+    background: url(image/sprite-icons.png) no-repeat scroll -217px -149px transparent;
     display: inline-block; 
     height: 15px;
-    margin: 0px 0px 0px 5px;
+    margin: 0px 0px 0px 0px;
     vertical-align:top;
     width: 15px;
 }
 .icon_redo {
-    background: url(image/sprite-icons.png) no-repeat scroll -246px -147px transparent;
+    background: url(image/sprite-icons.png) no-repeat scroll -249px -149px transparent;
     display: inline-block; 
     height: 15px;
-    margin: 0px 2px 0px 0px;
+    margin: 0px 0px 0px 0px;
     vertical-align:top;
     width: 15px;
 }
@@ -323,9 +323,9 @@ input, textarea {
     float:left;
     background: none repeat scroll 0 0 transparent;
     /* border-radius: 10px 10px 10px 10px; */
-    margin: 0px 0 -20px -20px;
+    margin: 0px;
     border-radius: 10px 10px 10px 10px;
-    padding: 15px;
+    padding: 0px;
     width:160px;
     /* -moz-box-shadow:inset 0 -5px 3px #eee;
     -webkit-box-shadow:inset 0 -5px 3px #eee; */
@@ -344,6 +344,31 @@ input, textarea {
 /*     box-shadow: 0 1px 3px #A8CFE5; */
 	color: #333;
 	
+}
+
+.footer {
+	height:30px;
+	width:980px;
+	padding-top:15px;
+	margin: 20px -50px -40px -20px;
+	border-radius:0px 0px 10px 10px;
+	background: #e8e8e8; /* Old browsers */
+    background: -moz-linear-gradient(top,  #e8e8e8 1%, #f4f4f4 23%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#e8e8e8), color-stop(23%,#f4f4f4)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* IE10+ */
+    background: linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e8e8e8', endColorstr='#f4f4f4',GradientType=0 ); /* IE6-9 */
+	
+}
+
+.footer_content {
+    margin-left:20px; 
+    color:#889; 
+    font-size:13px; 
+    font-weight:bold; 
+    text-shadow: 0px 1px 1px #fff;
 }
 
 div.wrapper {
@@ -381,7 +406,7 @@ div#container_game {
 div#board, div.board {
 	width: 330px;
 	height:330px;
-	background: url(image/tictactoe_board.png) no-repeat;
+	background: url(image/tictactoe_board_clear.png) no-repeat;
 }
 li { 
 	display: list-item;
@@ -414,19 +439,15 @@ li {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
-.console_panel {
-	border: 0px silver solid;
-	float:left;
-	width: 300px;	
-	height: 500px;
-	margin-left: 5px; margin-right:10px;
-}
-.tile_p1 {
+/* .tile_p1 {
 	background: url(image/icon_human_40.png) no-repeat center;
+}
+.tile_human {
+    background: url(image/icon_human_40.png) no-repeat center;
 }
 .tile_p2 {
 	background: url(image/icon_computer_40.png) no-repeat center;
-}
+} */
 #console > .message {
 /* 	margin-top:5px;
 	height:400px;
@@ -445,6 +466,11 @@ li {
 	border-radius: 5px;
 }
 
+.halo {
+	-webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 80, 255, 1);
+    -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 80, 255, 1);
+    box-shadow: inset 0px 0px 10px 0px rgba(0, 80, 255, 1);
+}
 
 .rule {
 	font-size:1.3em;
@@ -583,6 +609,19 @@ div#title_bar {
                -moz-opacity: 0.5;       /* mozilla, netscape */
                opacity: 0.5;    
 }
+.modal_message {
+	background-color:black;
+           filter: alpha(opacity=50); /* internet explorer */
+           -khtml-opacity: 0.8;      /* khtml, old safari */
+           -moz-opacity: 0.8;       /* mozilla, netscape */
+           opacity: 0.8;           /* fx, safari, opera */
+    overflow:auto;
+    margin:0px auto;
+    height:50px;
+    border-radius:20px;
+}
+
+
 .panel_floating {
 	background-color:white;
 	border:1px solid #ddd;
@@ -655,18 +694,16 @@ div#title_bar {
 	overflow: hidden;
     display: inline-block;
     margin: 3px 0 3px 0;
-    padding: 3px 12px 3px 12px;
+    padding: 7px 12px 3px 15px;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
     float:left; 
 }
 .icon_order {
 	position: absolute;
-	right:12px; 
-	top:3px;
+	right:10px; top:10px;
     background: url(image/icon_order.png) no-repeat transparent;
     display: inline-block; 
     width: 8px; height: 12px; 
-    margin: 5px -5px 0 0;
 }
 
 .dotted {
@@ -677,9 +714,100 @@ div#title_bar {
 	background:none red;
 }
 
+
+
 .bot_icon_big {
 	width:33px;
 	height:30px;
 	background: url(image/bot-icons-big.png) no-repeat scroll -63px -66px transparent;
 }
 
+.tile_p1{
+    background: url(image/create_icons.png) no-repeat scroll -29px -21px;
+    border: none;
+}
+
+.tile_p2{
+    background: url(image/create_icons.png) no-repeat scroll -139px -20px;
+    border: none;
+}
+
+.consider{
+    background-color: #FFFFFF;
+}
+
+.ignore{
+    background-color: #aaa;
+}
+
+.consider_demonstrate{
+    background-color: #FFFFFF;
+}
+
+.ignore_demonstrate{
+    background-color: #737373;
+}
+
+.create_ignore{
+    background: url(image/create_icons.png) no-repeat scroll -250px -19px;
+    border: none;
+}
+
+.create_p1{
+    background: url(image/create_icons.png) no-repeat scroll -29px -21px;
+    border: none;
+}
+
+.create_p2{
+    background: url(image/create_icons.png) no-repeat scroll -139px -20px;
+    border: none;
+}
+
+.create_empty{
+    background: none;
+}
+
+.create_selected{
+    background: url(image/create_icons.png) no-repeat scroll -29px -130px;
+    border: none;
+}
+
+/* tile type icons for small board */
+.create_ignore_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -17px -15px;
+    border: none;
+}
+
+.create_p1_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -17px -3px;
+    border: none;
+}
+
+.create_p2_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -29px -3px;
+    border: none;
+}
+
+.create_empty_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -5px -15px;
+    border: none;
+}
+
+.create_selected_tiny{
+    background: url(image/create_icons_small.png) no-repeat scroll -5px -3px;
+    border: none;
+}
+
+
+
+#overlayConsole > .message {
+    margin-top:5px;
+    height:400px;
+    padding:10px;
+    line-height:1.3em;
+    border: 1px solid #ccc;
+    background-color:#eee;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.8em;
+    overflow-y:scroll;
+}

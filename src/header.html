@@ -17,13 +17,12 @@
             
             <div class='ui_user' style='float:right;'> 
                 <div id='ui_user_loggedIn' style='margin:1px 0px 0px 15px;'>
-                    <span>Welcome, <a id='user_name' href='' style='margin-left:3px; font-weight:bold;'></a></span>
+                    <span><a id='user_name' href='' style='margin-left:3px; font-weight:bold;'></a>,</span>
                     <span ><a href='javascript:logOut();'>Log Out</a></span>
                 </div>
                 <div id='ui_user_notLoggedIn' style='margin:0px 0px 0px 5px;'>
-                    <span><a href='javascript:openCreateAccount();'>Create New Account</a></span>
-                    <span><a href='javascript:openSignIn();'>Sign In
-                            <span class='icon_dropdown'>&nbsp;</span></a></span>
+                    <!-- <span><a href='javascript:openCreateAccount();'>Create New Account</a></span>-->
+                    <span><a href='javascript:openSignIn();'>Sign In</a></span>
                     
                 </div>
                 <!--- Login Form 
@@ -67,14 +66,15 @@
         </div>
     </div>
     <script type="text/javascript">
+        $.ajaxSetup({ cache: false });
         function openSignIn() {
-            self.location="/signIn?redirect="+document.URL;
+            self.location="/signIn?redirect="+window.location.pathname;
             /*$("#registration_form_div").hide();
             $("#login_form_div").toggle();
             $("#userID").focus();*/
         }
         function openCreateAccount() {
-            self.location="/signIn?redirect="+document.URL;
+            self.location="/signIn?redirect="+window.location.pathname;
             /*$("#login_form_div").hide();
             $("#registration_form_div").toggle();
             $("#userID").focus();*/

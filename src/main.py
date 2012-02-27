@@ -83,42 +83,54 @@ class SignUp(webapp.RequestHandler):
         # create User object defined in datastore.py
         # assign usr id and password and save it
         # send back success message
+        print >>sys.stderr, "Sign up process start"
         namePattern = re.compile(r"[a-zA-Z][a-zA-Z0-9]{2,16}$")
-        name = self.request.get('name')
-        if namePattern.match(name)==None:
+        id = self.request.get('id')
+        if namePattern.match(self.request.get('id'))==None:
             self.response.out.write("User name(3~16 characters) should contain only alphabets and numbers(not for the first character).")
             return
-        existingUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",name).get()
+        existingUser = db.GqlQuery("SELECT * FROM User WHERE id=:1",id).get()
         if existingUser:
-            self.response.out.write(name+" already exists. Try a different name please.")
+            self.response.out.write(id+" already exists. Try a different name please.")
             return
-        user = User(key_name=name,
-                    id = name,
+        user = User(key_name=id,
+                    id = id,
                     email = self.request.get('email'),
                     password = self.request.get('password'),
+                    botKind = self.request.get('botKind'),
+                    botName = self.request.get('botName'),
                     score = 0)            
-        result = user.put()                
+        result = user.put()         
+        print >>sys.stderr, result       
         if result:
-            AI(key_name=name+"_tictactoe",
-                        user = name,
+            AI(key_name=id+"_tictactoe",
+                        user = id,
                         game = "tictactoe").put()
-            TicTacToe.activateBuiltInRuleByTitle(name, 'Take Random')
-            self.response.out.write("You may now login.")         
+            TicTacToe.activateBuiltInRuleByTitle(id, 'Take Random')
+            self.sess = sessions.Session()
+            self.sess['loggedInAs'] = user.id;
+            self.response.out.write("yes")  
+            return
+        else: 
+            self.response.out.write("no")  
+            return       
         #http://ctarcade.appspot.com/signUp?name=ben&email=ben@umd.edu&password=ben
 
 class LogIn(webapp.RequestHandler):
     def get(self):
+        print >>sys.stderr, "login start"
         self.sess = sessions.Session()
         ''' this login module will receive ajax call from lobby.html '''
         # read given user id and password
         findUser = db.GqlQuery("SELECT * FROM User WHERE id=:1 and password=:2",self.request.get('name'),self.request.get('password')).get()
         if findUser:
             self.sess['loggedInAs'] = findUser.id
-            self.response.out.write("You are now logged in as " + self.sess['loggedInAs'])
-            self.redirect('/trainer')
+            print >>sys.stderr, "success to log in"
+            self.response.out.write("yes");
             return
         else:
-            self.response.out.write("We could not find your user information,<br />please try again.")    
+            print >>sys.stderr, "fail to log in"
+            self.response.out.write("no");    
             return      
 class LogOut(webapp.RequestHandler):
     def get(self):
@@ -128,9 +140,13 @@ class LogOut(webapp.RequestHandler):
 
 class SignIn(webapp.RequestHandler):
     def get(self):
-        self.sess = sessions.Session()
-        self.sess.delete()
+        session = sessions.Session()
+        try:
+            userID = session['loggedInAs']
+        except KeyError:
+            userID = "Guest"
         template_values = {
+                           'userID':userID,
                            'redirect':self.request.get("redirect")
         }  
         path = os.path.join(os.path.dirname(__file__), 'signIn.html')
@@ -170,14 +186,18 @@ class PlayMatch(webapp.RequestHandler):
             userID = session['loggedInAs']
         except KeyError:
             userID = "Guest"
-	if userID != self.request.get("p2"):   
+        if userID!='Guest':
+            user = db.GqlQuery("SELECT * FROM User WHERE id=:1",userID).get()
+        if userID != self.request.get("p2"):
             opponent = self.request.get("p2")
         else:
             opponent = "" 
         print >>sys.stderr, userID
         template_values = {
             'userID' : userID,
-            'p2' : opponent
+            'p2' : opponent,
+            'botKind':user.botKind,
+            'botName': user.botName
 #            'matches': json.dumps(matches).replace("&quot;","'")
         }  # map of variables to be handed to html template
         path = os.path.join(os.path.dirname(__file__), 'playMatch.html')
@@ -187,14 +207,19 @@ class Trainer(webapp.RequestHandler):
     def get(self):
         try:
             session = sessions.Session()
-            if session["loggedInAs"]:
-                current_user_id = session["loggedInAs"]
-            else:
-                self.redirect('/')
+            current_user_id = session["loggedInAs"]
         except:
             current_user_id='Guest'
+            botKind = None
+            botName = None
+        if current_user_id!='Guest':
+            user = db.GqlQuery("SELECT * FROM User WHERE id=:1",current_user_id).get()
+            botKind = user.botKind
+            botName = user.botName
         template_values = {
             'user_id': current_user_id,
+            'botKind':botKind,
+            'botName': botName
         }  
         path = os.path.join(os.path.dirname(__file__), 'trainer.html')
         self.response.out.write(template.render(path, template_values))
@@ -247,7 +272,7 @@ class AjaxTrainer(webapp.RequestHandler):
             dict = getBuiltInRuleDict(self.request.get('game'))
             self.response.out.write(json.dumps(dict))
         elif action == 'findBestStrategy':
-            result = TicTacToe.findBestStrategy(json.loads(self.request.get('board')), self.request.get('turn'))
+            result = TicTacToe.findBestStrategy(json.loads(self.request.get('board')),self.request.get('user'),self.request.get('turn'))
             self.response.out.write(json.dumps(result)) 
         elif action == 'findMatchingStrategy':
             result = TicTacToe.findMatchingStrategy(json.loads(self.request.get('board')), self.request.get('turn'), self.request.get('loc'))  

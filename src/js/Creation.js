@@ -39,6 +39,15 @@ function Creation() {
 
 	this.startCreationInterface = function(target,board) {	// target: jquery object of container, board: board state
 		target.addClass('creationDIV').addClass('clearfix');
+		var headerDIV = $("<div></div>", {
+			style : '	width:790px;\
+						margin: -15px -15px 10px -15px;\
+						background: none #57A957;\
+						border-radius:10px 10px 0px 0px;\
+						padding: 10px;\
+					',
+		}).appendTo(target);
+		$("<h3 style='color:white; margin:0px 10px 0px 10px;'>Create your own custom rule</h3>").appendTo(headerDIV);
 		var leftDIV = $("<div></div>",{
 			id: 'cr_inst',
 			style : '	width: 350px;\
@@ -58,12 +67,13 @@ function Creation() {
 						margin:0px;\
 					',
 		}).appendTo(leftDIV);
-		$("<h2 style='color:#57A957;'>Step 1. Define basic pattern</h2>").appendTo(boardDIVcontainer);
+		$("<h3 style='color:#57A957;'>Step 1. Define basic pattern</h2>").appendTo(boardDIVcontainer);
 		var boardDIV = $("<div></div>",{
 			id: 'cr_board',
 			class: 'board',
 			style : '	float:left;\
 						margin:10px;\
+						background: url(css/image/tictactoe_board.png) no-repeat;\
 					',
 		}).appendTo(boardDIVcontainer);
 		var descDIV = $("<div></div>",{
@@ -83,11 +93,11 @@ function Creation() {
 		}).appendTo(rightDIV);
 		
 		// STEP0. title and description
-		$("<h2 style='color:#57A957;'>Step 3. Name your rule</h2>").appendTo(descDIV);
+		$("<h3 style='color:#57A957;'>Step 3. Name your rule</h3>").appendTo(descDIV);
 		$("<div style='margin:5px 0 5px 0;'><div style='width:100px; float:left;'>Title</div><input type='text' size='35' id='title' name='title'></div>").appendTo(descDIV);
 		$("<div style='margin:5px 0 5px 0; clear:both;'><div style='width:100px; float:left;'>Description</div><textarea rows='4' id='description' style='width:240px;'name='description'></textarea></div>").appendTo(descDIV);
 		$("<div style='margin:5px 0 5px 0; clear:both;'><div style='float:left;margin-right:15px;'>Allow other users to use your rule</div><input type='checkbox' name='publicCheckBox'></div>").appendTo(descDIV);
-		$("<div style='margin-right:20px;'><a class='btn green large' onclick='creation.createRule();'>CREATE RULE</a></div>").appendTo(descDIV);
+		$("<div style='margin-right:20px;'><a class='btn btn-success' onclick='creation.createRule();'>CREATE RULE</a></div>").appendTo(descDIV);
 		
 		// STEP1. create the web representation of the game board
 		for (var i=0; i<board.length; i++){
@@ -99,21 +109,27 @@ function Creation() {
 					board[i][j] = TYPE.P2;
 				else
 					board[i][j] = TYPE.IGNORE;
-				var tileDIV = $("<div></div>").
-							attr("id","tilecopy"+i+j).
-							attr("class", "tile " + board[i][j].ignorecss + " " + board[i][j].css).
-							appendTo(boardDIV);
-				tileDIV.mousedown(
-						function(index1,index2){
-							return function(){
-								creation.changeType(index1,index2);
-								$(this).attr("class", "tile " + board[index1][index2].ignorecss + " " + board[index1][index2].css);
-								creation.updateVariation();
-							}
-						}(i,j)
-				);
 			}
 		}
+		for (var i=0; i<board.length; i++){
+			for (var j=0; j<board[i].length; j++){
+				var tileDIV = $("<div></div>").
+				attr("id","tilecopy"+i+j).
+				attr("class", "tile " + board[j][i].ignorecss + " " + board[j][i].css).
+				appendTo(boardDIV);
+				tileDIV.mousedown(
+					function(index1,index2){
+						return function(){
+							creation.changeType(index1,index2);
+							$(this).attr("class", "tile " + board[index1][index2].ignorecss + " " + board[index1][index2].css);
+							creation.updateVariation();
+						}
+					}(i,j)
+				);
+			}
+		}	
+
+
 		this.overlayBoard = board;		
 				
 		
@@ -135,7 +151,7 @@ function Creation() {
 //		instDIV.append(html);
 
 		// STEP2. add variation UI
-		$("<h2 style='color:#57A957;'>Step 2. Make variations</h2>").appendTo(variationDIV);
+		$("<h3 style='color:#57A957;'>Step 2. Make variations</h3>").appendTo(variationDIV);
 		$.each(variationList,function(i_op,op) {
 			var d = $("<div></div>").attr('id','var_'+i_op).appendTo(variationDIV);
 			d.css('border-bottom','1px solid #ddd');

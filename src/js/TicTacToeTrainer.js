@@ -53,22 +53,6 @@ function TicTacToeTrainer() {
         });
         this.started=false;
     }
-//  AS THE SERVER HAS ALL THE RULE OF THE USER, trainer doesn't update all the strategies at once,
-//	this.updateRule = function() {
-//		// 
-//		
-// 		var user_id = this.p1;
-// 		var game_id = 'tictactoe';
-// 		var strategy = JSON.stringify(this.getEnabledStrategy());
-// 		$.get('updateRule',
-// 			{ 	player: user_id, 
-// 				game: game_id,
-// 				strategy: strategy 
-// 			}, function(response) {
-// 				alert(response);
-// 			}	
-// 		);
-// 	}
  	this.resumeFromHistoryMode = function(step) {
  		if (step>=this.history.length-1) {
  			alert('history out of bound');	
@@ -97,6 +81,7 @@ function TicTacToeTrainer() {
         }
         this.history.push({'board':this.cloneBoard(this.board), 'loc':[i,j], 'turn':t});
         this.turn = this.flipTurn(this.turn);
+        this.lastestMove = [i,j];
         return this.board[i][j];
     }
 
@@ -294,6 +279,14 @@ function TicTacToeTrainer() {
     				}
     	});
     }
+    this.deleteAllRules = function() {
+    	for(val in this.strategy) {
+    		var strat = this.strategy[val];
+    		if(strat.definition!='takeRandom') {
+    			this.deleteRule(this.p1,strat.key);
+    		}
+    	}
+    }
     
     this.changeOrder = function(nameList) {
     	$.ajax({
@@ -358,6 +351,7 @@ function TicTacToeTrainer() {
 		this.strategyKeyList = [];  // list of keys only
 		this.history = [];	// pop in/out current board state for undo/redo moves
 	
+		this.latestMove = null;
 		this.turn = this.p1;
 		this.started = true;    
 		this.board = this.createEmptyBoard(this.width, this.height);	

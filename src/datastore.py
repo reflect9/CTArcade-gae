@@ -15,6 +15,8 @@ class User(db.Model):
     password = db.StringProperty()
     email = db.StringProperty()
     score = db.IntegerProperty(indexed=True)
+    botKind = db.StringProperty()
+    botName = db.StringProperty(indexed=True)
     
 class Match(db.Model):
     user_a = db.StringProperty()
@@ -176,9 +178,9 @@ def initSampleData():
     Rule(title='Take Opposite Corner',definition='takeOppositeCorner',description='Take a corner cell if its opposite corner is occupied by another player',author='built-in',rule_type='built-in',game='tictactoe').put()
     
 
-    User(id='easyNPC',password='easyNPC',email='easyNPC@umd.edu',score=0,key_name='easyNPC').put()
-    User(id='moderateNPC',password='moderateNPC',email='moderateNPC@umd.edu',score=0,key_name='moderateNPC').put()
-    User(id='hardNPC',password='hardNPC',email='hardNPC@umd.edu',score=0,key_name='hardNPC').put()    
+    User(id='easyBot',password='easyBot',email='easyBot@umd.edu',score=0,key_name='easyBot').put()
+    User(id='moderateBot',password='moderateBot',email='moderateNPC@umd.edu',score=0,key_name='moderateBot').put()
+    User(id='hardBot',password='hardBot',email='hardNPC@umd.edu',score=0,key_name='hardBot').put()    
 
     AI(user='easyNPC',game='tictactoe',key_name='easyNPC_tictactoe').put()
     AI(user='moderateNPC',game='tictactoe',key_name='moderateNPC_tictactoe').put()

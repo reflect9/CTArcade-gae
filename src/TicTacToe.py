@@ -219,11 +219,10 @@ def findBestStrategyFromRuleDict(board,turn,rules):
         if result['success']:
             return {'message':rule['title'],'rule':rule,'userRules':rules,'locList':result['loc']}
     return {'message':"no matching strategy found",'userRules':rules,'locList':None}
-def findBestStrategy(board,turn):  
+def findBestStrategy(board,user,turn):  
     if isFull(board):       return {'message':"Tie Game",'locList':None}
     # retrieve player's rules from DB here
-    userID = turn.replace("_AI","")
-    rules = datastore.getUserRuleDict(userID,'tictactoe')      
+    rules = datastore.getUserRuleDict(user,'tictactoe')      
     for rule in rules:
         if (rule['rule_type']=="built-in"):
             result = eval(rule['definition'])(board,turn)

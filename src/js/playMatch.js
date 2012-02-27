@@ -433,6 +433,20 @@ function deselectBoard() {
 	selectedBoard = "";
 	dehighlightPath();
 }
+
+/* assuming that dA and dB (jquery selection) are within a same parent DIV, 
+ * it creates a new canvas DIV and draw line connecting the center of dA and dB
+ * */
+function drawlinebetweenDIV(dA,dB) {
+	var dParent = $(dA).parent();
+	var dCanvas = $(dParent).append("<canvas style='z-index:1000; width:100%; height:100%; background-color:#e1d1d1;'></canvas>");
+	var c = $(dCanvas)[0];
+	var cxt = c.getContext("2d");
+	cxt.moveTo(dA.position.left+(dA.position.width/2),dA.position.top+(dA.position.height/2));
+	cxt.lineTo(dB.position.left+(dB.position.width/2),dB.position.top+(dB.position.height/2));
+	cxt.stroke();
+}
+
 function drawGraphLinesAll(targetDivID,canvas,direction) {
 	var ctx = $(canvas)[0].getContext("2d");
 	ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);	
@@ -678,8 +692,10 @@ $(document).ready( function() {
 	memberList = new MemberList();
 	memberList.init("#memberListDIV");
 	currentMode = 'list';
-	if(p1=="Guest") {
-		$("#userInfo").append("Welcome, Guest!  You need to <a href='javascript:openSignIn();'>log in</a> to play matches with others.");
+	$.ajaxSetup({ cache: false });
+	if (p1=='Guest') {
+		var t = setTimeout("window.location.href = '/signIn';",500);
+		return;
 	} else {
 		showUserAI(p1,"userInfo");
 //		$("#welcome").append("Welcome, "+p1+"! Select an opponent to play matches.");
