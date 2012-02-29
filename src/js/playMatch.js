@@ -1,4 +1,4 @@
-var memberList, currentMode;
+var currentMode;
 
 var p1_color = "paleGreen";   
 var p2_color = "violetPink";  
@@ -13,7 +13,11 @@ function showUserAI(userID,targetDIV) {
 	else var t = targetDIV;
 	$(t).empty();
 	//  show the player's strategy
-	$(t).append("<h2 style='float:left; color:#eee;'>"+p1+"'s gamebot</h2>");
+	$(t).append("<div class='bot_icon_big' style='float:left; width:35px; margin:5px 5px 0; background-position:"+botIconOffset(botKind)+"'></div>")
+	var names = $("<div style='float:left; width:105px;'></div>");
+	$(names).append("<h5 style='color:#eee;'>"+p1+"'s</h5>");
+	$(names).append("<h3 style='margin-top:-5px; color:#eee;'>"+botName+"</h3>");
+	$(t).append(names);
 	var aiDIV = $(t).append("<DIV id='p1_ai_div' class='clearfix' style='clear:both; position:relative; width:100%; float:left;'><ul id='p1_ai' style='list-style-type:none;padding-left:0px;margin:0px;'></ul><div style='clear:both;'></div></DIV>");
 	$.get('ajaxCall',{action:'getStrategy', player:p1, game:'tictactoe'}, function(data){
 		userAI = JSON.parse(data);
@@ -43,11 +47,12 @@ function showUserAI(userID,targetDIV) {
 		    	});
 			}
 		});
+		$("#p1_ai_div").tooltip({
+			placement : 'top',
+			title: botName+" knows these game rules and applies them in top-down order."
+		});
+		
 		$("#p1_ai").disableSelection();
-		$("#instruction_reorder").hide();
-		$("#p1_ai").mouseover(function() { $("#instruction_reorder").show(); });
-		$("#p1_ai").mouseout(function() { $("#instruction_reorder").hide(); });
-//		$(t).append("<div id='createRuleButton' class='btn green clearfix' style='float:right;' onclick='javascript:startCreationInterface(game.cloneBoard(game.board));'>Create New Rule</div>")
 		$(t).append("<div style='clear:both;'></div>");
 	});
 }
@@ -100,6 +105,7 @@ function runMatch(pl1,pl2) {
 function showMatches(mode) {
 	$(".tbtn").css('color','#bbb');
 	$("#btn_"+mode).css('color','#1F8CC2');
+    //alert(mode);
 	if(mode=='list')
 		showMatchesAsList(matches);
 	else if(mode=='animation')
@@ -141,8 +147,12 @@ function createMiniBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
 			} else {
                if (c==p1) $(col).css("background-color",getColor("paleGreen",0.3));  
                else if (c==p2) $(col).css("background-color",getColor("violetPink",0.3));
-			}		
-			if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
+			}	
+		    if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
+//			if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).tooltip({
+//				placement:top,
+//				title:strategyInOrder[ir][ic]
+//			});
 			$(row).append(col);
 		});
 		$(row).append("<div style='clear:both'></div>");
@@ -180,7 +190,11 @@ function createTinyBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
                if (c==p1) $(col).css("background-color",getColor("paleGreen",0.25));  
                else if (c==p2) $(col).css("background-color",getColor("violetPink",0.25));
 			}		
-			if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
+		    if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).qtip({content:strategyInOrder[ir][ic]});
+//			if(strategyInOrder[ir][ic]!="" && (c==p1 || c==p2)) $(col).tooltip({
+//				placement:top,
+//				title:strategyInOrder[ir][ic]
+//			});
 			$(row).append(col);
 		}
 		$(row).append("<div style='clear:both'></div>");
@@ -205,6 +219,7 @@ function createTinyBoard(board,st,loc,movesInOrder,strategyInOrder,showStrategy)
 function showMatchesAsList(matchList) {
 	currentMode = "list";
     $("#matches").empty();
+
    $(matchList).each( function(i,m) {
        //alert(e.message);
        var matchDIV = $("<div style='clear:both; margin:10px 0 10px 0px; padding-top:10px; border-bottom:0px dotted #aaa'></div>");
@@ -315,7 +330,7 @@ function findCluster(matches) {
 }
 // graph (from left to right). Each column represents round. In a column, similar matches are clustered. Edges between two clusters in adjacent columns are strategy used. 
 function showMatchesAsGraph(matchList, direction) {
-	currentMode = "graph_"+direction;
+	currentMode = "graph";
 	$("#matches").empty();
 //	var graph_p1 = [];  var graph_p2 = [];	// graph_p1 is a set of matches initiated by p1's move first
 	$.each([p1,p2], function(iP, firstMovePlayer) {	//
@@ -459,17 +474,6 @@ function drawGraphLinesAll(targetDivID,canvas,direction) {
 			drawGraphLine(canvas,$(tinyboard),downwardConnectedTinyBoard,direction,"#ddd");
 		});
 	});
-//	$.each(connectivityMatrix, function(iR, round) {
-//		$.each(round.downward, function(shapeA, connectedShapesB){
-//			$.each(connectedShapesB, function(iB, shapeB) {
-//				var sA = $(targetDivID+' div[shape="'+shapeA.replace(/"/gi,'')+'"]');
-//				var sB = $(targetDivID+' div[shape="'+shapeB.replace(/"/gi,'')+'"]');
-//				if (sA.length==0)
-//					alert("ahahaha");
-//				drawGraphLine(canvas,sA,sB,direction,"#eee");	// ctx: canvas context, sA: start div jquery var, sB: ending, direction : "horizontal" or vertical, and color
-//			});
-//		});
-//	});
 }
 function clearAllCanvas(){
 	$.each($("canvas"),function(iCanvas,c) {
@@ -557,74 +561,6 @@ function dehighlightPath() {
 }
 
 
-//function drawGraph_vertical(result,selectedMatches,targetDivID) {
-//	var graph = result.graph;
-//	var cM = result.connectivity;
-//	// find max, min position (integer)
-//	var min_pos = 100000;	var max_pos = -100000;
-//	for(var rI in graph) 
-//		for(var nodeI in graph[rI]) {
-//			if (graph[rI][nodeI]['position'] <min_pos) min_pos = graph[rI][nodeI]['position'];
-//			if (graph[rI][nodeI]['position'] >max_pos) max_pos = graph[rI][nodeI]['position'];
-//		}
-//
-////			 vertical flow
-//	var gap = max_pos-min_pos;
-//	var interval = $(targetDivID).width()/(gap+1);
-//	if (interval<$(".tinyboard:first").width()) interval = $(".tinyboard:first").width()+10;
-//	var hor_offset = (-1*min_pos*interval) + (interval/2);
-//	
-//	// place tinyboard representation
-//	$(graph).each(function(iR,round){
-//		var columnDiv = $("<div id='graph_round_"+iR+"' class='matchGraphRound clearfix'></div>");
-//		$.each(round, function(boardShape,data) { // iterate clusters
-////			var parentShape = data.connection.up[0];
-//			var sampleMatch = selectedMatches[data['matches'][0]];  // use the first game in the list, generate representative miniboard
-//			var matchBoard = createMiniBoard_singleRound(sampleMatch,iR);
-//			$(matchBoard).removeClass('miniboard');  $(matchBoard).addClass('miniboard_graph');
-//			$(matchBoard).css("left",data.position*interval+hor_offset);
-//			$(matchBoard).css("top",0);
-//			$(matchBoard).attr("shape",boardShape.replace(/"/gi,''));
-//			var listOfMatches = data.matches.length;
-//			$(matchBoard).append("<div class='board_frequency' style='position:absolute; bottom:0; left:0; margin-bottom:-15px; font-size:9px;'>"+listOfMatches+"</div>")
-//			$(columnDiv).append(matchBoard);
-//		});
-//		$(targetDivID).append(columnDiv);
-//	});
-//	// draw lines
-//	$(targetDivID).prepend("<canvas id='canvas_"+targetDivID.replace("#","")+"' style='position:absolute; top:0px; left:0px;' width='"+$(targetDivID).width()+"px' height='"+$(targetDivID).height()+"px'></canvas>");
-//	var canvas = $("#canvas_"+targetDivID.replace("#",""));
-//	ctx = $(canvas)[0].getContext("2d");
-//	ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);	
-//	$.each(cM, function(iR, round) {
-//			$.each(round.downward, function(shapeA, connectedShapesB){
-//				$.each(connectedShapesB, function(iB, shapeB) {
-//					var sA = $(targetDivID+' div[shape="'+shapeA.replace(/"/gi,'')+'"]');
-//					var sB = $(targetDivID+' div[shape="'+shapeB.replace(/"/gi,'')+'"]');
-//					var offsetA = sA.offset();
-//					var offsetB = sB.offset();
-//					var widthA = $(targetDivID+' div[shape="'+sA+'"]').width();
-//					var widthB = $(targetDivID+' div[shape="'+sA+'"]').width();
-//					var gap = 15; // how strong bezierCurve tends to go straight
-//					var startPoint = {'x':sA.offset().left+sA.width()/2-$(canvas).offset().left, 'y':sA.offset().top+sA.height()-$(canvas).offset().top};
-//					var endPoint = {'x':sB.offset().left+sB.width()/2-$(canvas).offset().left, 'y':sB.offset().top-$(canvas).offset().top};
-//					var ctrA = {'x':startPoint.x,'y':startPoint.y+gap};
-//					var ctrB = {'x':endPoint.x, 'y':endPoint.y-gap};
-//					ctx.beginPath();
-//					ctx.moveTo(startPoint.x,startPoint.y);
-//					ctx.bezierCurveTo(ctrA.x,ctrA.y,ctrB.x,ctrB.y,endPoint.x,endPoint.y);
-//					if(parseInt($(sA).find(".board_frequency").text()) < parseInt($(sB).find(".board_frequency").text())) {
-//						ctx.lineWidth = 1+parseInt($(sA).find(".board_frequency").text())/2;
-//					} else {
-//						ctx.lineWidth = 1+parseInt($(sB).find(".board_frequency").text())/2;
-//					}
-//				    ctx.strokeStyle ="#eee"; // line color
-//				    ctx.stroke();
-//				});
-//			});
-//	});
-//}
-
 
    // colorize user class with matching colors
    function colorizeUser() {
@@ -687,14 +623,54 @@ function findWinningCells(board) {
            return result;
        return false;
 }
-   
+
+function showUserList() {
+	$.get('/ajaxCall?action=getSystemUserList', function(data) {
+		var users = JSON.parse(data);
+		$.each(users.data, function(i, user) {
+//				alert(user);
+			var userDIV = $("<DIV class='ui_item' id='user_"+user[0]+"'></DIV>");
+			if (user[0]==p1) {
+				userDIV.css('color',playerColor[p1]);
+				return true;
+			}
+			$(userDIV).click(function() {
+//					alert($(this).attr('id')+ " clicked");
+				init(p1,user[0]);
+				runMatch(p1,user[0]);
+			});
+			userDIV.append(user[0]);
+			$("#npcListDIV .list").append(userDIV);
+		});
+	});
+
+	$.get('/ajaxCall?action=getHumanUserList', function(data) {
+		var users = JSON.parse(data);
+		$.each(users.data, function(i, user) {
+//				alert(user);
+			var userDIV = $("<DIV class='ui_item' id='user_"+user[0]+"'></DIV>");
+			if (user[0]==p1) {
+				userDIV.css('color',playerColor[p1]);
+				return true;
+			}
+			$(userDIV).click(function() {
+//					alert($(this).attr('id')+ " clicked");
+				init(p1,user[0]);
+				runMatch(p1,user[0]);
+			});
+			userDIV.append(user[0]);
+			$("#memberListDIV .list").append(userDIV);
+		});
+	});	
+}
+
+
 $(document).ready( function() {
-	memberList = new MemberList();
-	memberList.init("#memberListDIV");
+	showUserList();
 	currentMode = 'list';
 	$.ajaxSetup({ cache: false });
 	if (p1=='Guest') {
-		var t = setTimeout("window.location.href = '/signIn';",500);
+		var t = setTimeout("window.location.href = '/signIn?redirect=playMatch';",500);
 		return;
 	} else {
 		showUserAI(p1,"userInfo");

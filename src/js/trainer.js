@@ -272,11 +272,9 @@ function clearBoard() {
 	
 }	
 function showUserAI(userAI,targetDIV) {
-//	alert("showUSERAI");
 	if (typeof targetDIV=='string' && targetDIV[0]!='#') var t = "#"+targetDIV;
 	else var t = targetDIV;
 	$(t).empty();
-	
 	//  show the player's strategy
 	$(t).append("<div class='bot_icon_big' style='float:left; width:35px; margin:5px 5px 0; background-position:"+botIconOffset(botKind)+"'></div>")
 	var names = $("<div style='float:left; width:105px;'></div>");
@@ -312,7 +310,7 @@ function showUserAI(userAI,targetDIV) {
 	});
 	$("#p1_ai_div").tooltip({
 		placement : 'top',
-		title: "These are the rules that your bot currently knows."
+		title: botName+" knows these game rules and applies them in top-down order."
 	});
 	// Add reset modal Button
 	$("#p1_ai").after("<div id='rule-manager' style='text-align:right;'></div>");
@@ -413,7 +411,6 @@ function showUserAI(userAI,targetDIV) {
 	//$(t).append("<div id='createRuleButton' class='ai_item btn green clearfix' style='text-align:center;' onclick='javascript:addCustomRule();'>Add Custom Rule</div>")
 	$(t).append("<div class='ai_detail' style='clear:both; float:left;'> </div>")
 	$(t).append("<div style='clear:both;'></div>");
-
 }
 
 function showResetModal() {
@@ -439,7 +436,7 @@ function addCustomRule() {
 				id : 'container_creation',
 				style : '	position: absolute;\
 							left: '+ ($(".pageContent").offset()['left']+50)+'px;\
-							top: 80px;\
+							top: 55px;\
 							margin-left : 50px;\
 							width: 780px;\
 							z-index:2;\
@@ -548,7 +545,7 @@ $(document).ready(function () {
 	$(".header #header_button_trainer").addClass("currentMode");
 	$.ajaxSetup({ cache: false });
 	if (p1=='Guest') {
-		var t = setTimeout("window.location.href = '/signIn';",500);
+		var t = setTimeout("window.location.href = '/signIn?redirect=trainer';",500);
 		return;
 	}
 	game = new TicTacToeTrainer();

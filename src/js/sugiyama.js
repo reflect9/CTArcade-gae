@@ -1,4 +1,4 @@
-<script type="text/javascript">
+
 
 // subfunction for sugiyama algorithm
 function extractConnectivity(rA,rB) {
@@ -339,4 +339,3 @@ function sugiyama(graph) {
 	return {'graph':graph,'connectivity':cM};
 }
 
-</script>

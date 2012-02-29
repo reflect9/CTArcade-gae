@@ -96,6 +96,7 @@ class SignUp(webapp.RequestHandler):
         user = User(key_name=id,
                     id = id,
                     email = self.request.get('email'),
+                    type = 'user',
                     password = self.request.get('password'),
                     botKind = self.request.get('botKind'),
                     botName = self.request.get('botName'),
@@ -183,21 +184,25 @@ class PlayMatch(webapp.RequestHandler):
     def get(self):
         session = sessions.Session()
         try:
-            userID = session['loggedInAs']
-        except KeyError:
-            userID = "Guest"
-        if userID!='Guest':
-            user = db.GqlQuery("SELECT * FROM User WHERE id=:1",userID).get()
-        if userID != self.request.get("p2"):
+            current_user_id = session["loggedInAs"]
+        except:
+            current_user_id='Guest'
+            botKind = None
+            botName = None
+        if current_user_id!='Guest':
+            user = db.GqlQuery("SELECT * FROM User WHERE id=:1",current_user_id).get()
+            botKind = user.botKind
+            botName = user.botName
+        if current_user_id != self.request.get("p2"):
             opponent = self.request.get("p2")
         else:
             opponent = "" 
-        print >>sys.stderr, userID
+        #print >>sys.stderr, userID
         template_values = {
-            'userID' : userID,
+            'p1' : current_user_id,
             'p2' : opponent,
-            'botKind':user.botKind,
-            'botName': user.botName
+            'botKind':botKind,
+            'botName': botName
 #            'matches': json.dumps(matches).replace("&quot;","'")
         }  # map of variables to be handed to html template
         path = os.path.join(os.path.dirname(__file__), 'playMatch.html')
@@ -227,6 +232,18 @@ class Trainer(webapp.RequestHandler):
 class AjaxCall(webapp.RequestHandler):
     def get(self):
         action = self.request.get('action')
+        if action== 'getSystemUserList':
+            users = db.GqlQuery("SELECT * FROM User WHERE type='system'").fetch(5000)
+            result = []
+            for user in users:
+                result.append([user.id,user.score])
+            self.response.out.write('{"data":'+json.dumps(result)+'}')
+        if action== 'getHumanUserList':
+            users = db.GqlQuery("SELECT * FROM User WHERE type='user'").fetch(5000)
+            result = []
+            for user in users:
+                result.append([user.id,user.score])
+            self.response.out.write('{"data":'+json.dumps(result)+'}')
         if action== 'getUserList':
             users = db.GqlQuery("SELECT * FROM User").fetch(5000)
             result = []

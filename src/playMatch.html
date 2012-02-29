@@ -2,17 +2,16 @@
 <html>
 <head>
 	<title>Challenge - CTArcade</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	<!-- includes -->
+	{% include "includes.html" %}
+	<!-- end of includes -->
 	<link rel="stylesheet" type="text/css" href="css/jquery.qtip.css"/>
-	<script type="text/javascript" src="js/jquery-1.7.js"></script>
-	<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
-	<script type="text/javascript" src="js/jquery.qtip.js"></script>
-	<script type="text/javascript" src="js/util.js"></script>
 	<script type="text/javascript" src="js/sugiyama.js"></script>
-	<script type="text/javascript" src="js/MemberList.js"></script>
+	<script type="text/javascript" src="js/jquery.qtip.js"></script>
 	<script type="text/javascript">
 		var matches, p1, p2, p1_AI, p2_AI;
-		p1 = "{{userID}}";   p2 = "{{p2}}";
+		p1 = "{{p1}}";   p2 = "{{p2}}";
+		botKind = "{{botKind}}";  botName = "{{botName}}";
 	</script>
 	<script type="text/javascript" src="js/playMatch.js"></script>	
 </head>
@@ -28,28 +27,40 @@
 					<div id='desc' style=''>
 						<div id='userInfo'></div>
 					</div>
-					<div id='memberListDIV' style=''></div>
-					
+					<div id='npcListDIV' class='ui_panel'>
+						<div style='margin:10px;'>
+							<h5 style='cursor:pointer; color:#aaa; margin-left:3px;'>SYSTEM BOTS <b class='caret' style='float:right; margin:5px'></b></h5>
+							
+							<div class='list'></div>
+						</div>
+					</div>
+					<div id='memberListDIV' class='ui_panel'>
+						<div style='margin:10px;'>
+							<h5 style='cursor:pointer; color:#aaa; margin-left:3px;'>USER BOTS <b class='caret' style='float:right; margin:5px'></b></h5>
+							<div class='list'></div>
+						</div>
+					</div>
 				</div>
 			
-				<!--<div class="innerHeader" style='min-height:180px;'>
-					<div id='memberListDIV' style='float:left; width:150px; height:150px; overflow-y:scroll; overflow-x:hidden;'></div>
-					<div id='desc' style='float:left; margin:10px;'>
-						<div id='userInfo'></div>
-						<div id='summary'></div>
-					</div>
-				</div>-->
-				
+
 				<div class="reviewPanel">
 					<div id='summary' style='margin:5px;'></div>
-					<div id='viewSelection' style='float:left; margin-left:15px; width:auto; padding-bottom:3px; border-bottom:solid 1px #ddd;'>  
-					   <input type="button" id='btn_list' class='tbtn visMode' onclick="showMatches('list')" value="List view"/>
+					<div id='viewSelection' style='float:left; margin:0px 0px 0px 0px; width:100%; padding-bottom:3px;'>  
+						<ul class="nav nav-tabs">
+						  <li><a onClick="javascript:showMatches('list')" data-toggle="tab">List view</a></li>
+						  <li><a onClick="javascript:showMatches('group')" data-toggle="tab">Grouped by winner</a></li>
+						  <li><a onClick="javascript:showMatches('graph')" data-toggle="tab">Game tree graph</a></li>
+						  <li><a onClick="javascript:showMatches('animation')" data-toggle="tab">Stepwise animation</a></li>
+						</ul>
+					
+					<!--   <input type="button" id='btn_list' class='tbtn visMode' onclick="showMatches('list')" value="List view"/>
 					   <input type="button" id='btn_group' class='tbtn visMode' onclick="showMatches('group')" value="Grouped by winner"/>
 					   <input type="button" id='btn_graph' class='tbtn visMode' onclick="showMatches('graph')" value="Game tree graph"/>
-					   <input type="button" id='btn_animation' class='tbtn visMode' onclick="showMatches('animation')" value="Stepwise animation"/>
+					   <input type="button" id='btn_animation' class='tbtn visMode' onclick="showMatches('animation')" value="Stepwise animation"/>-->
 					</div>	
 					<div id='matches' style='float:left; margin:10px; min-height:200px; position:relative;'></div>
 					<div style='clear:both;'></div>
+					
 				</div>
 				
 

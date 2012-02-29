@@ -6,7 +6,7 @@
 body { 
 	height:100%;
 	background-color: #222;
-	padding-top: 50px !important;
+	padding-top: 40px !important;
 	font: 13px/1.5 Helvetica Neue,Arial,Helvetica,'Liberation Sans',FreeSans,sans-serif
 }
 h3 {
@@ -547,7 +547,7 @@ div#title_bar {
 	text-align:center;
 	color:#fff;
 	font: 11px Helvetica, Arial, sans-serif;
-	margin-top:3px;
+	margin-top:2px;
 }
 
 .miniboard {
@@ -640,8 +640,8 @@ div#title_bar {
 .ui_panel {
     border:1px solid #ddd;
     background: white;
+    width:170px;
     margin:10px 0 10px 0; 
-    padding:10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
@@ -658,15 +658,15 @@ div#title_bar {
 .ui_panel .ui_list {
     
 }
-.ui_panel .ui_list .ui_item {
-	border-bottom: 1px dotted #ccc;
-	margin: 0 0 5px 0;
+.ui_panel .ui_item {
+	/* border-bottom: 1px dotted #ccc; */
+	margin: 5px 0 0 0;
 	padding: 2px 4px 2px 4px;
 	cursor:pointer;
 }
-.ui_panel .ui_list .ui_item:hover {
-    border-bottom: 1px dotted #ccc;
-    margin: 0 0 5px 0;
+.ui_panel .ui_item:hover {
+    /* border-bottom: 1px dotted #ccc; */
+    margin: 5px 0 0 0;
     padding: 2px 4px 2px 4px;
     background-color:#888;
     color:#fff;

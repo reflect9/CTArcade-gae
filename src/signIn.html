@@ -207,7 +207,7 @@ Updates:
             if (id=="" || password=="") { alert("id and password must be filled in."); return; }
             var param = 'name=' + id + "&password=" + password;
             $.get("logIn",param,function(response) {
-	           if(response=='yes')     var t = setTimeout("window.location.href = '/intro';",1000);
+	           if(response=='yes')     var t = setTimeout("window.location.href = '/"+redirect+"';",1000);
 	           else $("#login_result").html("Could not find the user information.");
            });
         }
@@ -220,10 +220,10 @@ Updates:
             if (id=="" || password=="" || email=="" || botKind=="" || botName=="") { alert("all the fields should be filled in."); return; }
             var param = 'id=' + id + "&password=" + password + "&email=" + email+ "&botKind="+botKind+"&botName="+botName;
             //var param = $('form#registerForm').serialize();
-            alert(param);
+            //alert(param);
             $.get("signUp",param,function(response) {
                 if (response=='yes') { 
-                    var t = setTimeout("window.location.href = '/intro';",1000);
+                    var t = setTimeout("window.location.href = '/"+redirect+"';",1000);
                 }else $("#register_result").html("<p class='help-block'>Sorry! We could not create it. Check your form and try again</p>");
             });
         } 
