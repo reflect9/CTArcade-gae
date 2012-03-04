@@ -1,7 +1,7 @@
 from google.appengine.ext import db
 from django.utils import simplejson as json
 import sys, datetime, time
-import TicTacToe
+from tictactoe import TicTacToe
 
 class TournamentWinners(db.Model):
     timestamp = db.DateTimeProperty(auto_now_add=True)

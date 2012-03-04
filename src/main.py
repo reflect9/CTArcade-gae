@@ -2,7 +2,6 @@
 
 from google.appengine.dist import use_library
 use_library('django', '1.2')
-
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from datastore import *
@@ -10,9 +9,9 @@ from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from django.utils import simplejson as json
 import pprint, os, sys, re
-#from TicTacToeMatch import TicTacToeMatch
-#from TicTacToeTrainer import TicTacToeTrainer
-import TicTacToe
+
+import datastore
+from tictactoe import TicTacToe
 from appengine_utilities import sessions
 from google.appengine.api import taskqueue
 import urllib2
@@ -28,7 +27,7 @@ class Intro(webapp.RequestHandler):
         template_values = {
             'userID' : userID,
         }  # map of variables to be handed to html template
-        path = os.path.join(os.path.dirname(__file__), 'intro.html')
+        path = os.path.join(os.path.dirname(__file__), 'tictactoe/intro.html')
         self.response.out.write(template.render(path, template_values))     
 
 class Lobby(webapp.RequestHandler):
@@ -440,6 +439,15 @@ class ScoreWorker(webapp.RequestHandler):
                 next_round.append(self.request.get('by'))
             if len(next_round) >= 2:     
                 taskqueue.add(url='/round', params={'tournament_entries': json.dumps(next_round)}, countdown=180)
+class Fishtank(webapp.RequestHandler):
+    def get(self): # shoul
+        template_values = {
+            'p1' : 'aa',
+        }  
+        path = os.path.join(os.path.dirname(__file__)+"/fishtank", 'fishtank.html')
+        print >>sys.stderr, path
+        self.response.out.write(template.render(path, template_values))
+
 def main():
     application = webapp.WSGIApplication([('/', Intro),
                                           ('/intro', Intro),
@@ -457,6 +465,7 @@ def main():
                                           ('/round', RoundWorker),
                                           ('/score', ScoreWorker),								  
                                           ('/lobby', Lobby),
+                                          ('/fishtank',Fishtank)
   
                                           ],
                                          debug=True)

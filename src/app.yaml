@@ -5,21 +5,12 @@ api_version: 1
 
 handlers:
 
-- url: /js
-  static_dir: js
-  
-- url: /css
-  static_dir: css
-
-- url: /bootstrap
-  static_dir: bootstrap
-
-- url: /css/image
-  static_dir: css/image
-
+- url: /static
+  static_dir: static
+    
 - url: /favicon.ico
-  static_files: css/image/favicon.ico
-  upload: css/image/favicon.ico
+  static_files: static/image/favicon.ico
+  upload: static/image/favicon.ico
   
 - url: .*
   script: main.py

@@ -1,14 +1,8 @@
-'''
-Created on Dec 6, 2011
-    merging TicTacToeMatch and TicTacToeTrainer into one
-@author: reflect9
-'''
-
 from google.appengine.ext import db
 import sys, copy
 from django.utils import simplejson as json
 from random import choice
-import datastore
+
 
 ''' TRAINER FUNCTIONS '''
 def addCustomRuleList(ruleBoardList, title, desc, author):
