@@ -2,7 +2,7 @@ from google.appengine.ext import db
 import sys, copy
 from django.utils import simplejson as json
 from random import choice
-
+import datastore
 
 ''' TRAINER FUNCTIONS '''
 def addCustomRuleList(ruleBoardList, title, desc, author):

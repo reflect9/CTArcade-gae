@@ -10,22 +10,28 @@ Updates:
     <meta name = "viewport" content = "width=device-width">
     <title>CTArcade - Learn Computational Thinking While Playing Game</title>
 <!-- includes -->
-{% include "includes.html" %}
+{% include "tictactoe/includes.html" %}
 <!-- end of includes -->
     <script type="text/javascript">
       var p1='{{userID}}';
       var redirect= '{{redirect}}';
       var currentUser = "{{userID}}";
        $(document).ready(function() {
-          $(".header #header_button_intro").addClass("currentMode");
           $("input#userID").focus();
        });   
     </script>
+    <script type="text/javascript">
+        $(function() {
+            $('body').prepend("<div id='header_wrapper'></div>");
+            $('#header_wrapper').load('static/html/header.html', function(){
+                // highlight current mode button
+                //$(".header #header_button_intro").addClass("currentMode");
+            });
+        });   
+    </script>    
+    
 </head>
 <body>  
-<!-- header -->
-{% include "header.html" %}
-<!-- end of header -->
 
 <div class='container'>
     <div class='pageContent clearfix' style='padding:20px;'>
@@ -207,8 +213,11 @@ Updates:
             if (id=="" || password=="") { alert("id and password must be filled in."); return; }
             var param = 'name=' + id + "&password=" + password;
             $.get("logIn",param,function(response) {
-	           if(response=='yes')     var t = setTimeout("window.location.href = '/"+redirect+"';",1000);
-	           else $("#login_result").html("Could not find the user information.");
+	           if(response=='yes')     {
+	               if(redirect='/') {
+	                   var t = setTimeout("window.location.href = '/trainer';",1000);
+	               } else var t = setTimeout("window.location.href = '/"+redirect+"';",1000);
+	           } else $("#login_result").html("Could not find the user information.");
            });
         }
         function submitRegisterForm() {
@@ -222,9 +231,11 @@ Updates:
             //var param = $('form#registerForm').serialize();
             //alert(param);
             $.get("signUp",param,function(response) {
-                if (response=='yes') { 
-                    var t = setTimeout("window.location.href = '/"+redirect+"';",1000);
-                }else $("#register_result").html("<p class='help-block'>Sorry! We could not create it. Check your form and try again</p>");
+                if(response=='yes')     {
+                   if(redirect='/') {
+                       var t = setTimeout("window.location.href = '/trainer';",1000);
+                   } else var t = setTimeout("window.location.href = '/"+redirect+"';",1000);
+                } else $("#register_result").html("<p class='help-block'>Sorry! We could not create it. Check your form and try again</p>");
             });
         } 
         $("input#login_submit").click(submitLoginForm); 

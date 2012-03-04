@@ -6,11 +6,11 @@
 body { 
 	height:100%;
 	background-color: #222;
-	padding-top: 50px !important;
+	padding-top: 40px !important;
 	font: 13px/1.5 Helvetica Neue,Arial,Helvetica,'Liberation Sans',FreeSans,sans-serif
 }
 h3 {
-    font-size: 20px;
+    font-size: 25px;
     margin: 10px 0 5px;
 }
 p {
@@ -254,7 +254,7 @@ input, textarea {
 }
 
 .icon_dropdown {
-	background: url(../imagesprite-icons.png) no-repeat scroll -79px -68px transparent;
+	background: url(../image/sprite-icons.png) no-repeat scroll -79px -68px transparent;
 	display: inline-block; 
 	height: 7px;
 	margin: 10px 10px 0px 0px;
@@ -262,7 +262,7 @@ input, textarea {
 	width: 7px;
 }
 .icon_star {
-    background: url(../imagesprite-icons.png) no-repeat scroll -64px -0px transparent;
+    background: url(../image/sprite-icons.png) no-repeat scroll -64px -0px transparent;
     display: inline-block; 
     height: 15px;
     margin: 0px 2px 0px 0px;
@@ -270,7 +270,7 @@ input, textarea {
     width: 15px;
 }
 .icon_checkSmall {
-    background: url(../imagesprite-icons.png) no-repeat scroll -143px -16px transparent;
+    background: url(../image/sprite-icons.png) no-repeat scroll -143px -16px transparent;
     display: inline-block; 
     height: 15px;
     margin: 0px 2px 0px 5px;
@@ -278,7 +278,7 @@ input, textarea {
     width: 15px;
 }
 .icon_question {
-    background: url(../imagesprite-icons.png) no-repeat scroll -207px -0px transparent;
+    background: url(../image/sprite-icons.png) no-repeat scroll -207px -0px transparent;
     display: inline-block; 
     height: 15px;
     margin: 0px 2px 0px 5px;
@@ -286,7 +286,7 @@ input, textarea {
     width: 15px;
 }
 .icon_undo {
-    background: url(../imagesprite-icons.png) no-repeat scroll -217px -149px transparent;
+    background: url(../image/sprite-icons.png) no-repeat scroll -217px -149px transparent;
     display: inline-block; 
     height: 15px;
     margin: 0px 0px 0px 0px;
@@ -294,7 +294,7 @@ input, textarea {
     width: 15px;
 }
 .icon_redo {
-    background: url(../imagesprite-icons.png) no-repeat scroll -249px -149px transparent;
+    background: url(../image/sprite-icons.png) no-repeat scroll -249px -149px transparent;
     display: inline-block; 
     height: 15px;
     margin: 0px 0px 0px 0px;
@@ -338,41 +338,43 @@ input, textarea {
     padding: 10px;
 }
 
+.introPanel {
+    background: none repeat scroll 0 0 #fff;
+    border-radius: 10px 10px 10px 10px;
+    padding: 20px;
+}
+
 .pageContent {
-    background: none repeat scroll 0 0 #FFFFFF;
-    border-radius: 10px;
+    background: none;
+/*     border-radius: 10px; */
 /*     box-shadow: 0 1px 3px #A8CFE5; */
 	color: #333;
 	
 }
 
+.footer_wrapper {
+	width:100%;
+}
+
 .footer {
 	height:30px;
-	width:980px;
 	padding-top:15px;
-	margin: 20px -50px -40px -20px;
-	border-radius:0px 0px 10px 10px;
-	background: #e8e8e8; /* Old browsers */
-    background: -moz-linear-gradient(top,  #e8e8e8 1%, #f4f4f4 23%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#e8e8e8), color-stop(23%,#f4f4f4)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* IE10+ */
-    background: linear-gradient(top,  #e8e8e8 1%,#f4f4f4 23%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e8e8e8', endColorstr='#f4f4f4',GradientType=0 ); /* IE6-9 */
+	margin: auto;
+	width:980px;
+/* 	margin: 20px -50px -40px -20px; */
 	
 }
 
 .footer_content {
-    margin-left:20px; 
-    color:#889; 
+    width:100%;
+    text-align:center;
+    color:#555; 
     font-size:13px; 
-    font-weight:bold; 
-    text-shadow: 0px 1px 1px #fff;
+    font-weight:normal; 
 }
 
 div.wrapper {
-    padding: 20px;
+    padding: 10px;
 }
 .clearfix:after {   /* don't need to add clear:both div */
     clear: both;
@@ -384,14 +386,14 @@ div.wrapper {
 
 .icon_edit {
 	float:left;
-	background: url(../imagesprite-icons.png) no-repeat scroll -176px -80px transparent;
+	background: url(../image/sprite-icons.png) no-repeat scroll -176px -80px transparent;
     display: inline-block; 
     width: 12px; height: 12px; 
     margin: 8px 2px 0px 5px;
 }
 .icon_downArrow {
     float:left;
-    background: url(../imagesprite-icons.png) no-repeat scroll -188px -159px transparent;
+    background: url(../image/sprite-icons.png) no-repeat scroll -188px -159px transparent;
     display: inline-block; 
     width: 12px; height: 12px; 
     margin: 8px 2px 0px 5px;
@@ -406,7 +408,7 @@ div#container_game {
 div#board, div.board {
 	width: 330px;
 	height:330px;
-	background: url(../imagetictactoe_board_clear.png) no-repeat;
+	background: url(../image/tictactoe_board_clear.png) no-repeat;
 }
 li { 
 	display: list-item;
@@ -440,13 +442,13 @@ li {
 }
 
 /* .tile_p1 {
-	background: url(../imageicon_human_40.png) no-repeat center;
+	background: url(../image/icon_human_40.png) no-repeat center;
 }
 .tile_human {
-    background: url(../imageicon_human_40.png) no-repeat center;
+    background: url(../image/icon_human_40.png) no-repeat center;
 }
 .tile_p2 {
-	background: url(../imageicon_computer_40.png) no-repeat center;
+	background: url(../image/icon_computer_40.png) no-repeat center;
 } */
 #console > .message {
 /* 	margin-top:5px;
@@ -484,7 +486,7 @@ li {
 .rule_unapplicable {
 	color:#B81900;
 	line-height:1.2em;
-	background-image:url(../imageicon_unknown.png);
+	background-image:url(../image/icon_unknown.png);
 	background-position:0px -5px;
 	background-repeat: no-repeat;
 	min-height:22px;
@@ -495,7 +497,7 @@ li {
 	color:#6e8d30;
 	line-height:1.1em;
 	background-position:0px -5px;
-	background-image:url(../imageicon_y.png);	
+	background-image:url(../image/icon_y.png);	
 	background-repeat: no-repeat;
 	padding-left:35px;
 	min-height:22px;
@@ -633,7 +635,7 @@ div#title_bar {
 	margin: -24px -24px 0 0;
 	width:48px;
 	height:48px;
-	background: url(../imageicon_close.png) no-repeat center;
+	background: url(../image/icon_close.png) no-repeat center;
 }
 
 /* user list */
@@ -701,7 +703,7 @@ div#title_bar {
 .icon_order {
 	position: absolute;
 	right:10px; top:10px;
-    background: url(../imageicon_order.png) no-repeat transparent;
+    background: url(../image/icon_order.png) no-repeat transparent;
     display: inline-block; 
     width: 8px; height: 12px; 
 }
@@ -719,16 +721,16 @@ div#title_bar {
 .bot_icon_big {
 	width:33px;
 	height:30px;
-	background: url(../imagebot-icons-big.png) no-repeat scroll -63px -66px transparent;
+	background: url(../image/bot-icons-big.png) no-repeat scroll -63px -66px transparent;
 }
 
 .tile_p1{
-    background: url(../imagecreate_icons.png) no-repeat scroll -29px -21px;
+    background: url(../image/create_icons.png) no-repeat scroll -29px -21px;
     border: none;
 }
 
 .tile_p2{
-    background: url(../imagecreate_icons.png) no-repeat scroll -139px -20px;
+    background: url(../image/create_icons.png) no-repeat scroll -139px -20px;
     border: none;
 }
 
@@ -749,17 +751,17 @@ div#title_bar {
 }
 
 .create_ignore{
-    background: url(../imagecreate_icons.png) no-repeat scroll -250px -19px;
+    background: url(../image/create_icons.png) no-repeat scroll -250px -19px;
     border: none;
 }
 
 .create_p1{
-    background: url(../imagecreate_icons.png) no-repeat scroll -29px -21px;
+    background: url(../image/create_icons.png) no-repeat scroll -29px -21px;
     border: none;
 }
 
 .create_p2{
-    background: url(../imagecreate_icons.png) no-repeat scroll -139px -20px;
+    background: url(../image/create_icons.png) no-repeat scroll -139px -20px;
     border: none;
 }
 
@@ -768,33 +770,33 @@ div#title_bar {
 }
 
 .create_selected{
-    background: url(../imagecreate_icons.png) no-repeat scroll -29px -130px;
+    background: url(../image/create_icons.png) no-repeat scroll -29px -130px;
     border: none;
 }
 
 /* tile type icons for small board */
 .create_ignore_tiny{
-    background: url(../imagecreate_icons_small.png) no-repeat scroll -17px -15px;
+    background: url(../image/create_icons_small.png) no-repeat scroll -17px -15px;
     border: none;
 }
 
 .create_p1_tiny{
-    background: url(../imagecreate_icons_small.png) no-repeat scroll -17px -3px;
+    background: url(../image/create_icons_small.png) no-repeat scroll -17px -3px;
     border: none;
 }
 
 .create_p2_tiny{
-    background: url(../imagecreate_icons_small.png) no-repeat scroll -29px -3px;
+    background: url(../image/create_icons_small.png) no-repeat scroll -29px -3px;
     border: none;
 }
 
 .create_empty_tiny{
-    background: url(../imagecreate_icons_small.png) no-repeat scroll -5px -15px;
+    background: url(../image/create_icons_small.png) no-repeat scroll -5px -15px;
     border: none;
 }
 
 .create_selected_tiny{
-    background: url(../imagecreate_icons_small.png) no-repeat scroll -5px -3px;
+    background: url(../image/create_icons_small.png) no-repeat scroll -5px -3px;
     border: none;
 }
 

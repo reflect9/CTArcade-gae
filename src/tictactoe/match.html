@@ -5,20 +5,30 @@
 	<!-- includes -->
 	{% include "includes.html" %}
 	<!-- end of includes -->
-	<link rel="stylesheet" type="text/css" href="css/jquery.qtip.css"/>
-	<script type="text/javascript" src="js/tictactoe/sugiyama.js"></script>
-	<script type="text/javascript" src="js/jquery.qtip.js"></script>
+	<link rel="stylesheet" type="text/css" href="static/css/jquery.qtip.css"/>
+	<script type="text/javascript" src="static/js/tictactoe/sugiyama.js"></script>
+	<script type="text/javascript" src="static/js/jquery.qtip.js"></script>
 	<script type="text/javascript">
 		var matches, p1, p2, p1_AI, p2_AI;
 		p1 = "{{p1}}";   p2 = "{{p2}}";
 		botKind = "{{botKind}}";  botName = "{{botName}}";
 	</script>
-	<script type="text/javascript" src="js/tictactoe/playMatch.js"></script>	
+	<script type="text/javascript" src="static/js/tictactoe/playMatch.js"></script>	
+    <script type="text/javascript">
+	    $(function() {
+	        $('body').prepend("<div id='header_wrapper'></div>");
+	        $('#header_wrapper').load('static/html/header.html', function(){
+	            // highlight current mode button
+	            $(".header #header_button_match").addClass("currentMode");
+	            
+	        });
+	        $('body').append("<div class='footer_wrapper clearfix'></div>");
+	        $('.footer_wrapper').load('static/html/footer.html');
+	    });   
+	</script>   
+	
 </head>
 <body>
-	<!-- header -->
-		{% include "header.html" %}
-	<!-- end of header -->
 	<!-- container : main stuff -->
 	<div class='container'>
 		<div class='pageContent' style='background-color:rgba(0,0,0,0);'>

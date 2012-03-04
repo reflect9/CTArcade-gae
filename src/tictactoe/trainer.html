@@ -6,20 +6,26 @@
 	<!-- includes -->
 	{% include "includes.html" %}
 	<!-- end of includes -->
-	<script type="text/javascript" src="js/tictactoe/TicTacToeTrainer.js"> </script>
-	<script type="text/javascript" src="js/tictactoe/Creation.js"> </script>
+	<script type="text/javascript" src="static/js/tictactoe/TicTacToeTrainer.js"> </script>
+	<script type="text/javascript" src="static/js/tictactoe/Creation.js"> </script>
 	<script type="text/javascript">
 		var p1='{{user_id}}';	var p2='{{botName}}';
 		var botKind = '{{botKind}}'; var botName='{{botName}}';
 	</script>
-	<script type="text/javascript" src="js/tictactoe/trainer.js"> </script>
-
+	<script type="text/javascript" src="static/js/tictactoe/trainer.js"> </script>
+    <script type="text/javascript">
+	    $(function() {
+	        $('body').prepend("<div id='header_wrapper'></div>");
+	        $('#header_wrapper').load('static/html/header.html', function(){
+	            // highlight current mode button
+	            $(".header #header_button_trainer").addClass("currentMode");
+	        });
+	        $('body').append("<div class='footer_wrapper clearfix'></div>");
+	        $('.footer_wrapper').load('static/html/footer.html');
+	    });   
+	</script>   
 </head>
 <body>	
-<!-- header -->
-{% include "header.html" %}
-<!-- end of header -->
-
 <!-- container : main stuff -->
 <div class='container'>
 	<div class='pageContent' style='background-color:rgba(0,0,0,0);'>
@@ -31,10 +37,10 @@
 				</div>
 				<div id='memberListDIV' style='position:absolute; right:10px; top:10px; width:100px;'></div>
 			</div>
-			<div class="trainerPanel clearfix" style='width:720px; padding:15px;'>
+			<div class="trainerPanel clearfix" style='width:740px; padding:15px;'>
 				<div class='row-fluid'>
 					<div id="container_board" class='span6'>	
-						<div id="board" style="position:relative; margin-top:10px; margin-bottom:10px;">
+						<div id="board" style="position:relative; margin:10px;">
 							<div id="t00" class="tile"></div>
 							<div id="t10" class="tile"></div>
 							<div id="t20" class="tile"> </div>
@@ -92,4 +98,5 @@
 <!-- end of reset modal-->
 
 </body>
+
 </html>

@@ -9,15 +9,15 @@ Updates:
 <html>
 <head>
 	<title>Lobby - CTArcade</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css"/>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
-	<script type="text/javascript">
+    <!-- includes -->
+    {% include "includes.html" %}
+    <!-- end of includes -->
+    <script type="text/javascript">
 	   var p1='{{user_id}}';
 	   var currentUser = "{{user_id}}";
 	   var returnedTimer = false;
 	   function playMatch(p1, p2) {
-	       location.href = "playMatch?p2="+p2;
+	       location.href = "match?p2="+p2;
 	   }
 	   function challenge(opponent) {
 	       if (currentUser=="Guest") {
@@ -53,23 +53,26 @@ Updates:
 			return s;
 			})());
 		}
-		$(document).ready(function() {
-			$(".header #header_button_lobby").addClass("currentMode");
-		});
-	</script>
 
-    
+	</script>
+    <script type="text/javascript">
+        $(function() {
+            $('body').prepend("<div id='header_wrapper'></div>");
+            $('#header_wrapper').load('static/html/header.html', function(){
+                // highlight current mode button
+                $(".header #header_button_lobby").addClass("currentMode");
+            });
+            $('body').append("<div class='footer_wrapper clearfix'></div>");
+            $('.footer_wrapper').load('static/html/footer.html');
+        });   
+    </script>   
 
 </head>
 <body>	
-<!-- header -->
-{% include "header.html" %}
-<!-- end of header -->
-
 <!-- container : main stuff -->
 <div class='container'>
-<div class='pageContent'>
-		<div class="wrapper clearfix">
+   <div class="wrapper clearfix">    
+       <div class="introPanel">
 			<div class="innerHeader">
 				<div id='desc' style='margin-bottom:10px;'>
 					<div id='welcome'>Welcome to the CTArcade lobby!<br />

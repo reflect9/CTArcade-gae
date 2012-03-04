@@ -59,7 +59,7 @@ class Lobby(webapp.RequestHandler):
 			'server_time': json.dumps(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), default=dthandler),
         }  # map of variables to be handed to html template
 
-        path = os.path.join(os.path.dirname(__file__), 'lobby.html')
+        path = os.path.join(os.path.dirname(__file__), 'tictactoe/lobby.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
@@ -179,7 +179,7 @@ class UpdateRule(webapp.RequestHandler):
         self.response.out.write(rule.put())
 
 
-class PlayMatch(webapp.RequestHandler):
+class Match(webapp.RequestHandler):
     def get(self):
         session = sessions.Session()
         try:
@@ -204,7 +204,7 @@ class PlayMatch(webapp.RequestHandler):
             'botName': botName
 #            'matches': json.dumps(matches).replace("&quot;","'")
         }  # map of variables to be handed to html template
-        path = os.path.join(os.path.dirname(__file__), 'playMatch.html')
+        path = os.path.join(os.path.dirname(__file__), 'tictactoe/match.html')
         self.response.out.write(template.render(path, template_values))        
        
 class Trainer(webapp.RequestHandler):
@@ -225,7 +225,7 @@ class Trainer(webapp.RequestHandler):
             'botKind':botKind,
             'botName': botName
         }  
-        path = os.path.join(os.path.dirname(__file__), 'trainer.html')
+        path = os.path.join(os.path.dirname(__file__), 'tictactoe/trainer.html')
         self.response.out.write(template.render(path, template_values))
 
 class AjaxCall(webapp.RequestHandler):
@@ -444,7 +444,7 @@ class Fishtank(webapp.RequestHandler):
         template_values = {
             'p1' : 'aa',
         }  
-        path = os.path.join(os.path.dirname(__file__)+"/fishtank", 'fishtank.html')
+        path = os.path.join(os.path.dirname(__file__), 'fishtank/fishtank.html')
         print >>sys.stderr, path
         self.response.out.write(template.render(path, template_values))
 
@@ -457,7 +457,7 @@ def main():
                                           ('/logOut',LogOut),   # logOut process no UI
                                           ('/signIn',SignIn),   # signIn UI
                                           ('/updateRule', UpdateRule),
-                                          ('/playMatch',PlayMatch),
+                                          ('/match',Match),
                                           ('/trainer',Trainer),
                                           ('/ajaxCall',AjaxCall),
                                           ('/ajaxTrainer',AjaxTrainer),
