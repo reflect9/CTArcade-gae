@@ -27,6 +27,8 @@ Updates:
                 // highlight current mode button
                 //$(".header #header_button_intro").addClass("currentMode");
             });
+        $('body').append("<div class='footer_wrapper'></div>");
+        $('.footer_wrapper').load('static/html/footer.html');
         });   
     </script>    
     
@@ -34,164 +36,158 @@ Updates:
 <body>  
 
 <div class='container'>
-    <div class='pageContent clearfix' style='padding:20px;'>
-        <div class="row">
-            <div class="span12" style='margin-bottom:20px;'>
-                <h2>Log In and Play Together</h2>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <div class="span6"> <!--  left column -->
-                <div class="well">
-                    <form class="form-horizontal login" action="#">
-                        <legend>Already a member?</legend>
-                        <div class="control-group">
-                            <label class="control-label" for="input01">User Name</label>
-                            <div class="controls">
-                                <input type="text" class="input-large" placeholder="" id="userID">
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input02">Password</label>
-                            <div class="controls">
-                                <input type="password" class="input-large" placeholder="" id="password" onKeyPress="return submitFormWithEnter('login',event)">  
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <div class="controls">
-                                <input type="button" id='login_submit' class="btn" value="Log In"></input>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <div class="controls">
-                                <p class="help-block" id="login_result"></p>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <div class="controls">
-                                <a href="#">Forgot your password?</a>
-                            </div>
-                        </div>
-                    </form>          
-                
-                </div>
-
-            </div> <!--  end left column -->
-            <div class="span6" > <!--  right column -->
-                <div class="well" style="background:none; border:none; box-shadow:none; ">
-                    <form class="form-horizontal register" id="registerForm"  name="registerForm" action="#">
-                        <legend>Join CTArcade</legend>
-                        <div class="control-group">
-                            <label class="control-label" for="input01">Email</label>
-                            <div class="controls">
-                                <input type="text" class="input-medium" placeholder="" id="registerEmail">
-                            </div>
-                        </div>                        
-                        
-                        <div class="control-group">
-                            <label class="control-label" for="input02">User Name</label>
-                            <div class="controls">
-                                <input type="text" class="input-medium" placeholder="" id="registerID">
-                                <span class="label" id='id_check'>Availability</span>
-                                <p class="help-block" id="userNameFormatCheck"></p>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input03">Password</label>
-                            <div class="controls">
-                                <input type="password" class="input-medium new_password" placeholder="" id="registerPassword">
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input04">Password Confirm</label>
-                            <div class="controls">
-                                <input type="password" class="input-medium new_password" placeholder="" id="registerPasswordConfirm">
-                                <span class="label label-important" id="password_match">NOT MATCHING</span>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="input05">Choose An Icon For Your Bot</label>
-                            <div class="controls" id="botSelector">
-                            </div>
-                        </div>    
-                        <script type="text/javascript"> // create bot selection buttons
-                            var num_bots = 6;
-                            var t_div = $("#botSelector");
-                            var x_offset_org = -63;   var y_offset_org = -66;
-                            var x_offset_step = (117-63);
-                            for (var i=1;i<=6;i++) {
-                                var x_offset = x_offset_org- (x_offset_step*(i-1));
-                                var y_offset = y_offset_org;
-                                var html = "<label class='radio inline' style='margin-left:10px;'>" +
-                                           "<div class='bot_icon_big' style='background-position:"+x_offset+"px "+y_offset+"px'></div>"+
-                                           "<input type='radio' name='registerBot' id='bot_selection_"+i+"' value='bot_"+i+
-                                           "' style='margin-left:10px;'>"+ 
-                                           "</label>";
-                                t_div.append(html);
-                                if(i==3) t_div.append("<br>");
-                            }
-                            $("input#bot_selection_"+Math.ceil(Math.random()*6)).attr('checked',true);
-                         </script>
-                        <div class="control-group">
-                            <label class="control-label" for="input06">Name your bot</label>
-                            <div class="controls">
-                                <input type="text" class="input-large" id="botName" name="registerBotName" value="gamebot">
-                                <p class="help-block">Change your bot's name as you like.</p>
-                            </div>
-                        </div>             
-                        <script type='text/javascript'>
-                            //$(  $("#registerID").change(function() {
-                                    //alert("fdf");
-                            //        $("#botName").val($("#registerID").val().trim()+" bot");
-                            //}));
-                            $(  $("#registerPasswordConfirm").keyup(function() {
-                                    //alert("not matching");
-                                    if($("#registerPassword").val()!=$("#registerPasswordConfirm").val()) {
-                                        $('#password_match').show();
-                                    } else {
-                                        $('#password_match').hide();
-                                    }
-                            }));
-                            $(  $("#registerID").change(function() {
-                                $(this).show();
-                                var new_userName = $(this).val();
-                                if(new_userName.match(/[a-zA-Z][a-zA-Z0-9]{2,16}$/g)==null) 
-                                        $("#userNameFormatCheck").html("User name(3~16 characters) should contain only alphabets and numbers.");
-                                else    $("#userNameFormatCheck").html("");
-
-                                $.get('ajaxCall',{action:"checkUserName",userName:new_userName},
-                                        function(data) {
-                                            $("span#id_check").html(data);
-                                });
-                                
-                            }));
-                            
-                        </script>
-                        
-                        
-                        <div class="control-group">
-                            <div class="controls">
-                                <input type="button" id='register_submit' class="btn" value="Create New Account"></input>
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <div class="controls">
-                                <p class="help-block" id="register_result"></p>
-                            </div>
-                        </div>                        
-                    </form>          
-                
-                </div>
-            </div>  <!--  end right  -->
-        
-        </div>        
-
-
-        
-<!-- footer -->
-{% include "footer.html" %}
-<!-- end of footer -->
-    
+   <div class="wrapper clearfix">    
+       <div class="fullPanel">
+	        <div class="row">
+	            <div class="span12" style='margin-bottom:20px;'>
+	                <h2>Log In and Play Together</h2>
+	            </div>
+	        </div>
+	        <div class="row-fluid">
+	            <div class="span6"> <!--  left column -->
+	                <div class="well">
+	                    <form class="form-horizontal login" action="#">
+	                        <legend>Already a member?</legend>
+	                        <div class="control-group">
+	                            <label class="control-label" for="input01">User Name</label>
+	                            <div class="controls">
+	                                <input type="text" class="input-large" placeholder="" id="userID">
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <label class="control-label" for="input02">Password</label>
+	                            <div class="controls">
+	                                <input type="password" class="input-large" placeholder="" id="password" onKeyPress="return submitFormWithEnter('login',event)">  
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <div class="controls">
+	                                <input type="button" id='login_submit' class="btn" value="Log In"></input>
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <div class="controls">
+	                                <p class="help-block" id="login_result"></p>
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <div class="controls">
+	                                <a href="#">Forgot your password?</a>
+	                            </div>
+	                        </div>
+	                    </form>          
+	                
+	                </div>
+	
+	            </div> <!--  end left column -->
+	            <div class="span6" > <!--  right column -->
+	                <div class="well" style="background:none; border:none; box-shadow:none; ">
+	                    <form class="form-horizontal register" id="registerForm"  name="registerForm" action="#">
+	                        <legend>Join CTArcade</legend>
+	                        <div class="control-group">
+	                            <label class="control-label" for="input01">Email</label>
+	                            <div class="controls">
+	                                <input type="text" class="input-medium" placeholder="" id="registerEmail">
+	                            </div>
+	                        </div>                        
+	                        
+	                        <div class="control-group">
+	                            <label class="control-label" for="input02">User Name</label>
+	                            <div class="controls">
+	                                <input type="text" class="input-medium" placeholder="" id="registerID">
+	                                <span class="label" id='id_check'>Availability</span>
+	                                <p class="help-block" id="userNameFormatCheck"></p>
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <label class="control-label" for="input03">Password</label>
+	                            <div class="controls">
+	                                <input type="password" class="input-medium new_password" placeholder="" id="registerPassword">
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <label class="control-label" for="input04">Password Confirm</label>
+	                            <div class="controls">
+	                                <input type="password" class="input-medium new_password" placeholder="" id="registerPasswordConfirm">
+	                                <span class="label label-important" id="password_match">NOT MATCHING</span>
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <label class="control-label" for="input05">Choose An Icon For Your Bot</label>
+	                            <div class="controls" id="botSelector">
+	                            </div>
+	                        </div>    
+	                        <script type="text/javascript"> // create bot selection buttons
+	                            var num_bots = 6;
+	                            var t_div = $("#botSelector");
+	                            var x_offset_org = -63;   var y_offset_org = -66;
+	                            var x_offset_step = (117-63);
+	                            for (var i=1;i<=6;i++) {
+	                                var x_offset = x_offset_org- (x_offset_step*(i-1));
+	                                var y_offset = y_offset_org;
+	                                var html = "<label class='radio inline' style='margin-left:10px;'>" +
+	                                           "<div class='bot_icon_big' style='background-position:"+x_offset+"px "+y_offset+"px'></div>"+
+	                                           "<input type='radio' name='registerBot' id='bot_selection_"+i+"' value='bot_"+i+
+	                                           "' style='margin-left:10px;'>"+ 
+	                                           "</label>";
+	                                t_div.append(html);
+	                                if(i==3) t_div.append("<br>");
+	                            }
+	                            $("input#bot_selection_"+Math.ceil(Math.random()*6)).attr('checked',true);
+	                         </script>
+	                        <div class="control-group">
+	                            <label class="control-label" for="input06">Name your bot</label>
+	                            <div class="controls">
+	                                <input type="text" class="input-large" id="botName" name="registerBotName" value="gamebot">
+	                                <p class="help-block">Change your bot's name as you like.</p>
+	                            </div>
+	                        </div>             
+	                        <script type='text/javascript'>
+	                            //$(  $("#registerID").change(function() {
+	                                    //alert("fdf");
+	                            //        $("#botName").val($("#registerID").val().trim()+" bot");
+	                            //}));
+	                            $(  $("#registerPasswordConfirm").keyup(function() {
+	                                    //alert("not matching");
+	                                    if($("#registerPassword").val()!=$("#registerPasswordConfirm").val()) {
+	                                        $('#password_match').show();
+	                                    } else {
+	                                        $('#password_match').hide();
+	                                    }
+	                            }));
+	                            $(  $("#registerID").change(function() {
+	                                $(this).show();
+	                                var new_userName = $(this).val();
+	                                if(new_userName.match(/[a-zA-Z][a-zA-Z0-9]{2,16}$/g)==null) 
+	                                        $("#userNameFormatCheck").html("User name(3~16 characters) should contain only alphabets and numbers.");
+	                                else    $("#userNameFormatCheck").html("");
+	
+	                                $.get('ajaxCall',{action:"checkUserName",userName:new_userName},
+	                                        function(data) {
+	                                            $("span#id_check").html(data);
+	                                });
+	                                
+	                            }));
+	                            
+	                        </script>
+	                        
+	                        
+	                        <div class="control-group">
+	                            <div class="controls">
+	                                <input type="button" id='register_submit' class="btn" value="Create New Account"></input>
+	                            </div>
+	                        </div>
+	                        <div class="control-group">
+	                            <div class="controls">
+	                                <p class="help-block" id="register_result"></p>
+	                            </div>
+	                        </div>                        
+	                    </form>          
+	                
+	                </div>
+	            </div>  <!--  end right  -->
+	        </div>        <!-- wrapper clearfix -->
+        </div>  <!-- fullPanel -->
     </div>  <!--  pagecotent -->
 </div>      <!-- end of container-->
 
