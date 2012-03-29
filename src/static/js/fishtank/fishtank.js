@@ -1,6 +1,9 @@
-var CANVAS_WIDTH = 500, CANVAS_HEIGHT = 500;
-var FRAME_RATE = 10;
-var game, viewer;
+var CANVAS_WIDTH = 530, CANVAS_HEIGHT = 500;
+var FRAME_RATE = 20;
+var gLoop, is_running;
+var model, view;
+var showCurrentTasks = false;
+var showSightRange = false;
 //INIT PROCESS
 $(function() {
 	model = new Model_fishtank();
@@ -10,8 +13,8 @@ $(function() {
 
 // constructor of Fishtank game model
 var Model_fishtank = function() {   
-	var agents = [];
-	var foods = [];
+	this.agents = [];
+	this.foods = [];
 }
 
 // view
@@ -20,24 +23,33 @@ var View_fishtank = function(canvasID) {
 	this.ctx = this.c.getContext('2d');
 	this.c.width = CANVAS_WIDTH;
 	this.c.height = CANVAS_HEIGHT;
-	
 	this.clear = function() {
-		ctx.fillStyle = '#d0e7f9';
-		ctx.beginPath();
-		ctx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-		ctx.closePath();
-		ctx.fill();
+		this.ctx.fillStyle = '#d0e7f9';
+		this.ctx.beginPath();
+		this.ctx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		this.ctx.closePath();
+		this.ctx.fill();
 	}
 	this.drawAgent = function(agent) {
-		ctx.fillStyle = agent.appearance.color;
-		ctx.fillRect(agent.x, agent.y, agent.size.width, agent.size.height);
+		this.ctx.fillStyle = agent.color;
+		this.ctx.fillRect(agent.x, agent.y, agent.size.width, agent.size.height);
+		if (showCurrentTasks) {
+			this.ctx.fillText(agent.currentTask.type,agent.x, agent.y+13);
+		}
+		if (showSightRange) {
+			this.ctx.fillStyle = "rgba(0,0,0,0.15)";
+			this.ctx.beginPath();
+			this.ctx.arc(agent.x+(agent.size.width/2),agent.y+(agent.size.height/2),agent.sight.range,Math.PI*2,0,true);
+			this.ctx.closePath();
+			this.ctx.fill();
+		}
 	}
 	this.drawFood = function(food) {
-		ctx.fillStyle = food.appearance.color;
-		ctx.beginPath();
-		ctx.arc(food.x, food.y, food.size, food.size, Math.PI*2, true); 
-		ctx.closePath();
-		ctx.fill();
+		this.ctx.fillStyle = food.color;
+		this.ctx.beginPath();
+		this.ctx.arc(food.x, food.y, food.size, food.size, Math.PI*2, true); 
+		this.ctx.closePath();
+		this.ctx.fill();
 	}
 }
 
@@ -45,12 +57,13 @@ var View_fishtank = function(canvasID) {
 var restart = function() {
 	for ( var i = 0; i < 5; i++) {
 		model.agents.push(new Agent({
-			x : Math.floor(Math.random() * CANVAS_WIDTH),
-			y : Math.floor(Math.random() * CANVAS_HEIGHT),
-			rules : [presetRule.randomExploration]
+			id : 'agent'+i,
+			x : 50,
+			y : 50,
+			rules : [PresetRule("Random Exploration"),PresetRule("Gathering Food")]
 		}));
 	}
-	for ( var i = 0; i < 50; i++) {
+	for ( var i = 0; i < 20; i++) {
 		model.foods.push(new Food({
 			size : 5,
 			x : Math.floor(Math.random() * CANVAS_WIDTH),
@@ -59,20 +72,32 @@ var restart = function() {
 	}
 	// make it run forever
 	gLoop = setTimeout(gameLoop, 1000 / FRAME_RATE);
+	is_running = true;
+}
+var control = function(mode){
+	if (mode=='play') { gLoop = setTimeout(gameLoop, 1000 / FRAME_RATE);  is_running=true; }
+	else if(mode=='stop') { clearTimeout(gLoop);  is_running=false; }
+	else if(mode=='toggle') {
+		if (is_running==true) control('stop');
+		else if(is_running==false) control('play');
+	}
+}
+var pause = function() {
+	clearTimeout(gLoop);
 }
 // gameLoop will run every frame
 var gameLoop = function() {
 	console.log("gameLoop");
-	view.update();
+	update();
 	view.clear();
-	$.each(model.agents, function(agent) { view.drawAgent(agent); });
-	$.each(model.foods, function(food) { view.drawFood(food); });
+	$.each(model.agents, function(i,agent) { view.drawAgent(agent); });
+	$.each(model.foods, function(i,food) { view.drawFood(food); });
 	gLoop = setTimeout(gameLoop, 1000 / 10);
 }
 var update = function() {
 	// change position, do something this round
-	agents.forEach(function(agent) { agent.update(); });
-	foods.forEach(function(food) { food.update(); });
+	model.agents.forEach(function(agent) { agent.update(); });
+	model.foods.forEach(function(food) { food.update(); });
 }
 //
 //var updateBins = function(collection) {

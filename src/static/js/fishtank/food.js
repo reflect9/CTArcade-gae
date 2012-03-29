@@ -4,7 +4,7 @@ function Food(I) {
 	if(I.x==undefined) I.x = Math.floor(Math.random() * CANVAS_WIDTH);
 	if(I.y==undefined) I.y = Math.floor(Math.random() * CANVAS_WIDTH);
 	
-	I.appearance.color = "#ffbb00"
+	I.color = "#ffbb00"
 	I.consume = function() {
 		I.size -= 1;
 	}

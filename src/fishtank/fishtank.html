@@ -11,9 +11,76 @@
    
    <div class="wrapper clearfix">    
        <div class="fullPanel">
-          <canvas id='canvas'>
-          
-          </canvas>  
+            <div class="row-fluid">
+                <div id='canvasPanel' class="span7">
+                    <canvas id='canvas'></canvas>
+                </div>
+                <div id='controllerPanel' class="span5">
+                    <div id='gameControlPanel' class='well' style='padding:5px;'>
+                        <button id='btn_playstop' class="btn"><i class="icon-play"></i></button>
+                        <script type="text/javascript">
+                            $("#btn_playstop").click(function(){
+                               $(this).find("i").toggleClass('icon-play').toggleClass('icon-stop');
+                               control("toggle");
+                            });
+                        </script>
+                        <div>Show Current Tasks&nbsp;<input id="check_showCurrentTask" type='checkbox'></input></div> 
+                        <div>Show Sight Range&nbsp;<input id="check_showSightRange" type='checkbox'></input></div> 
+                        <script type="text/javascript">
+		                         $("#check_showCurrentTask").change(function(){
+		                            showCurrentTasks = $(this).is(':checked');
+		                         });
+                                 $("#check_showSightRange").change(function(){
+                                    showSightRange = $(this).is(':checked');
+                                 });
+                        </script>
+                    </div>
+                    <div id='rulePanel' style='margin-bottom:20px;'>
+                        <h4 style='padding-bottom:5px;'>Agent Rules</h4>
+                        <div class='ruleObject' style='margin:5px 0 5px 0;'>
+                            <span class='label label-info'>Random Exploration</span>
+                            <div>
+                                <strong>If</strong> the agent is <code>idle</code> 
+                            </div>
+                            <div>
+                                <strong>Do</strong> Choose a random location and start <code>move</code>.  
+                            </div>
+                            <div>
+                                <strong>Until</strong> it reaches to the destination.  
+                            </div>
+                        </div>
+                        <div class='ruleObject' style='margin:5px 0 5px 0;'>
+                            <span class='label label-info'>Gathering Food </span>
+                            <div>
+                                <strong>If</strong> the agent is in <code>move</code> and food is nearby. 
+                            </div>
+                            <div>
+                                <strong>Do</strong> <code>eat</code> the first food it finds. 
+                            </div>
+                            <div>
+                                <strong>Until</strong> it does not feel hungry or the food is gone.  
+                            </div>
+                        </div>
+                        <div class='ruleObject' style='margin:5px 0 5px 0;'>
+                            <span class='label '>Incremental Search</span>
+                            <span class='label '>Zig Zag</span>
+                            <span class='label '>Spiral</span>
+                            <span class='label '>Follow Friends</span>
+                        </div>
+                        
+                    </div>
+                    <div id='statusPanel'>
+                        <h4 style='padding-bottom:5px;'>Agent Status</h4>
+                        <div style='margin:5px 0 5px 0;'>
+                            
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                  
+            </div>
+            
        </div>
    </div>
 </div>
