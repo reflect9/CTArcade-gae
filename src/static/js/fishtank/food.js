@@ -1,18 +1,17 @@
 // FOOD
 function Food(I) {
-	if(I.size==undefined) I.size=5;
-	if(I.x==undefined) I.x = Math.floor(Math.random() * CANVAS_WIDTH);
-	if(I.y==undefined) I.y = Math.floor(Math.random() * CANVAS_WIDTH);
-	
-	I.color = "#ffbb00"
-	I.consume = function() {
-		I.size -= 1;
-	}
-	I.update = function() {
-		I.active = I.size > 0;
-	}
-	return I;
+	copyVariables(I,this);	// copy all the variables defined in I : input argument
+	if(this.size==undefined) I.size=5;
+	if(this.x==undefined) I.x = Math.floor(Math.random() * CANVAS_WIDTH);
+	if(this.y==undefined) I.y = Math.floor(Math.random() * CANVAS_WIDTH);
+	this.color = "#ffbb00"
 }
 
 
 
+Food.prototype.consume = function() {
+	this.size -= 1;
+}
+Food.prototype.update = function() {
+	this.active = this.size > 0;
+}

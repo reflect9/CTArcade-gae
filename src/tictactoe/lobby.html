@@ -71,80 +71,40 @@ Updates:
 <body>	
 <!-- container : main stuff -->
 <div class='container'>
-   <div class="wrapper clearfix">    
-       <div class="introPanel">
-			<div class="innerHeader">
-				<div id='desc' style='margin-bottom:10px;'>
-					<div id='welcome'>Welcome to the CTArcade lobby!<br />
-                    {% if user_id != "Guest"%}
-                    You can review you rank and score against other players using CT Arcade.<br />
-                    You can also select a player to challenge from the list below.<br />
-                    {% else %}
-					In order to use the lobby you must sign in as a registered user using the "Sign In" link.<br />
-                    Registering a user account is quick and easy, just click on the "Create New Account" link.<br />
-					{% endif %}
-				    <hr /></div>
-				</div>
-			</div>
-			 <!-- container_board -->
-		<div style="width:100%;" align="center">
-            <div style="width:33%;float:left;">
-            <p><strong>Players</strong><br /><br />
-            	{% for user in users %}
-                  {% if user.id %}
-                  	{% if user.id == champ.winner %}
-                     	{{ user.id }} &diams; <br />
-                   	{% else %}     
-                    	{{ user.id }}<br />
-					{% endif %}
-                  {% else %}
-            		<!--- Do Nothing --->
-                  {% endif %}
-              {% endfor %}</p>
-                </div>
-            <div style="width:33%;float:left;">
-            <p><strong>Score/Rank</strong><br /><br />
-             {% for user in users %}
-                  {% if user.id %}
-                    {{ user.score }}<br />
-                  {% else %}
-            		<!--- Do Nothing --->
-                  {% endif %}
-              {% endfor %}</p>
-                </div>
-            <div style="width:33%;float:left;">
-            <p><strong>Actions</strong><br /><br />
-			{% if user_id != "Guest"%}  
-             {% for user in users %}
-                  {% if user.id != user_id%}
-                    <a href="javascript:challenge('{{user.id}}')">Challenge</a><br />
-                  {% else %}
-            		<br />
-                  {% endif %}
-              {% endfor %}
-			 {% endif %}</p>
-                </div>
-                </div>
-         	<div style="width:100%;clear:both;">
-                <hr />
-	
-
-<div id="javascript_countdown_time"></div>
-                
-                <p align="left" id="accessTrainer" style="padding-top:8px; cursor:pointer;">
-                {% if user_id == "mattm401" or user_id == "tak" %}
-                	<strong>Administration:</strong><br /><form action="/lobby" method="post">
-                	<input type="submit" value="Run Server Tournament" />
-                	<input type="hidden" name="key" id="key" value="Test"/>
-                	</form>
-                  {% endif %}  
-                </p>
+    <div class="wrapper clearfix">    
+        <div class="fullPanel clearfix">
+            <div id='desc' style='margin-bottom:10px;'>
+                <h3>Welcome to the CTArcade lobby!</h3><br />
+                    CTArcade runs a tournament between all the bots everyday automatically and shows the result in the table below.   
+				
             </div>
-        </div>
-			<div style="clear:both;"></div>
-		</div> <!--wrapper clearfix-->
-	</div>	<!--pageContent-->
-</div>		<!-- end of container-->
+            <div id='rankTable' class='clearfix' align="center">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Score/Rank</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %} {% if user.id %}
+                        <tr>
+                            <td>{{user.id}}</td>
+                            <td>{{user.score}}</td>
+                            <td>
+                                {% if user.id != user_id%}
+                                <a href="javascript:challenge('{{user.id}}')">Play Match</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {%endif%}{% endfor %}    <!-- endfor users -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="javascript_countdown_time"></div>
+	   </div>	<!--pageContent-->
+    </div>		<!-- end of container-->
 </div>
 <script type="application/javascript">
 var javascript_countdown = function () {

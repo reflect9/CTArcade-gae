@@ -813,3 +813,7 @@ div#title_bar {
     font-size: 0.8em;
     overflow-y:scroll;
 }
+
+#rankTable {
+	font-size:1.2em;
+}

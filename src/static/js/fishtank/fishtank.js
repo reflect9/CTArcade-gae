@@ -4,6 +4,8 @@ var gLoop, is_running;
 var model, view;
 var showCurrentTasks = false;
 var showSightRange = false;
+var selection = {};		// currently selected agents,foods and other signals
+
 //INIT PROCESS
 $(function() {
 	model = new Model_fishtank();
@@ -23,12 +25,31 @@ var View_fishtank = function(canvasID) {
 	this.ctx = this.c.getContext('2d');
 	this.c.width = CANVAS_WIDTH;
 	this.c.height = CANVAS_HEIGHT;
+	$("#"+canvasID).click(function(e) {	// CANVAS CLICK EVENT
+		// find which element is closest
+		console.log(e.pageX + ","+ e.pageY);
+		var closestObj = {dist:100};
+		for(i in model.agents) {
+			var agent = model.agents[i];
+			var dObj = (agent.getDirection({x:e.pageX-($(this).offset()).left, y:e.pageY-($(this).offset()).top});
+			if (dObj.distance<closestObj.dist) {
+				console.log(agent.id + " is clicked");
+				closestObj.dist = agent.getDirection
+				
+			}
+		}
+		// add the element to the selection
+		
+	});
 	this.clear = function() {
 		this.ctx.fillStyle = '#d0e7f9';
 		this.ctx.beginPath();
 		this.ctx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 		this.ctx.closePath();
 		this.ctx.fill();
+	}
+	this.drawSelection = function() {
+		
 	}
 	this.drawAgent = function(agent) {
 		this.ctx.fillStyle = agent.color;
@@ -56,12 +77,15 @@ var View_fishtank = function(canvasID) {
 // CONTROLLER FUNCTIONS
 var restart = function() {
 	for ( var i = 0; i < 5; i++) {
-		model.agents.push(new Agent({
+		var newAgent = new Agent({
 			id : 'agent'+i,
 			x : 50,
-			y : 50,
-			rules : [PresetRule("Random Exploration"),PresetRule("Gathering Food")]
-		}));
+			y : 50
+		});
+		newAgent.rules = [];
+		newAgent.rules.push(PresetRule.call(newAgent,"Random Exploration"));
+//		newAgent.rules.push(PresetRule.call(newAgent,"Gathering Food"));
+		model.agents.push(newAgent);
 	}
 	for ( var i = 0; i < 20; i++) {
 		model.foods.push(new Food({

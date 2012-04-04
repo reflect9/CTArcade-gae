@@ -6,18 +6,18 @@ operation is another function object that accepts signal and returns a new state
 
 var Rule = function(I) {
 // title, key, precondition, operation
-	I.run = function(t) {
-		if (this.precondition.call(t)) {
-			return {currentTask:this.getNewTask()};
-		} 
-		else return false;
-	}
-	return I;
+	copyVariables(I,this);
 }
+//Rule.prototype.run = function() {
+//	if (this.precondition.call()) {
+//		return {currentTask:this.getNewTask()};
+//	} 
+//	else return false;
+//}
 
-var presetRule = {};
-var PresetRule = function(template) {
-	if (template=='Random Exploration') {
+//var presetRule = {};
+var PresetRule = function(templateCode) {
+	if (templateCode=='Random Exploration') {
 		var rule = new Rule({
 			title : 'Random Exploration',
 			key : 'Random Exploration',
@@ -25,7 +25,7 @@ var PresetRule = function(template) {
 				if(this.currentTask.type=='idle') return true;	// activated when there's no task assigned for the agent
 			},
 			getNewTask : function() {
-				var newTask = presetTask("moveToDestination");
+				var newTask = presetTask.call(this,"moveToDestination");  // 'this' is bound to agent
 				newTask.xDestination = Math.floor(Math.random()*CANVAS_WIDTH)
 				newTask.yDestination = Math.floor(Math.random()*CANVAS_WIDTH);
 //				console.log("["+this.id+"] "+newTask.xDestination);
@@ -33,7 +33,7 @@ var PresetRule = function(template) {
 			}
 		});
 		return rule;
-	} else if (template=='Gathering Food') {
+	} else if (templateCode=='Gathering Food') {
 		var rule = new Rule({
 			title : 'Gathering Food',
 			key : 'Gathering Food',
@@ -53,7 +53,7 @@ var PresetRule = function(template) {
 				return false;
 			},
 			getNewTask : function() {
-				var newTask = presetTask("moveToDestination");
+				var newTask = presetTask("moveToDestination").bind(this);
 				var foodLocation = null;
 				for (var fid=0;fid<model.foods.length;fid++) {
 					var food = model.foods[fid];
@@ -70,7 +70,7 @@ var PresetRule = function(template) {
 			}
 		});
 		return rule;
-	}else if (template=='other') {
+	}else if (templateCode=='other') {
 		// return another rule
 	}
 } 
@@ -94,22 +94,23 @@ var presetTask = function(template) {
 		var newTask = new Task({
 			type:'move',
 			id: Number(new Date()),
-			operation: function(self) {
-				var newAgentProperties = {velocity:{}};
-				var target = {x:self.currentTask.xDestination, y:self.currentTask.yDestination};
-				var direction = self.getDirection(target);
-				var velocity = self.getVelocityFromAngleAndDistance(direction.angle,5);
-				newAgentProperties.velocity.x = (self.velocity.x*3+velocity.x)/4;
-				newAgentProperties.velocity.y = (self.velocity.y*3+velocity.y)/4;
-				return newAgentProperties;
-			},
-			isDone: function(self) {		
-				var xDist = self.currentTask.xDestination-self.getLocation().x;
-				var yDist = self.currentTask.yDestination-self.getLocation().y;
-				if (xDist<30 & yDist<30) return true;
-				else return false;
-			}
+			owner: this 	// owner contains the task
 		});	
+		newTask.operation = function() {
+			var newAgentProperties = {velocity:{}};
+			var target = {x:this.currentTask.xDestination, y:this.currentTask.yDestination};
+			var direction = this.getDirection(target);
+			var velocity = this.getVelocityFromAngleAndDistance(direction.angle,5);
+			newAgentProperties.velocity.x = (this.velocity.x*3+velocity.x)/4;
+			newAgentProperties.velocity.y = (this.velocity.y*3+velocity.y)/4;
+			return newAgentProperties;
+		};
+		newTask.isDone = function() {		
+			var xDist = this.currentTask.xDestination-this.getLocation().x;
+			var yDist = this.currentTask.yDestination-this.getLocation().y;
+			if (xDist<30 & yDist<30) return true;
+			else return false;
+		};
 		return newTask;
 	}
 	if (template =="idle") {
