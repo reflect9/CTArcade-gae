@@ -1,10 +1,10 @@
 var CANVAS_WIDTH = 530, CANVAS_HEIGHT = 500;
 var FRAME_RATE = 20;
 var gLoop, is_running;
-var model, view;
+var model, view, trainer;
 var showCurrentTasks = false;
 var showSightRange = false;
-var selection = {};		// currently selected agents,foods and other signals
+var selection = [];		// currently selected agents,foods and other signals
 
 //INIT PROCESS
 $(function() {
@@ -28,17 +28,37 @@ var View_fishtank = function(canvasID) {
 	$("#"+canvasID).click(function(e) {	// CANVAS CLICK EVENT
 		// find which element is closest
 		console.log(e.pageX + ","+ e.pageY);
+		var cursorObj = {x:e.pageX-($(this).offset()).left, y:e.pageY-($(this).offset()).top};
 		var closestObj = {dist:100};
 		for(i in model.agents) {
 			var agent = model.agents[i];
-			var dObj = (agent.getDirection({x:e.pageX-($(this).offset()).left, y:e.pageY-($(this).offset()).top});
+			var dObj = agent.getDirection(cursorObj);
+			console.log(agent.id + " : "+dObj.distance);
 			if (dObj.distance<closestObj.dist) {
-				console.log(agent.id + " is clicked");
-				closestObj.dist = agent.getDirection
 				
+				closestObj = agent;
+				closestObj.dist = dObj.distance;
 			}
 		}
+		for(i in model.foods) {
+			var food = model.foods[i];
+			var dObj = food.getDirection(cursorObj);
+			console.log(food.id + " : "+dObj.distance);
+			if (dObj.distance<closestObj.dist) {
+				
+				closestObj = food;
+				closestObj.dist = dObj.distance;
+			}
+		}
+		console.log("closest object is "+closestObj.id);
+		if (closestObj.dist>30) return true;
 		// add the element to the selection
+		var indexOfClosestObjInSelection = $.inArray(closestObj,selection);
+		if(indexOfClosestObjInSelection!=-1) {
+			selection.splice(indexOfClosestObjInSelection,1);
+		} else {
+			selection.push(closestObj);
+		}
 		
 	});
 	this.clear = function() {
@@ -49,18 +69,35 @@ var View_fishtank = function(canvasID) {
 		this.ctx.fill();
 	}
 	this.drawSelection = function() {
-		
+		// on Canvas, draw something on selected obj
+		this.ctx.fillStyle = "rgba(255,0,0,0.3)";
+		for(i in selection) {
+			var s = selection[i];
+			if(s.id.indexOf("agent")!=-1) {
+				this.ctx.beginPath();
+				this.ctx.arc(s.x+(s.size/2),s.y+(s.size/2),s.sight.range,Math.PI*2,0,true);
+				this.ctx.closePath();
+				this.ctx.fill();
+			}
+			if(s.id.indexOf("food")!=-1) {
+				this.ctx.beginPath();
+				this.ctx.arc(s.x,s.y,10,Math.PI*2,0,true);
+				this.ctx.closePath();
+				this.ctx.fill();
+			}
+		}
 	}
 	this.drawAgent = function(agent) {
 		this.ctx.fillStyle = agent.color;
-		this.ctx.fillRect(agent.x, agent.y, agent.size.width, agent.size.height);
+		this.ctx.fillRect(agent.x, agent.y, agent.size, agent.size);
 		if (showCurrentTasks) {
 			this.ctx.fillText(agent.currentTask.type,agent.x, agent.y+13);
+			this.ctx.fillText(agent.id,agent.x, agent.y+26);
 		}
 		if (showSightRange) {
 			this.ctx.fillStyle = "rgba(0,0,0,0.15)";
 			this.ctx.beginPath();
-			this.ctx.arc(agent.x+(agent.size.width/2),agent.y+(agent.size.height/2),agent.sight.range,Math.PI*2,0,true);
+			this.ctx.arc(agent.x+(agent.size/2),agent.y+(agent.size/2),agent.sight.range,Math.PI*2,0,true);
 			this.ctx.closePath();
 			this.ctx.fill();
 		}
@@ -71,6 +108,27 @@ var View_fishtank = function(canvasID) {
 		this.ctx.arc(food.x, food.y, food.size, food.size, Math.PI*2, true); 
 		this.ctx.closePath();
 		this.ctx.fill();
+	}
+	this.updateSensorPanel = function() {
+		var target = $("#sensorPanel");
+		for(i in selection) {
+			var s = selection[i];
+			var infoDIV;
+			if ($("#info-"+s.id)) {
+				infoDIV = $("#info-"+s.id);
+				$(infoDIV).text(s.id);
+			} else {
+				infoDIV = $("<div/>",{
+					id : 'info'+s.id,
+					class:'info',
+				}).css({
+					'float':'left',
+					'border':'1px solid #eee',
+					'width':'70px'
+				}).appendTo(target);
+				$(infoDIV).text(s.id);
+			} 
+		}
 	}
 }
 
@@ -89,6 +147,7 @@ var restart = function() {
 	}
 	for ( var i = 0; i < 20; i++) {
 		model.foods.push(new Food({
+			id : 'food'+i,
 			size : 5,
 			x : Math.floor(Math.random() * CANVAS_WIDTH),
 			y : Math.floor(Math.random() * CANVAS_HEIGHT)
@@ -114,8 +173,10 @@ var gameLoop = function() {
 	console.log("gameLoop");
 	update();
 	view.clear();
+	view.drawSelection();
 	$.each(model.agents, function(i,agent) { view.drawAgent(agent); });
 	$.each(model.foods, function(i,food) { view.drawFood(food); });
+//	view.updateSensorPanel();
 	gLoop = setTimeout(gameLoop, 1000 / 10);
 }
 var update = function() {
@@ -123,6 +184,34 @@ var update = function() {
 	model.agents.forEach(function(agent) { agent.update(); });
 	model.foods.forEach(function(food) { food.update(); });
 }
+
+
+function createNewRule() {
+    $('#btn_playstop').find("i").removeClass('icon-play').addClass('icon-stop');
+    control("stop");
+	$('#creationDIV').remove();
+	var fullPanelHandle = $(".fullPanel");
+	var creationDIV = $("<div></div>",{
+        id:'creationDIV'
+	}).appendTo(fullPanelHandle);
+	var graymat = $("<div></div>",{
+		style: '	position:absolute;\
+					z-index: 1;\
+					width: '+ fullPanelHandle.width()+20 +'px;\
+					height: '+ fullPanelHandle.height()+20 +'px;\
+					left: '+fullPanelHandle.offset()['left']+'px;\
+					top: '+fullPanelHandle.offset()['top']+'px;'
+	}).attr("class","grayMat").appendTo("html");
+	graymat.click(function() {
+		$(".grayMat").fadeOut().remove();
+		$("#creationDIV").fadeOut().remove();
+	});
+	creation = new Creation();
+	creation.init("#creationDIV",selection);
+//	creation.setScope(model);
+}
+
+
 //
 //var updateBins = function(collection) {
 //	collection.forEach(function(e) {

@@ -71,10 +71,7 @@ function Creation() {
 		var boardDIV = $("<div></div>",{
 			id: 'cr_board',
 			class: 'board',
-			style : '	float:left;\
-						margin:10px;\
-						background: url(css/image/tictactoe_board.png) no-repeat;\
-					',
+			
 		}).appendTo(boardDIVcontainer);
 		var descDIV = $("<div></div>",{
 			style : '	float:left;\

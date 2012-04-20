@@ -1,10 +1,10 @@
 // Agent, Rule and Task
 
-var Agent = function(I) {
+function Agent(I) {
 	copyVariables(I,this);	// copy all the variables defined in I : input argument
 	// predefined properties
 	this.velocity = {x:0, y:0};
-	this.size = {width:5, height:5};
+	this.size = 5;
 	this.angle = 0;	// angle 0~2 pi
 	this.sight = {range:20, angle:20};
 	this.color = "#000000";
@@ -17,6 +17,27 @@ var Agent = function(I) {
 	this.message = "";		// message is pheromone.  
 	this.currentTask = presetTask("idle");
 }
+
+//// defines object properties that can be used as precondition/logic features 
+//Agent.prototype.features = {'velocity':{'x':'@','y':'@'},
+//				'x':'@','y':'@',
+//				'size':{'width':'@','height':'@'},
+//				'sight':{'range':'@','angle':'@'},
+//				'health':'@',
+//				'stamina':'@',
+//				'message':'@'
+//				};
+//
+//Agent.prototype.getFeatures = function() {
+//	return {
+//		'position':{'x':this.x,'y':this.y},
+//		'velocity':this.velocity,
+//		'size':this.size.width,
+//		'health':this.health
+//	}
+//}
+
+Agent.prototype.class = ['object'];
 
 // external status
 Agent.prototype.sense = function(s) {

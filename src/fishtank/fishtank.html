@@ -24,6 +24,12 @@
                                control("toggle");
                             });
                         </script>
+                        <button id='btn_creation' class='btn btn-info'>Create New Rule</button>
+                        <script type="text/javascript">
+                            $("#btn_creation").click(function(){
+                               createNewRule();
+                            });
+                        </script>
                         <div>Show Current Tasks&nbsp;<input id="check_showCurrentTask" type='checkbox'></input></div> 
                         <div>Show Sight Range&nbsp;<input id="check_showSightRange" type='checkbox'></input></div> 
                         <script type="text/javascript">
@@ -36,9 +42,7 @@
                         </script>
                     </div>
                     <div id='sensorPanel' class='' style='border:2px solid #eee;'>  
-                        <div>
-                            dfdf
-                        </div>                    
+                    
                     </div> 
                     
                     <div id='rulePanel' style='margin-bottom:20px;'>

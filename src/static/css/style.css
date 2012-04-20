@@ -9,10 +9,6 @@ body {
 	padding-top: 40px !important;
 	font: 13px/1.5 Helvetica Neue,Arial,Helvetica,'Liberation Sans',FreeSans,sans-serif
 }
-h3 {
-    font-size: 25px;
-    margin: 10px 0 5px;
-}
 p {
     font-size: 13px;
     line-height: 18px;
@@ -339,6 +335,7 @@ input, textarea {
 }
 
 .fullPanel {
+	position:relative;
     background: none repeat scroll 0 0 #fff;
     border-radius: 10px 10px 10px 10px;
     padding: 20px;
@@ -623,7 +620,11 @@ div#title_bar {
     border-radius:20px;
 }
 
-
+#cr_board {
+	float:left;
+    margin:10px;
+    background: url(../image/tictactoe_board.png) no-repeat;
+}
 .panel_floating {
 	background-color:white;
 	border:1px solid #ddd;
@@ -817,3 +818,67 @@ div#title_bar {
 #rankTable {
 	font-size:1.2em;
 }
+
+#creationDIV {
+	position:absolute;
+	margin:auto;
+	padding:20px;
+	top:30px;  left:30px;
+	width:850px;
+	height:600px;
+	border-radius: 20px;
+	background:white;
+	z-index:5;
+	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
+}
+#creationDIV .head {
+	width:890px;
+	margin: -20px -20px 10px -20px; 
+	background: none #57A957; 
+	border-radius:20px 20px 0px 0px;     
+}
+#creationDIV .head h2 {
+	padding:10px 0px 10px 20px;
+    color:white;
+}
+#stageWrapper{
+
+}
+#featureWrapper {
+    
+}
+#conditions div.condition{
+	width:100%;
+	min-height:20px; 
+	margin-bottom:5px;
+	border-radius:5px;
+	background:none white;
+	border:1px solid #ddd;
+}
+
+#ul_tasks{
+	padding-left:10px;
+}
+.objButton {
+	float:left;
+	font-weight:bold;
+	margin-top:2px;
+}
+.propertyButton {
+    float:left;
+}
+.propertyArea {
+	margin:2px 5px 10px 15px;
+}
+
+.exampleDIV {
+	float:left;
+	margin:5px;
+}
+.exampleStage {
+	position:relative;
+	width:110px; height:110px;
+	border:1px solid #eee;
+	overflow:hidden;
+}
+
