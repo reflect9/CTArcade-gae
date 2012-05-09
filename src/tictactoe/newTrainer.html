@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+
+<html>
+<head>
+	<title>Trainer - CTArcade</title>
+	<!-- includes -->
+	{% include "includes.html" %}
+	<!-- end of includes -->
+	<script type="text/javascript" src="static/js/tictactoe/newTicTacToeTrainer.js"> </script>
+	<script type="text/javascript" src="static/js/tictactoe/Creation.js"> </script>
+	<script type="text/javascript">
+		var p1='{{user_id}}';	var p2='easy';
+	</script>
+	<script type="text/javascript" src="static/js/tictactoe/newTrainer.js"> </script>
+    <script type="text/javascript">
+	    $(function() {
+	        $('body').prepend("<div id='header_wrapper'></div>");
+	        $('#header_wrapper').load('static/html/header.html', function(){
+	            // highlight current mode button
+	            $(".header #header_button_trainer").addClass("currentMode");
+	        });
+	        $('body').append("<div class='footer_wrapper clearfix'></div>");
+	        $('.footer_wrapper').load('static/html/footer.html');
+	    });   
+	</script>   
+</head>
+<body>	
+<!-- container : main stuff -->
+<div class='container'>
+	<div class='pageContent' style='background-color:rgba(0,0,0,0);'>
+		<div class="wrapper clearfix">
+			<div class="ruleListPanel">
+				<div id='desc' style=''>
+					<div id='welcome'></div>
+					<div id='userInfo'></div>
+				</div>
+				<div id='memberListDIV' style='position:absolute; right:10px; top:10px; width:100px;'></div>
+			</div>
+			<div class="trainerPanel clearfix" style='width:740px; padding:15px;'>
+				<div class='row-fluid'>
+					<div id="container_board" class='span6'>	
+						<div id="board" style="position:relative; margin:10px;">
+							<div id="t00" class="tile"></div>
+							<div id="t10" class="tile"></div>
+							<div id="t20" class="tile"> </div>
+							<div id="t01" class="tile"> </div>
+							<div id="t11" class="tile"> </div>
+							<div id="t21" class="tile"> </div>
+							<div id="t02" class="tile"> </div>
+							<div id="t12" class="tile"> </div>
+							<div id="t22" class="tile"> </div>		
+						</div>
+						<div id="pane_control">
+							<div>
+								<div id="historyControl" style="float:left;">
+									<div id="prev" class='btn icon_undo' onclick="history('prev');">
+									</div> 
+									<div id="next" class='btn icon_redo' onclick="history('next');">
+									</div>
+									
+								</div>
+								<div id="gameStatusMessage" style="float:left; margin-left:10px; color:#08C; font-size:0.9em; font-weight:bold;"></div>
+								<div style="float:right; margin-right:20px;"><input type="button" class='btn blue' value="New Game" onclick="clearBoard();"></div>
+								
+								<div style="clear:both;"></div>
+							</div>
+						</div>
+					</div> 
+					<div id="console" class='console_panel span6'>
+						<div id='turn_info' style="text-align:left; width:100%; margin:5px 10px 5px 10px"></div>
+						<div class='message'></div>
+						<div id='desc' style='margin-bottom:10px;'>
+							<div id='welcome'></div>
+						</div>
+					</div>	<!-- console -->
+				</div>
+		        				
+			</div>	<!-- trainerPanel end -->
+		</div> <!--wrapper clearfix-->
+	</div>	<!--pageContent-->
+</div>		<!-- end of container-->
+
+<!-- reset modal-->
+<div id="resetModal" class="modal hide" style="display: none; ">
+	<div class="modal-header">
+	  <a class="close" data-dismiss="modal">x</a>
+	  <h3>Do you really want to reset all the rules?</h3>
+	</div>
+	<div class="modal-body">
+	  <p> It will delete all the rules except <code>Take Random</code>. <br>Rules once deleted cannot be restored. 
+	</div>
+	<div class="modal-footer">
+	  <a onclick="javascript:game.deleteAllRules();" class="btn btn-danger" data-dismiss="modal">Delete</a>
+	  <a href="#" class="btn" data-dismiss="modal">Keep Them</a>
+	</div>
+</div>
+<!-- end of reset modal-->
+
+</body>
+
+</html>

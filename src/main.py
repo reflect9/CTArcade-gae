@@ -228,6 +228,27 @@ class Trainer(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'tictactoe/trainer.html')
         self.response.out.write(template.render(path, template_values))
 
+class NewTrainer(webapp.RequestHandler):
+    def get(self):
+        try:
+            session = sessions.Session()
+            current_user_id = session["loggedInAs"]
+        except:
+            current_user_id='Guest'
+            botKind = None
+            botName = None
+        if current_user_id!='Guest':
+            user = db.GqlQuery("SELECT * FROM User WHERE id=:1",current_user_id).get()
+            botKind = user.botKind
+            botName = user.botName
+        template_values = {
+            'user_id': current_user_id,
+            'botKind':botKind,
+            'botName': botName
+        }  
+        path = os.path.join(os.path.dirname(__file__), 'tictactoe/newTrainer.html')
+        self.response.out.write(template.render(path, template_values))
+
 class AjaxCall(webapp.RequestHandler):
     def get(self):
         action = self.request.get('action')
@@ -459,6 +480,7 @@ def main():
                                           ('/updateRule', UpdateRule),
                                           ('/match',Match),
                                           ('/trainer',Trainer),
+                                          ('/newTrainer',NewTrainer),
                                           ('/ajaxCall',AjaxCall),
                                           ('/ajaxTrainer',AjaxTrainer),
                                           ('/worker', CounterWorker), 
