@@ -1,5 +1,6 @@
 var game=null; 	// trainer object created from TicTacToeTrainer.js
 var needReset = false;   
+var alwaysContinue = false; 	// whether gamebot waits user's CONTINUE after user's move
 var playbackMode = false; // True when user's viewing previous moves, 
 var TYPE = {
 		0 : {code:'EMPTY',value: 0, css: "create_empty", ignorecss: "consider", description:
@@ -52,7 +53,7 @@ function showMatchingStrategy(response) {
 	matchingRules = JSON.parse(response);
 	$("#console").empty();
 //	alert("aha");
-	var userMove = $("<div class='well clearfix' style='padding:12px; margin-bottom:5px;'></div>").appendTo($("#console"));
+	var userMove = $("<div id='userMoveDIV' class='well clearfix' style='padding:12px; margin-bottom:5px;'></div>").appendTo($("#console"));
 	$(userMove).append("<div><b>"+p1+"</b>'s last move matches with the rules below</div>");
 	$(matchingRules).each( function(i,rule) {
 		var r = $('<div></div>',{
@@ -88,12 +89,12 @@ function computerMove(response) {
 		clearBoard();
 		return;
 	}
-	$("#console .well").css({
-		'background':'none',
-		'border':'1px solid white',
-		'box-shadow':'none'
-	});
-	var botMove = $("<div class='well clearfix' style='padding:12px; margin-bottom:5px;'></div>").appendTo($("#console"));
+//	$("#console #userMoveDIV").css({
+//		'background':'none',
+//		'border':'1px solid white',
+//		'box-shadow':'none'
+//	});
+	var botMove = $("<div id='botMoveDIV' class='clearfix' style='padding:12px; margin-bottom:5px;'></div>").appendTo($("#console"));
 	$("#sortable").each( function() {
 		$(this).attr('id','');	// when there's an existing list of rules already, delete their id to prevent conflicts with new list.
 	});
@@ -519,25 +520,45 @@ function userMove(x,y) {
 	game.currentStep = game.history.length-1;
 	updateBoard(game.board);	// update game.board on #txy.text
 	var isThereWinner = checkWinner();	// check winning condition. if yes, show the winner, otherwise show next one to play
-	
 	if (isThereWinner!=false) {
 		return;
 	} else if(game.isFull()==true) {
 		$("#console").append("<div class='alert alert-info'>Tie Game</div>");
 	} else {
-		// PROGRESS BAR : AI THinking
-		var progressBar = $("<div class='progress progress-info progress-striped active' style='height:5px; margin-bottom:10px;'></div>").appendTo($('#console'));
-		var progress = $("<div class='bar' style='width:1%;'></div>").appendTo(progressBar);
-		var progressLabel = $("<div style='color:#49AFCD;font-size:11px;margin-top:-10px;'>"+botName+" is thinking...</h4>").appendTo($('#console'));
-		$(progress).animate({ 
-			width:'100%'
-		}, 1500, function() {   // when progress bar reach the end,
-			progressBar.hide('slow').remove();
-			progressLabel.hide('slow').remove();
-			$("#continueButton").remove();
-			game.findBestStrategy(game.board,game.turn,computerMove);
+		// show CONTINUE button with checkbox
+		var continueButton = $("<div id='continueDIV' style='margin-bottom:5px;'><button id='continueButton' class='btn btn-small btn-success'>CONTINUE</button></div>").appendTo($("#console"));
+		$("#continueDIV").append("<input type='checkbox' id='alwaysContinue' style='margin-left:5px; margin-right:5px; color:#888'></input><span id='labelAlwaysContinue'>always continue</span>");
+		$("#alwaysContinue").attr('checked',alwaysContinue);
+		$("#alwaysContinue").click(function() {
+			alwaysContinue=$("#alwaysContinue").is(':checked');
+			if (alwaysContinue==true) gamebotThinkingStart();
 		});
+		if (alwaysContinue==true) {
+			$("#continueButton").addClass('disabled').removeClass('btn-primary');
+			gamebotThinkingStart();
+		}
+		$('#continueButton').click(function() {
+			$("#alwaysContinue").remove();	$("#labelAlwaysContinue").remove();	
+			gamebotThinkingStart();
+		});
+		
 	} 
+}
+
+function gamebotThinkingStart() {
+	// PROGRESS BAR : AI THinking
+	var progressBar = $("<div class='progress progress-info progress-striped active' style='height:5px; margin-bottom:10px;'></div>").appendTo($('#console'));
+	var progress = $("<div class='bar' style='width:1%;'></div>").appendTo(progressBar);
+	var progressLabel = $("<div style='color:#49AFCD;font-size:11px;margin-top:-10px;'>"+botName+" is thinking...</h4>").appendTo($('#console'));
+	$(progress).animate({ 
+		width:'100%'
+	}, 1500, function() {   // when progress bar reach the end,
+		progressBar.hide('slow').remove();
+		progressLabel.hide('slow').remove();
+		$("#continueButton").addClass('disabled').unbind('click');
+		game.findBestStrategy(game.board,game.turn,computerMove);	// run computerMove as callback function
+	});
+	
 }
 
 
