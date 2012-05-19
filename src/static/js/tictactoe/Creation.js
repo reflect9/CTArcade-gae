@@ -108,20 +108,20 @@ function Creation() {
 					board[i][j] = TYPE.IGNORE;
 			}
 		}
-		for (var i=0; i<board.length; i++){
-			for (var j=0; j<board[i].length; j++){
+		for (var row=0; row<board.length; row++){	
+			for (var col=0; col<board[row].length; col++){	
 				var tileDIV = $("<div></div>").
-				attr("id","tilecopy"+i+j).
-				attr("class", "tile " + board[j][i].ignorecss + " " + board[j][i].css).
+				attr("id","tilecopy"+col+row).
+				attr("class", "tile " + board[col][row].ignorecss + " " + board[col][row].css).
 				appendTo(boardDIV);
 				tileDIV.mousedown(
-					function(index1,index2){
+					function(colIndex,rowIndex){
 						return function(){
-							creation.changeType(index1,index2);
-							$(this).attr("class", "tile " + board[index1][index2].ignorecss + " " + board[index1][index2].css);
+							creation.changeType(colIndex,rowIndex);
+							$(this).attr("class", "tile " + board[colIndex][rowIndex].ignorecss + " " + board[colIndex][rowIndex].css);
 							creation.updateVariation();
 						}
-					}(i,j)
+					}(col,row)
 				);
 			}
 		}	
@@ -184,13 +184,12 @@ function Creation() {
 		var miniBoard = $("<div class='tinyboard' style='float:left;'></div>"); 
 		var cellSize = 10;
 		var boardDiv = $("<div style='position:absolute; margin:2px 0 0 2px;'></div>");
-		for (ir in board) {
-			var r= board[ir];
+		for (var ir=0; ir<3; ir++){
 			var row = $("<div></div>");
-			for (ic in r) {
-				var tileType = r[ic].value;
-				var col = $("<div class='review_cell "+ir+"_"+ic+"'></div>");
-				col.addClass(r[ic].css+"_tiny").addClass(r[ic].ignorecss);				
+			for (var ic=0; ic<3; ic++){
+				var tileType = board[ic][ir].value;
+				var col = $("<div class='review_cell "+ic+"_"+ir+"'></div>");
+				col.addClass(board[ic][ir].css+"_tiny").addClass(board[ic][ir].ignorecss);				
 				col.css({'width':cellSize,'height':cellSize,'border':'1px solid #eee'});
 				$(row).append(col);
 			}

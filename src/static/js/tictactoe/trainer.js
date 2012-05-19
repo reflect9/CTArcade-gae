@@ -541,7 +541,6 @@ function userMove(x,y) {
 			$("#alwaysContinue").remove();	$("#labelAlwaysContinue").remove();	
 			gamebotThinkingStart();
 		});
-		
 	} 
 }
 
