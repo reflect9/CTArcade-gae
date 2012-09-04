@@ -403,8 +403,8 @@ div#container_game {
 	float:left;
 }
 div#board, div.board {
-	width: 330px;
-	height:330px;
+	width: 340px;
+	height:340px;
 	background: url(../image/tictactoe_board_clear.png) no-repeat;
 }
 li { 
@@ -512,9 +512,9 @@ li {
  	/* border: 2px solid #e1e1e1;  */
 	cursor: pointer;
 	float:left;
-	width: 31%;
-	height: 31%;
-	margin: 4px;
+	width: 106px;
+	height: 106px;
+	margin: 2px;
 	line-height:120px;
 	font-size:64px;
 	text-align: center;

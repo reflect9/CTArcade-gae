@@ -21,15 +21,15 @@ function updateBoard(board) {  // update current board presentation
 		for(var y=0;y<game.height;y++) {
 			$("#t"+x+""+y).removeClass('tile_p1');
 			$("#t"+x+""+y).removeClass('tile_p2');
-			$("#t"+x+""+y).css('opacity',0.5);
+			//$("#t"+x+""+y).css('opacity',0.5);
 			if(board[x][y]==game.p1)
 				$("#t"+x+""+y).addClass('tile_p1');
 			else if(board[x][y]==game.p2)
 				$("#t"+x+""+y).addClass('tile_p2');
 			
-			if(x==game.lastestMove[0] & y==game.lastestMove[1]) {
-				$("#t"+x+""+y).css('opacity',1.0);
-			}
+//			if(x==game.lastestMove[0] & y==game.lastestMove[1]) {
+//				$("#t"+x+""+y).css('opacity',1.0);
+//			}
 		}
 	}
 }
@@ -231,7 +231,7 @@ function historyMode(flag) {
 			callUserMove($(this).attr('id'));
 		});
 		$('#gameStatusMessage').text("");
-		$('.tile').css('background-color','#fff');
+//		$('.tile').css('background-color','#fff');
 //		$('#status').text(currentTurn + " 's turn")
 //						.css('background-color','#fff');
 		$("#console").append("It's your turn. Click an empty cell to take.");			
