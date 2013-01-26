@@ -18,6 +18,7 @@ Updates:
       var currentUser = "{{userID}}";
        $(document).ready(function() {
           $("input#userID").focus();
+          $('#gamebot_conflict').hide();
        });   
     </script>
     <script type="text/javascript">
@@ -139,7 +140,7 @@ Updates:
 	                            <label class="control-label" for="input06">Name your bot</label>
 	                            <div class="controls">
 	                                <input type="text" class="input-large" id="botName" name="registerBotName" value="gamebot">
-	                                <p class="help-block">Change your bot's name as you like.</p>
+	                                <p style="margin-top:5px; height:20px;"><span class="label label-important" id="gamebot_conflict">Choose a name different from your name</span></p>
 	                            </div>
 	                        </div>             
 	                        <script type='text/javascript'>
@@ -147,6 +148,14 @@ Updates:
 	                                    //alert("fdf");
 	                            //        $("#botName").val($("#registerID").val().trim()+" bot");
 	                            //}));
+	                            $(  $("#botName").keyup(function() {
+	                                    //alert("not matching");
+	                                    if($("#registerID").val()==$("#botName").val()) {
+	                                        $('#gamebot_conflict').show();
+	                                    } else {
+	                                        $('#gamebot_conflict').hide();
+	                                    }
+	                            }));
 	                            $(  $("#registerPasswordConfirm").keyup(function() {
 	                                    //alert("not matching");
 	                                    if($("#registerPassword").val()!=$("#registerPasswordConfirm").val()) {
@@ -223,6 +232,7 @@ Updates:
             var botKind = $('input[name=registerBot]:checked').val();
             var botName = $("input#botName").val();
             if (id=="" || password=="" || email=="" || botKind=="" || botName=="") { alert("all the fields should be filled in."); return; }
+            if ($("#password_match").is(":visible") || $("#gamebot_conflict").is(":visible")) { alert("check the password or the gamebot name."); return; }
             var param = 'id=' + id + "&password=" + password + "&email=" + email+ "&botKind="+botKind+"&botName="+botName;
             //var param = $('form#registerForm').serialize();
             //alert(param);

@@ -160,7 +160,7 @@ def runMatch(p1,p2,startTurn,p1_AI,p2_AI):
     board = [[0 for i in range(3)] for j in range(3)]
     def makeMove(board,x,y,turn):
         if board[x][y] != 0:
-            print >>sys.stderr,"cannot move on occipied cell ["+str(x)+","+str(y)+"]"
+            #print >>sys.stderr,"cannot move on occipied cell ["+str(x)+","+str(y)+"]"
             return
         board[x][y]=turn
         return board
@@ -173,6 +173,7 @@ def runMatch(p1,p2,startTurn,p1_AI,p2_AI):
             result = "Tie Game"
             return {'history':history, 'winner': result}       
         else: # now it will select one from all the moves of the best strategy
+            #print >>sys.stderr, nextMove
             selectedLoc = choice(nextMove['locList'])  # randomly select one location from list
             board = makeMove(board,selectedLoc[0], selectedLoc[1],turn); # update board
             history.append({'board':copy.deepcopy(board),'loc':selectedLoc,'turn':turn,'message':nextMove['message']})
@@ -262,6 +263,8 @@ def checkCol(board,x):
         return board[x][0]
     else: return False
 def checkRow(board,y):
+    #print >> sys.stderr, y
+    #print >> sys.stderr, board
     if board[0][y]==board[1][y] and board[1][y]==board[2][y] and board[0][y]!=0:
         return board[0][y]
     else: return False
@@ -378,7 +381,7 @@ def takeOppositeCorner(board,player):
         c2 = corners[1]
         if board[c1[0]][c1[1]]!=0 and board[c2[0]][c2[1]]==0:
             return {'success':True, 'loc':[c2]}
-        if board[c2[0]][c1[1]]!=0 and board[c1[0]][c2[1]]==0:
+        if board[c2[0]][c2[1]]!=0 and board[c1[0]][c1[1]]==0:
             return {'success':True, 'loc':[c1]}      
     return {'success':False}
 def evaluateCreatedStrategy(ruleBoardList, board, player):
