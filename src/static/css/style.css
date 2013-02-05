@@ -208,7 +208,7 @@ input, textarea {
 	overflow:hidden;
 	text-decoration:none;
 }
-.header a:hover {
+.header a.link:hover {
     color: #fff;
     border-radius: 5px;
     background: none repeat scroll 0 0 rgba(255,255,255,0.3);
