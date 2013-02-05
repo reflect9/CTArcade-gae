@@ -226,7 +226,7 @@ Updates:
            });
         }
         function submitRegisterForm() {
-            var id = $("input#registerID").val();
+        	var id = $("input#registerID").val();
             var password = $("input#registerPassword").val();
             var email = $("input#registerEmail").val();
             var botKind = $('input[name=registerBot]:checked').val();
@@ -236,12 +236,18 @@ Updates:
             var param = 'id=' + id + "&password=" + password + "&email=" + email+ "&botKind="+botKind+"&botName="+botName;
             //var param = $('form#registerForm').serialize();
             //alert(param);
+            $("input#register_submit").attr('disabled');
+        	$("input#register_submit").unbind('click');
             $.get("signUp",param,function(response) {
                 if(response=='yes')     {
                    if(redirect='/') {
                        var t = setTimeout("window.location.href = '/trainer';",1000);
                    } else var t = setTimeout("window.location.href = '/"+redirect+"';",1000);
-                } else $("#register_result").html("<p class='help-block'>Sorry! We could not create it. Check your form and try again</p>");
+                } else { 
+                	$("#register_result").html("<p class='help-block'>Sorry! We could not create it. Check your form and try again</p>");
+                	$("input#register_submit").click(submitRegisterForm);
+                	$("input#register_submit").removeAttr('disabled');
+                }
             });
         } 
         $("input#login_submit").click(submitLoginForm); 
